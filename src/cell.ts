@@ -15,6 +15,9 @@
 /// <reference path="lib/jquery.d.ts"/>
 namespace EasySheet {
     export class CCell{
+        protected readonly CELL_NORMAL:number = 1;
+        protected readonly CELL_TOP:number = 2;
+        protected readonly CELL_LEFT:number = 3;
         protected x:number; //初始X坐标
         protected y:number; //初始Y坐标
         protected w:number; //宽度
@@ -25,9 +28,11 @@ namespace EasySheet {
         protected font_bold:boolean; //是否粗体
         protected font_family:string; //字体
         protected content:any;
-        protected row:number; //x轴序号
-        protected col:string; //y轴序号
+        protected row:number;  //x轴序号
+        protected col:string;  //y轴序号
+        protected type:number; //单元格类型
         constructor(x:number=0,y:number=0,width:number=24,height:number=10){
+            this.type = this.CELL_NORMAL;
             this.x = x;
             this.y = y;
             this.w = width;

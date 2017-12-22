@@ -14,7 +14,7 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 namespace EasySheet {
-    export class CApplication{
+    export class CSheet{
         protected appId:string;
         constructor(appId){
             this.appId = appId;
@@ -22,11 +22,17 @@ namespace EasySheet {
             let width:number  = $app.width();
             let height:number = $app.height();
         }
-        run(){
-            console.log("runApp");
+        draw(){
+
+        }
+        drawTopBar(){
+
+        }
+        drawLeftBar(){
+
         }
     }
 }
 
-let theApp:EasySheet.CApplication = new EasySheet.CApplication('#easy-sheet');
-theApp.run();
+let currentSheet:EasySheet.CSheet = new EasySheet.CSheet('#easy-sheet');
+currentSheet.draw();
