@@ -12,6 +12,10 @@
  * @Date      2017/12/23
  * @Time      23:31
  */
+interface IPoint{
+    x:number;
+    y:number;
+}
  class CPoint{
      public x:number;
      public y:number;
