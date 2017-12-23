@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 var EasySheet;
 (function (EasySheet) {
     var CCell = (function () {
-        function CCell(x, y, width, height) {
+        function CCell(iRow, iCol, x, y, width, height) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
             if (width === void 0) { width = 24; }
@@ -19,6 +19,8 @@ var EasySheet;
             this.CELL_NORMAL = 1;
             this.CELL_TOP = 2;
             this.CELL_LEFT = 3;
+            this.iRow = iRow;
+            this.iCol = iCol;
             this.type = this.CELL_NORMAL;
             this.x = x;
             this.y = y;
@@ -31,8 +33,14 @@ var EasySheet;
             this.font_size = 12;
             this.font_bold = false;
             this.font_family = 'Arial';
-            this.content = '';
+            this.text = '';
+            this.pTable = '';
+            this.padding = DEFAULT_CELL_PADDING;
         }
+        CCell.prototype.setPos = function (iRow, iCol) {
+            this.iRow = iRow;
+            this.iCol = iCol;
+        };
         CCell.prototype.getRow = function () {
             return this.row;
         };
@@ -46,10 +54,10 @@ var EasySheet;
             this.col = col;
         };
         CCell.prototype.getContent = function () {
-            return this.content;
+            return this.text;
         };
         CCell.prototype.setContent = function (text) {
-            this.content = text;
+            this.text = text;
         };
         CCell.prototype.getX = function () {
             return this.x;
@@ -102,6 +110,46 @@ var EasySheet;
         return CCell;
     }());
     EasySheet.CCell = CCell;
+})(EasySheet || (EasySheet = {}));
+var DEFAULT_ROWS = 1000;
+var DEFAULT_COLS = 52;
+var DEFAULT_BACK_COLOR = "#FFF";
+var DEFAULT_FORE_COLOR = "#000";
+var DEFAULT_SELECT_CELL_COLOR = "#FF0000";
+var DEFAULT_CELL_WIDTH = 32;
+var DEFAULT_CELL_HEIGHT = 20;
+var MODE_NORMAL = 0;
+var MODE_IN_EDIT = 1;
+var MODE_IN_DRAG = 2;
+var MODE_IN_SELECT = 3;
+var INSERT_TEXT = 0;
+var INSERT_IMAGE = 1;
+var DEFAULT_CELL_PADDING = 2;
+var EasySheet;
+(function (EasySheet) {
+    var CEdit = (function () {
+        function CEdit() {
+        }
+        return CEdit;
+    }());
+    EasySheet.CEdit = CEdit;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
+    var CFixedCell = (function (_super) {
+        __extends(CFixedCell, _super);
+        function CFixedCell(x, y, width, height) {
+            if (x === void 0) { x = 0; }
+            if (y === void 0) { y = 0; }
+            if (width === void 0) { width = 24; }
+            if (height === void 0) { height = 10; }
+            var _this = _super.call(this, x, y, width, height) || this;
+            _this.type = _this.CELL_LEFT;
+            return _this;
+        }
+        return CFixedCell;
+    }(EasySheet.CCell));
+    EasySheet.CFixedCell = CFixedCell;
 })(EasySheet || (EasySheet = {}));
 var EasySheet;
 (function (EasySheet) {
@@ -188,23 +236,22 @@ var EasySheet;
         Key[Key["F12"] = 123] = "F12";
     })(Key = EasySheet.Key || (EasySheet.Key = {}));
 })(EasySheet || (EasySheet = {}));
-var EasySheet;
-(function (EasySheet) {
-    var CLeftCell = (function (_super) {
-        __extends(CLeftCell, _super);
-        function CLeftCell(x, y, width, height) {
-            if (x === void 0) { x = 0; }
-            if (y === void 0) { y = 0; }
-            if (width === void 0) { width = 24; }
-            if (height === void 0) { height = 10; }
-            var _this = _super.call(this, x, y, width, height) || this;
-            _this.type = _this.CELL_LEFT;
-            return _this;
-        }
-        return CLeftCell;
-    }(EasySheet.CCell));
-    EasySheet.CLeftCell = CLeftCell;
-})(EasySheet || (EasySheet = {}));
+var CPoint = (function () {
+    function CPoint(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return CPoint;
+}());
+var CRect = (function () {
+    function CRect(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+    return CRect;
+}());
 var EasySheet;
 (function (EasySheet) {
     var CSheet = (function () {
@@ -230,30 +277,14 @@ var EasySheet;
 (function (EasySheet) {
     var CTable = (function () {
         function CTable(nRow, nCol) {
-            this.DEFAULT_ROWS = 1000;
-            this.DEFAULT_COLS = 52;
             this.nRow = nRow;
             this.nCol = nCol;
+            this.fixCol = [];
+            this.fixRow = [];
+            this.rows = [];
         }
         return CTable;
     }());
     EasySheet.CTable = CTable;
-})(EasySheet || (EasySheet = {}));
-var EasySheet;
-(function (EasySheet) {
-    var CTopCell = (function (_super) {
-        __extends(CTopCell, _super);
-        function CTopCell(x, y, width, height) {
-            if (x === void 0) { x = 0; }
-            if (y === void 0) { y = 0; }
-            if (width === void 0) { width = 24; }
-            if (height === void 0) { height = 10; }
-            var _this = _super.call(this, x, y, width, height) || this;
-            _this.type = _this.CELL_TOP;
-            return _this;
-        }
-        return CTopCell;
-    }(EasySheet.CCell));
-    EasySheet.CTopCell = CTopCell;
 })(EasySheet || (EasySheet = {}));
 //# sourceMappingURL=easy-sheet.js.map
