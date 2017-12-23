@@ -18,6 +18,10 @@ namespace EasySheet {
         protected readonly CELL_NORMAL:number = 1;
         protected readonly CELL_TOP:number = 2;
         protected readonly CELL_LEFT:number = 3;
+        protected readonly pTable:any; //指向表格
+        protected iRow:number;  //第几行
+        protected iCol:number;  //第几列
+        protected state:number; //当前状态
         protected x:number; //初始X坐标
         protected y:number; //初始Y坐标
         protected w:number; //宽度
@@ -27,11 +31,14 @@ namespace EasySheet {
         protected font_size:number; //字体大小
         protected font_bold:boolean; //是否粗体
         protected font_family:string; //字体
-        protected content:any;
+        protected text:any;
         protected row:number;  //x轴序号
         protected col:string;  //y轴序号
         protected type:number; //单元格类型
-        constructor(x:number=0,y:number=0,width:number=24,height:number=10){
+        protected padding:number;//内间距
+        constructor(iRow:number,iCol:number,x:number=0,y:number=0,width:number=24,height:number=10){
+            this.iRow=iRow;
+            this.iCol=iCol;
             this.type = this.CELL_NORMAL;
             this.x = x;
             this.y = y;
@@ -44,7 +51,13 @@ namespace EasySheet {
             this.font_size = 12;
             this.font_bold = false;
             this.font_family = 'Arial';
-            this.content = '';
+            this.text = '';
+            this.pTable='';
+            this.padding=DEFAULT_CELL_PADDING;
+        }
+        setPos(iRow:number,iCol:number):void{
+            this.iRow=iRow;
+            this.iCol=iCol;
         }
         getRow():number{
             return this.row;
@@ -59,10 +72,10 @@ namespace EasySheet {
             this.col =col;
         }
         getContent():any{
-            return this.content;
+            return this.text;
         }
         setContent(text:any):void{
-            this.content = text;
+            this.text = text;
         }
         getX():number{
             return this.x;

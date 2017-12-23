@@ -17,12 +17,16 @@ namespace EasySheet {
     export class CTable{
         protected nRow:number;
         protected nCol:number;
-        protected dRows:any[];
-        protected readonly DEFAULT_ROWS:number = 1000;
-        protected readonly DEFAULT_COLS:number = 52;
+        protected fixRow:any[];//顶部行
+        protected fixCol:any[];//左侧列
+        protected rows:any[];//数据区
+
         constructor(nRow:number,nCol:number){
-            this.nRow = nRow;
-            this.nCol = nCol;
+            this.nRow=nRow;
+            this.nCol=nCol;
+            this.fixCol=[];
+            this.fixRow=[];
+            this.rows=[];
         }
     }
 }

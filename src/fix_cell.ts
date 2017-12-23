@@ -14,7 +14,7 @@
  */
 /// <reference path="cell.ts"/>
 namespace EasySheet {
-    export class CLeftCell extends CCell{
+    export class CFixedCell extends CCell{
         constructor(x:number=0,y:number=0,width:number=24,height:number=10){
            super(x,y,width,height);
            this.type = this.CELL_LEFT;
