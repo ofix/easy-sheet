@@ -245,11 +245,22 @@ var CPoint = (function () {
 }());
 var CRect = (function () {
     function CRect(x, y, w, h) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (w === void 0) { w = 0; }
+        if (h === void 0) { h = 0; }
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
     }
+    CRect.prototype.setRect = function (ptLeftTop, ptRightBottom) {
+        this.x = ptLeftTop.x;
+        this.y = ptLeftTop.y;
+        this.w = ptRightBottom.x - ptLeftTop.x;
+        this.h = ptRightBottom.y - ptLeftTop.y;
+        return this;
+    };
     return CRect;
 }());
 var EasySheet;
@@ -287,4 +298,32 @@ var EasySheet;
     }());
     EasySheet.CTable = CTable;
 })(EasySheet || (EasySheet = {}));
+function isPointInRect(pt, rect) {
+    return (pt.x >= rect.x && pt.x <= rect.x
+        && pt.y >= rect.y && pt.y <= rect.y);
+}
+function isRectEmpty(rect) {
+    return (rect.w == 0 || rect.h == 0);
+}
+function makeRect(pt1, pt2) {
+    var ptTopLeft;
+    var ptRightBottom;
+    if ((pt1.x >= pt2.x) && (pt1.y >= pt2.y)) {
+        ptTopLeft = pt1;
+        ptRightBottom = pt2;
+    }
+    else if ((pt1.x >= pt2.x) && (pt1.y <= pt2.y)) {
+        ptTopLeft = new CPoint(pt2.x, pt1.y);
+        ptRightBottom = new CPoint(pt1.x, pt2.y);
+    }
+    else if ((pt1.x <= pt2.x) && (pt1.y >= pt2.y)) {
+        ptTopLeft = new CPoint(pt1.x, pt2.y);
+        ptRightBottom = new CPoint(pt2.x, pt1.y);
+    }
+    else if ((pt1.x <= pt2.x) && (pt1.y <= pt2.y)) {
+        ptTopLeft = pt2;
+        ptRightBottom = pt1;
+    }
+    return (new CRect()).setRect(ptTopLeft, ptRightBottom);
+}
 //# sourceMappingURL=easy-sheet.js.map

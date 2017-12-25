@@ -25,8 +25,18 @@ function isRectEmpty(rect:CRect):boolean{
 function makeRect(pt1:CPoint,pt2:CPoint):CRect{
     let ptTopLeft:CPoint;
     let ptRightBottom:CPoint;
-    if(pt1.x>pt2.x){
+    if((pt1.x>=pt2.x)&&(pt1.y>=pt2.y)){
+        ptTopLeft = pt1;
+        ptRightBottom =pt2;
+    }else if((pt1.x>=pt2.x)&&(pt1.y<=pt2.y)){
+        ptTopLeft = new CPoint(pt2.x,pt1.y);
+        ptRightBottom = new CPoint(pt1.x,pt2.y);
+    }else if((pt1.x<=pt2.x)&&(pt1.y>=pt2.y)){
+        ptTopLeft = new CPoint(pt1.x,pt2.y);
+        ptRightBottom = new CPoint(pt2.x,pt1.y);
+    }else if((pt1.x<=pt2.x)&&(pt1.y<=pt2.y)){
         ptTopLeft = pt2;
-        ptRightBottom =pt1;
+        ptRightBottom = pt1;
     }
+    return (new CRect()).setRect(ptTopLeft,ptRightBottom);
 }

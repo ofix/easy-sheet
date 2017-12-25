@@ -13,27 +13,22 @@
  * @Time      23:31
  */
 /// <reference path="point.ts"/>
-interface IRect{
-    x:number;
-    y:number;
-    w:number;
-    h:number;
-}
-class CRect implements IRect{
+class CRect{
     public x:number;
     public y:number;
     public w:number;
     public h:number;
-    constructor(x:number,y:number,w:number,h:number){
+    constructor(x:number=0,y:number=0,w:number=0,h:number=0){
         this.x=x;
         this.y=y;
         this.w=w;
         this.h=h;
     }
-    constructor(ptLeftTop:IPoint={x:0,y:0},ptRightBottom:IPoint={x:0,y:0}){
+    setRect(ptLeftTop:CPoint,ptRightBottom:CPoint):CRect{
             this.x = ptLeftTop.x;
             this.y = ptLeftTop.y;
             this.w = ptRightBottom.x-ptLeftTop.x;
             this.h = ptRightBottom.y-ptLeftTop.y;
+            return this;
     }
 }
