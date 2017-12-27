@@ -12,7 +12,7 @@
  * @Date      2017/12/23
  * @Time      23:31
  */
-/// <reference path="point.ts"/>
+/// <reference path="Point.ts"/>
 class CRect{
     public x:number;
     public y:number;

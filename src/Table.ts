@@ -12,21 +12,26 @@
  * @Date      2017/12/23
  * @Time      22:31
  */
-/// <reference path="lib/jquery.d.ts"/>
 namespace EasySheet {
     export class CTable{
         protected nRow:number;
         protected nCol:number;
-        protected fixRow:any[];//顶部行
-        protected fixCol:any[];//左侧列
+        protected leftBar:CLeftBar;//顶部行
+        protected topBar:CTopBar;//左侧列
         protected rows:any[];//数据区
-
         constructor(nRow:number,nCol:number){
             this.nRow=nRow;
             this.nCol=nCol;
-            this.fixCol=[];
-            this.fixRow=[];
+            this.leftBar=new CLeftBar(nRow);
+            this.topBar=new CTopBar(nCol);
             this.rows=[];
+        }
+        draw(){
+            this.leftBar.draw();
+            this.topBar.draw();
+            this.rows.forEach((v)=>{
+                v.draw();
+            });
         }
     }
 }

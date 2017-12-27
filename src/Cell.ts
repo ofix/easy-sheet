@@ -55,6 +55,9 @@ namespace EasySheet {
             this.pTable='';
             this.padding=DEFAULT_CELL_PADDING;
         }
+        draw(){
+
+        }
         setPos(iRow:number,iCol:number):void{
             this.iRow=iRow;
             this.iCol=iCol;

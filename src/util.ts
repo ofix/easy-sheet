@@ -12,8 +12,8 @@
  * @Date      2017/12/23
  * @Time      23:36
  */
-/// <reference path="point.ts"/>
-/// <reference path="rect.ts"/>
+/// <reference path="Point.ts"/>
+/// <reference path="Rect.ts"/>
 
 function isPointInRect(pt:CPoint,rect:CRect):boolean{
      return (pt.x >= rect.x && pt.x <= rect.x

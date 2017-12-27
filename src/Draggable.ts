@@ -9,15 +9,18 @@
  * @copyright https://github.com/ofix
  * @qq        981326632
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- * @Date      2017/12/22
- * @Time      10:43
+ * @Date      2017/12/27
+ * @Time      09:38
  */
-/// <reference path="cell.ts"/>
-namespace EasySheet {
-    export class CFixedCell extends CCell{
-        constructor(x:number=0,y:number=0,width:number=24,height:number=10){
-           super(x,y,width,height);
-           this.type = this.CELL_LEFT;
+
+namespace EasySheet{
+   export abstract class CDraggable{
+        protected inDrag:boolean;
+        constructor(){
+            this.inDrag=false;
         }
+        abstract onDragStart(ptCursor:CPoint):void;
+        abstract onDragging(ptCursor:CPoint):void;
+        abstract onDragEnd(ptCursor:CPoint):void;
     }
 }
