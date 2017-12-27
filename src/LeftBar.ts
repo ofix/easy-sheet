@@ -14,14 +14,19 @@
  */
 /// <reference path="Cell.ts"/>
 /// <reference path="Draggable.ts"/>
+/// <reference path="Wnd.ts"/>
  namespace EasySheet{
      export class CLeftBar extends CDraggable{
          protected nRows:number;
          protected rows:number[];
+         protected wnd:CWnd;
+         protected ctx:CanvasRenderingContext2D;
          constructor(maxRow:number=100){
              super();
              this.nRows = maxRow;
              this.rows = [];
+             this.wnd = new CWnd("left_bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
+             this.ctx = this.wnd.context;
              for(let i=0; i<this.nRows;i++){
                  this.rows.push(BAR_CELL_HEIGHT);
              }
@@ -38,23 +43,23 @@
          draw():void{
             let hTotal:number=0;
             this.rows.forEach((v,i)=>{
-                ctx.save();
+                this.ctx.save();
                 let name:string = ""+i;
-                ctx.fillStyle=CLR_BAR_FILL;
-                ctx.fillRect(0,hTotal,LEFT_BAR_CELL_WIDTH,v);
+                this.ctx.fillStyle=CLR_BAR_FILL;
+                this.ctx.fillRect(0,hTotal,LEFT_BAR_CELL_WIDTH,v);
                 if(i>0) {
-                    ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                    ctx.textBaseline = "middle";
-                    ctx.textAlign = "center";
-                    ctx.fillStyle = CLR_BAR_TEXT;
-                    ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                    this.ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                    this.ctx.textBaseline = "middle";
+                    this.ctx.textAlign = "center";
+                    this.ctx.fillStyle = CLR_BAR_TEXT;
+                    this.ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
                 }
                 hTotal+=v;
-                ctx.strokeStyle=CLR_BAR_SEP;
-                ctx.moveTo(0,hTotal);
-                ctx.lineTo(LEFT_BAR_CELL_WIDTH,hTotal);
-                ctx.stroke();
-                ctx.restore();
+                this.ctx.strokeStyle=CLR_BAR_SEP;
+                this.ctx.moveTo(0,hTotal);
+                this.ctx.lineTo(LEFT_BAR_CELL_WIDTH,hTotal);
+                this.ctx.stroke();
+                this.ctx.restore();
             });
          }
          drawDragLine():void{

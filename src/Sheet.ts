@@ -14,30 +14,26 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 /// <reference path="Table.ts"/>
+/// <reference path="Wnd.ts"/>
 namespace EasySheet {
     export class CSheet{
-        protected appId:string;
-        protected $app:any;
         protected w:number;
         protected h:number;
-        protected canvas:CCanvas;
+        protected wnd:CWnd;
+        protected ctx:CanvasRenderingContext2D;
         protected table:CTable;
-        constructor(appId){
-            this.appId = appId;
-            this.$app = $('#'+appId);
-            this.w = this.$app.width();
-            this.h = this.$app.height();
-            this.canvas = new CCanvas(this.appId,this.w,this.h);
+        constructor(){
+            this.wnd = new CWnd("easy-sheet","100",LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT,4500,9000);
+            this.ctx = this.wnd.context;
             this.table = new CTable(1000,52);
         }
         run(){
-           this.canvas.bootstrap();
-           ctx.translate(0.5,0.5);
            this.table.draw();
+           CWndManager.instance().print();
         }
     }
 }
 
 let ctx:CanvasRenderingContext2D;
-let currentSheet:EasySheet.CSheet = new EasySheet.CSheet('easy-sheet');
+let currentSheet:EasySheet.CSheet = new EasySheet.CSheet();
 currentSheet.run();

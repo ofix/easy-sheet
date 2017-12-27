@@ -166,6 +166,114 @@ var INSERT_IMAGE = 1;
 var DEFAULT_CELL_PADDING = 2;
 var EasySheet;
 (function (EasySheet) {
+    var CWndManager = (function () {
+        function CWndManager() {
+            this.wndList = [];
+            this.topMostWndList = [];
+        }
+        CWndManager.instance = function () {
+            if (CWndManager._instance === null) {
+                CWndManager._instance = new CWndManager();
+            }
+            return CWndManager._instance;
+        };
+        CWndManager.prototype.registerWnd = function (wnd) {
+            this.wndList.push(wnd);
+        };
+        CWndManager.prototype.print = function () {
+            console.log(JSON.stringify(this.wndList));
+        };
+        CWndManager.prototype.setWndTopMost = function (wnd) {
+            if (this.isWndExist(wnd)) {
+            }
+            else {
+                this.topMostWndList.unshift(wnd);
+            }
+        };
+        CWndManager.prototype.isWndExist = function (wnd) {
+            var exist = false;
+            for (var i = 0, len = this.wndList.length; i < len; i++) {
+                if (this.wndList[i].name == wnd.name) {
+                    exist = true;
+                    break;
+                }
+            }
+            return exist;
+        };
+        CWndManager._instance = null;
+        return CWndManager;
+    }());
+    EasySheet.CWndManager = CWndManager;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
+    var CWnd = (function () {
+        function CWnd(name, zIndex, x, y, width, height, bFixed) {
+            if (bFixed === void 0) { bFixed = false; }
+            this.x = x;
+            this.y = y;
+            this.w = width;
+            this.h = height;
+            this._name = name;
+            this.zIndex = zIndex;
+            this.bFixed = bFixed;
+            this.createCanvas();
+        }
+        Object.defineProperty(CWnd.prototype, "name", {
+            get: function () {
+                return this._name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CWnd.prototype.createCanvas = function () {
+            this.canvas = document.createElement('canvas');
+            this.canvas.id = this.name;
+            this.canvas.style.position = this.bFixed ? "fixed" : "absolute";
+            this.canvas.style.left = this.x + "px";
+            this.canvas.style.top = this.y + "px";
+            this.canvas.style.zIndex = this.zIndex;
+            this.canvas.width = this.w;
+            this.canvas.height = this.h;
+            document.body.appendChild(this.canvas);
+            EasySheet.CWndManager.instance().registerWnd(this);
+            this.render2D = this.canvas.getContext("2d");
+            this.render2D.translate(0.5, 0.5);
+        };
+        Object.defineProperty(CWnd.prototype, "context", {
+            get: function () {
+                return this.render2D;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return CWnd;
+    }());
+    EasySheet.CWnd = CWnd;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
+    var CCorner = (function () {
+        function CCorner(width, height) {
+            this.x = 0;
+            this.y = 0;
+            this.w = width;
+            this.h = height;
+            this.wnd = new EasySheet.CWnd("corner", "999", 0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT, true);
+            this.ctx = this.wnd.context;
+        }
+        CCorner.prototype.draw = function () {
+            var ctx = this.ctx;
+            ctx.save();
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
+            ctx.restore();
+        };
+        return CCorner;
+    }());
+    EasySheet.CCorner = CCorner;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
     var CDraggable = (function () {
         function CDraggable() {
             this.inDrag = false;
@@ -332,6 +440,8 @@ var EasySheet;
             var _this = _super.call(this) || this;
             _this.nRows = maxRow;
             _this.rows = [];
+            _this.wnd = new EasySheet.CWnd("left_bar", "990", 0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * _this.nRows, true);
+            _this.ctx = _this.wnd.context;
             for (var i = 0; i < _this.nRows; i++) {
                 _this.rows.push(BAR_CELL_HEIGHT);
             }
@@ -346,25 +456,26 @@ var EasySheet;
             this.inDrag = false;
         };
         CLeftBar.prototype.draw = function () {
+            var _this = this;
             var hTotal = 0;
             this.rows.forEach(function (v, i) {
-                ctx.save();
+                _this.ctx.save();
                 var name = "" + i;
-                ctx.fillStyle = CLR_BAR_FILL;
-                ctx.fillRect(0, hTotal, LEFT_BAR_CELL_WIDTH, v);
+                _this.ctx.fillStyle = CLR_BAR_FILL;
+                _this.ctx.fillRect(0, hTotal, LEFT_BAR_CELL_WIDTH, v);
                 if (i > 0) {
-                    ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                    ctx.textBaseline = "middle";
-                    ctx.textAlign = "center";
-                    ctx.fillStyle = CLR_BAR_TEXT;
-                    ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                    _this.ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                    _this.ctx.textBaseline = "middle";
+                    _this.ctx.textAlign = "center";
+                    _this.ctx.fillStyle = CLR_BAR_TEXT;
+                    _this.ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
                 }
                 hTotal += v;
-                ctx.strokeStyle = CLR_BAR_SEP;
-                ctx.moveTo(0, hTotal);
-                ctx.lineTo(LEFT_BAR_CELL_WIDTH, hTotal);
-                ctx.stroke();
-                ctx.restore();
+                _this.ctx.strokeStyle = CLR_BAR_SEP;
+                _this.ctx.moveTo(0, hTotal);
+                _this.ctx.lineTo(LEFT_BAR_CELL_WIDTH, hTotal);
+                _this.ctx.stroke();
+                _this.ctx.restore();
             });
         };
         CLeftBar.prototype.drawDragLine = function () {
@@ -381,6 +492,8 @@ var EasySheet;
             var _this = _super.call(this) || this;
             _this.nCols = nCols;
             _this.cols = [];
+            _this.wnd = new EasySheet.CWnd("top_bar", "1000", 0, 0, TOP_BAR_CELL_WIDTH * _this.nCols, BAR_CELL_HEIGHT, true);
+            _this.ctx = _this.wnd.context;
             for (var i = 0; i < _this.nCols; i++) {
                 _this.cols.push(TOP_BAR_CELL_WIDTH);
             }
@@ -406,21 +519,21 @@ var EasySheet;
             var _this = this;
             var wTotal = LEFT_BAR_CELL_WIDTH;
             this.cols.forEach(function (v, i) {
-                ctx.save();
+                _this.ctx.save();
                 var name = _this.getColName(i);
-                ctx.fillStyle = CLR_BAR_FILL;
-                ctx.fillRect(wTotal, 0, v, BAR_CELL_HEIGHT);
-                ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                ctx.textBaseline = "middle";
-                ctx.textAlign = 'center';
-                ctx.fillStyle = CLR_BAR_TEXT;
-                ctx.fillText(name, wTotal + v / 2, BAR_CELL_HEIGHT / 2);
+                _this.ctx.fillStyle = CLR_BAR_FILL;
+                _this.ctx.fillRect(wTotal, 0, v, BAR_CELL_HEIGHT);
+                _this.ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                _this.ctx.textBaseline = "middle";
+                _this.ctx.textAlign = 'center';
+                _this.ctx.fillStyle = CLR_BAR_TEXT;
+                _this.ctx.fillText(name, wTotal + v / 2, BAR_CELL_HEIGHT / 2);
                 wTotal += v;
-                ctx.strokeStyle = CLR_BAR_SEP;
-                ctx.moveTo(wTotal, 0);
-                ctx.lineTo(wTotal, BAR_CELL_HEIGHT);
-                ctx.stroke();
-                ctx.restore();
+                _this.ctx.strokeStyle = CLR_BAR_SEP;
+                _this.ctx.moveTo(wTotal, 0);
+                _this.ctx.lineTo(wTotal, BAR_CELL_HEIGHT);
+                _this.ctx.stroke();
+                _this.ctx.restore();
             });
         };
         return CTopBar;
@@ -435,11 +548,13 @@ var EasySheet;
             this.nCol = nCol;
             this.leftBar = new EasySheet.CLeftBar(nRow);
             this.topBar = new EasySheet.CTopBar(nCol);
+            this.corner = new EasySheet.CCorner(LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT);
             this.rows = [];
         }
         CTable.prototype.draw = function () {
             this.leftBar.draw();
             this.topBar.draw();
+            this.corner.draw();
         };
         return CTable;
     }());
@@ -448,98 +563,20 @@ var EasySheet;
 var EasySheet;
 (function (EasySheet) {
     var CSheet = (function () {
-        function CSheet(appId) {
-            this.appId = appId;
-            this.$app = $('#' + appId);
-            this.w = this.$app.width();
-            this.h = this.$app.height();
-            this.canvas = new EasySheet.CCanvas(this.appId, this.w, this.h);
+        function CSheet() {
+            this.wnd = new EasySheet.CWnd("easy-sheet", "100", LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT, 4500, 9000);
+            this.ctx = this.wnd.context;
             this.table = new EasySheet.CTable(1000, 52);
         }
         CSheet.prototype.run = function () {
-            this.canvas.bootstrap();
-            ctx.translate(0.5, 0.5);
             this.table.draw();
+            EasySheet.CWndManager.instance().print();
         };
         return CSheet;
     }());
     EasySheet.CSheet = CSheet;
 })(EasySheet || (EasySheet = {}));
 var ctx;
-var currentSheet = new EasySheet.CSheet('easy-sheet');
+var currentSheet = new EasySheet.CSheet();
 currentSheet.run();
-var EasySheet;
-(function (EasySheet) {
-    var CWndManager = (function () {
-        function CWndManager() {
-            this.wndList = [];
-            this.topMostWndList = [];
-        }
-        CWndManager.instance = function () {
-            if (CWndManager._instance === null) {
-                CWndManager._instance = new CWndManager();
-            }
-            return CWndManager._instance;
-        };
-        CWndManager.prototype.registerWnd = function (wnd) {
-            this.wndList.push(wnd);
-        };
-        CWndManager.prototype.setWndTopMost = function (wnd) {
-            if (this.isWndExist(wnd)) {
-            }
-            else {
-                this.topMostWndList.unshift(wnd);
-            }
-        };
-        CWndManager.prototype.isWndExist = function (wnd) {
-            var exist = false;
-            for (var i = 0, len = this.wndList.length; i < len; i++) {
-                if (this.wndList[i].name == wnd.name) {
-                    exist = true;
-                    break;
-                }
-            }
-            return exist;
-        };
-        CWndManager._instance = null;
-        return CWndManager;
-    }());
-    EasySheet.CWndManager = CWndManager;
-})(EasySheet || (EasySheet = {}));
-var EasySheet;
-(function (EasySheet) {
-    var CWnd = (function () {
-        function CWnd(name, zIndex, x, y, width, height) {
-            this.x = x;
-            this.y = y;
-            this.w = width;
-            this.h = height;
-            this._name = name;
-            this.zIndex = zIndex;
-            this.createCanvas();
-        }
-        Object.defineProperty(CWnd.prototype, "name", {
-            get: function () {
-                return this._name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CWnd.prototype.createCanvas = function () {
-            this.canvas = document.createElement('canvas');
-            this.canvas.id = this.name;
-            this.canvas.style.position = "absolute";
-            this.canvas.width = this.w;
-            this.canvas.height = this.h;
-            document.body.appendChild(this.canvas);
-            EasySheet.CWndManager.instance().registerWnd(this);
-            this.render2D = this.canvas.getContext("2d");
-        };
-        CWnd.prototype.getContext = function () {
-            return this.render2D;
-        };
-        return CWnd;
-    }());
-    EasySheet.CWnd = CWnd;
-})(EasySheet || (EasySheet = {}));
 //# sourceMappingURL=easy-sheet.js.map

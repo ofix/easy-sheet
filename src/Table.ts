@@ -18,6 +18,7 @@ namespace EasySheet {
     export class CTable{
         protected nRow:number;
         protected nCol:number;
+        protected corner:CCorner;//左上角
         protected leftBar:CLeftBar;//顶部行
         protected topBar:CTopBar;//左侧列
         protected rows:any[];//数据区
@@ -26,11 +27,13 @@ namespace EasySheet {
             this.nCol=nCol;
             this.leftBar=new CLeftBar(nRow);
             this.topBar=new CTopBar(nCol);
+            this.corner = new CCorner(LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT);
             this.rows=[];
         }
         draw(){
             this.leftBar.draw();
             this.topBar.draw();
+            this.corner.draw();
             // this.rows.forEach((v)=>{
             //     v.draw();
             // });

@@ -17,10 +17,14 @@ namespace EasySheet {
     export class CTopBar extends CDraggable{
         protected nCols;
         protected cols:number[];
+        protected wnd:CWnd;
+        protected ctx:CanvasRenderingContext2D;
         constructor(nCols:number){
             super();
             this.nCols = nCols;
             this.cols = [];
+            this.wnd = new CWnd("top_bar","1000",0,0,TOP_BAR_CELL_WIDTH*this.nCols,BAR_CELL_HEIGHT,true);
+            this.ctx = this.wnd.context;
             for(let i=0; i<this.nCols;i++){
                 this.cols.push(TOP_BAR_CELL_WIDTH);
             }
@@ -45,21 +49,21 @@ namespace EasySheet {
         draw(){
             let wTotal:number=LEFT_BAR_CELL_WIDTH;
             this.cols.forEach((v,i)=>{
-                ctx.save();
+                this.ctx.save();
                 let name:string = this.getColName(i);
-                ctx.fillStyle=CLR_BAR_FILL;
-                ctx.fillRect(wTotal,0,v,BAR_CELL_HEIGHT);
-                ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
-                ctx.textBaseline = "middle";
-                ctx.textAlign = 'center';
-                ctx.fillStyle=CLR_BAR_TEXT;
-                ctx.fillText(name,wTotal+v/2,BAR_CELL_HEIGHT/2);
+                this.ctx.fillStyle=CLR_BAR_FILL;
+                this.ctx.fillRect(wTotal,0,v,BAR_CELL_HEIGHT);
+                this.ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
+                this.ctx.textBaseline = "middle";
+                this.ctx.textAlign = 'center';
+                this.ctx.fillStyle=CLR_BAR_TEXT;
+                this.ctx.fillText(name,wTotal+v/2,BAR_CELL_HEIGHT/2);
                 wTotal+=v;
-                ctx.strokeStyle=CLR_BAR_SEP;
-                ctx.moveTo(wTotal,0);
-                ctx.lineTo(wTotal,BAR_CELL_HEIGHT);
-                ctx.stroke();
-                ctx.restore();
+                this.ctx.strokeStyle=CLR_BAR_SEP;
+                this.ctx.moveTo(wTotal,0);
+                this.ctx.lineTo(wTotal,BAR_CELL_HEIGHT);
+                this.ctx.stroke();
+                this.ctx.restore();
             });
         }
     }
