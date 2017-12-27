@@ -16,42 +16,36 @@
 namespace EasySheet{
     export class CWndManager{
         protected static _instance:CWndManager= null;
-        protected static _wndList:CWnd[];
-        protected static _topMostWndList:CWnd[];
+        protected wndList:CWnd[];
+        protected topMostWndList:CWnd[];
         private constructor() {
-            CWndManager._wndList = [];
-            CWndManager._topMostWndList = [];
+            this.wndList = [];
+            this.topMostWndList = [];
         }
         static instance(){
-            if(CWndManager._instance===null){
+            if(CWndManager._instance === null){
                 CWndManager._instance = new CWndManager();
             }
             return CWndManager._instance;
         }
         registerWnd(wnd:CWnd):void{
-            CWndManager._wndList.push(wnd);
+            this.wndList.push(wnd);
         }
         setWndTopMost(wnd:CWnd):void{
             if(this.isWndExist(wnd)){
 
             }else {
-                CWndManager._topMostWndList.unshift(wnd);
+                this.topMostWndList.unshift(wnd);
             }
         }
         isWndExist(wnd:CWnd){
             let exist:boolean = false;
-            CWndManager._wndList.forEach((v)=>{
-                if(v.name == wnd.name){
+            for(let i=0,len=this.wndList.length; i<len;i++){
+                if(this.wndList[i].name == wnd.name){
                     exist = true;
-                    return;
+                    break;
                 }
-            });
-            CWndManager._topMostWndList.forEach((v)=>{
-                if(v.name == wnd.name){
-                    exist = true;
-                    return;
-                }
-            });
+            }
             return exist;
         }
     }

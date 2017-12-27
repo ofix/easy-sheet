@@ -468,4 +468,78 @@ var EasySheet;
 var ctx;
 var currentSheet = new EasySheet.CSheet('easy-sheet');
 currentSheet.run();
+var EasySheet;
+(function (EasySheet) {
+    var CWndManager = (function () {
+        function CWndManager() {
+            this.wndList = [];
+            this.topMostWndList = [];
+        }
+        CWndManager.instance = function () {
+            if (CWndManager._instance === null) {
+                CWndManager._instance = new CWndManager();
+            }
+            return CWndManager._instance;
+        };
+        CWndManager.prototype.registerWnd = function (wnd) {
+            this.wndList.push(wnd);
+        };
+        CWndManager.prototype.setWndTopMost = function (wnd) {
+            if (this.isWndExist(wnd)) {
+            }
+            else {
+                this.topMostWndList.unshift(wnd);
+            }
+        };
+        CWndManager.prototype.isWndExist = function (wnd) {
+            var exist = false;
+            for (var i = 0, len = this.wndList.length; i < len; i++) {
+                if (this.wndList[i].name == wnd.name) {
+                    exist = true;
+                    break;
+                }
+            }
+            return exist;
+        };
+        CWndManager._instance = null;
+        return CWndManager;
+    }());
+    EasySheet.CWndManager = CWndManager;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
+    var CWnd = (function () {
+        function CWnd(name, zIndex, x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.w = width;
+            this.h = height;
+            this._name = name;
+            this.zIndex = zIndex;
+            this.createCanvas();
+        }
+        Object.defineProperty(CWnd.prototype, "name", {
+            get: function () {
+                return this._name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CWnd.prototype.createCanvas = function () {
+            this.canvas = document.createElement('canvas');
+            this.canvas.id = this.name;
+            this.canvas.style.position = "absolute";
+            this.canvas.width = this.w;
+            this.canvas.height = this.h;
+            document.body.appendChild(this.canvas);
+            EasySheet.CWndManager.instance().registerWnd(this);
+            this.render2D = this.canvas.getContext("2d");
+        };
+        CWnd.prototype.getContext = function () {
+            return this.render2D;
+        };
+        return CWnd;
+    }());
+    EasySheet.CWnd = CWnd;
+})(EasySheet || (EasySheet = {}));
 //# sourceMappingURL=easy-sheet.js.map
