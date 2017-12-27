@@ -17,17 +17,13 @@
  namespace EasySheet{
      export class CLeftBar extends CDraggable{
          protected nRows:number;
-         protected rows:CCell[];
+         protected rows:number[];
          constructor(maxRow:number=100){
              super();
              this.nRows = maxRow;
              this.rows = [];
-             this.inDrag = false;
-         }
-         init(){
              for(let i=0; i<this.nRows;i++){
-                 let cell:CCell = new CCell(0,1,DEFAULT_CELL_WIDTH,DEFAULT_CELL_HEIGHT);
-                 this.rows.push(cell);
+                 this.rows.push(BAR_CELL_HEIGHT);
              }
          }
          onDragStart(ptCursor:CPoint):void{
@@ -40,11 +36,26 @@
              this.inDrag = false;
          }
          draw():void{
-            ctx.save();
-            this.rows.forEach((v)=>{
-                v.draw();
+            let hTotal:number=0;
+            this.rows.forEach((v,i)=>{
+                ctx.save();
+                let name:string = ""+i;
+                ctx.fillStyle=CLR_BAR_FILL;
+                ctx.fillRect(0,hTotal,LEFT_BAR_CELL_WIDTH,v);
+                if(i>0) {
+                    ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                    ctx.textBaseline = "middle";
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = CLR_BAR_TEXT;
+                    ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                }
+                hTotal+=v;
+                ctx.strokeStyle=CLR_BAR_SEP;
+                ctx.moveTo(0,hTotal);
+                ctx.lineTo(LEFT_BAR_CELL_WIDTH,hTotal);
+                ctx.stroke();
+                ctx.restore();
             });
-            ctx.restore();
          }
          drawDragLine():void{
 

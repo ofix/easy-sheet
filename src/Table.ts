@@ -12,6 +12,8 @@
  * @Date      2017/12/23
  * @Time      22:31
  */
+/// <reference path="LeftBar.ts"/>
+/// <reference path="TopBar.ts"/>
 namespace EasySheet {
     export class CTable{
         protected nRow:number;
@@ -29,9 +31,9 @@ namespace EasySheet {
         draw(){
             this.leftBar.draw();
             this.topBar.draw();
-            this.rows.forEach((v)=>{
-                v.draw();
-            });
+            // this.rows.forEach((v)=>{
+            //     v.draw();
+            // });
         }
     }
 }

@@ -13,6 +13,7 @@
  * @Time      10:43
  */
 /// <reference path="lib/jquery.d.ts"/>
+/// <reference path="Table.ts"/>
 namespace EasySheet {
     export class CSheet{
         protected appId:string;
@@ -31,11 +32,12 @@ namespace EasySheet {
         }
         run(){
            this.canvas.bootstrap();
-
+           ctx.translate(0.5,0.5);
+           this.table.draw();
         }
     }
 }
 
 let ctx:CanvasRenderingContext2D;
-let currentSheet:EasySheet.CSheet = new EasySheet.CSheet('#easy-sheet');
+let currentSheet:EasySheet.CSheet = new EasySheet.CSheet('easy-sheet');
 currentSheet.run();

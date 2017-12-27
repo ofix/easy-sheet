@@ -144,13 +144,19 @@ var EasySheet;
     }());
     EasySheet.CCell = CCell;
 })(EasySheet || (EasySheet = {}));
+var CLR_BAR_FILL = "#E4ECF7";
+var CLR_BAR_SEP = "#9EB6CE";
+var CLR_BAR_FILL_ACTIVE = "#FFD58D";
+var CLR_BAR_TEXT = "#27413E";
+var DEFAULT_FONT_SIZE = 12;
 var DEFAULT_ROWS = 1000;
 var DEFAULT_COLS = 52;
 var DEFAULT_BACK_COLOR = "#FFF";
 var DEFAULT_FORE_COLOR = "#000";
 var DEFAULT_SELECT_CELL_COLOR = "#FF0000";
-var DEFAULT_CELL_WIDTH = 32;
-var DEFAULT_CELL_HEIGHT = 20;
+var TOP_BAR_CELL_WIDTH = 72;
+var LEFT_BAR_CELL_WIDTH = 34;
+var BAR_CELL_HEIGHT = 20;
 var MODE_NORMAL = 0;
 var MODE_IN_EDIT = 1;
 var MODE_IN_DRAG = 2;
@@ -177,6 +183,61 @@ var EasySheet;
     }());
     EasySheet.CEdit = CEdit;
 })(EasySheet || (EasySheet = {}));
+var CPoint = (function () {
+    function CPoint(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return CPoint;
+}());
+var CRect = (function () {
+    function CRect(x, y, w, h) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (w === void 0) { w = 0; }
+        if (h === void 0) { h = 0; }
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+    CRect.prototype.setRect = function (ptLeftTop, ptRightBottom) {
+        this.x = ptLeftTop.x;
+        this.y = ptLeftTop.y;
+        this.w = ptRightBottom.x - ptLeftTop.x;
+        this.h = ptRightBottom.y - ptLeftTop.y;
+        return this;
+    };
+    return CRect;
+}());
+function isPointInRect(pt, rect) {
+    return (pt.x >= rect.x && pt.x <= rect.x
+        && pt.y >= rect.y && pt.y <= rect.y);
+}
+function isRectEmpty(rect) {
+    return (rect.w == 0 || rect.h == 0);
+}
+function makeRect(pt1, pt2) {
+    var ptTopLeft;
+    var ptRightBottom;
+    if ((pt1.x >= pt2.x) && (pt1.y >= pt2.y)) {
+        ptTopLeft = pt1;
+        ptRightBottom = pt2;
+    }
+    else if ((pt1.x >= pt2.x) && (pt1.y <= pt2.y)) {
+        ptTopLeft = new CPoint(pt2.x, pt1.y);
+        ptRightBottom = new CPoint(pt1.x, pt2.y);
+    }
+    else if ((pt1.x <= pt2.x) && (pt1.y >= pt2.y)) {
+        ptTopLeft = new CPoint(pt1.x, pt2.y);
+        ptRightBottom = new CPoint(pt2.x, pt1.y);
+    }
+    else if ((pt1.x <= pt2.x) && (pt1.y <= pt2.y)) {
+        ptTopLeft = pt2;
+        ptRightBottom = pt1;
+    }
+    return (new CRect()).setRect(ptTopLeft, ptRightBottom);
+}
 var EasySheet;
 (function (EasySheet) {
     var Key;
@@ -271,15 +332,11 @@ var EasySheet;
             var _this = _super.call(this) || this;
             _this.nRows = maxRow;
             _this.rows = [];
-            _this.inDrag = false;
+            for (var i = 0; i < _this.nRows; i++) {
+                _this.rows.push(BAR_CELL_HEIGHT);
+            }
             return _this;
         }
-        CLeftBar.prototype.init = function () {
-            for (var i = 0; i < this.nRows; i++) {
-                var cell = new EasySheet.CCell(0, 1, DEFAULT_CELL_WIDTH, DEFAULT_CELL_HEIGHT);
-                this.rows.push(cell);
-            }
-        };
         CLeftBar.prototype.onDragStart = function (ptCursor) {
             this.inDrag = true;
         };
@@ -289,11 +346,26 @@ var EasySheet;
             this.inDrag = false;
         };
         CLeftBar.prototype.draw = function () {
-            ctx.save();
-            this.rows.forEach(function (v) {
-                v.draw();
+            var hTotal = 0;
+            this.rows.forEach(function (v, i) {
+                ctx.save();
+                var name = "" + i;
+                ctx.fillStyle = CLR_BAR_FILL;
+                ctx.fillRect(0, hTotal, LEFT_BAR_CELL_WIDTH, v);
+                if (i > 0) {
+                    ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                    ctx.textBaseline = "middle";
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = CLR_BAR_TEXT;
+                    ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                }
+                hTotal += v;
+                ctx.strokeStyle = CLR_BAR_SEP;
+                ctx.moveTo(0, hTotal);
+                ctx.lineTo(LEFT_BAR_CELL_WIDTH, hTotal);
+                ctx.stroke();
+                ctx.restore();
             });
-            ctx.restore();
         };
         CLeftBar.prototype.drawDragLine = function () {
         };
@@ -301,54 +373,60 @@ var EasySheet;
     }(EasySheet.CDraggable));
     EasySheet.CLeftBar = CLeftBar;
 })(EasySheet || (EasySheet = {}));
-var CPoint = (function () {
-    function CPoint(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    return CPoint;
-}());
-var CRect = (function () {
-    function CRect(x, y, w, h) {
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (w === void 0) { w = 0; }
-        if (h === void 0) { h = 0; }
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-    }
-    CRect.prototype.setRect = function (ptLeftTop, ptRightBottom) {
-        this.x = ptLeftTop.x;
-        this.y = ptLeftTop.y;
-        this.w = ptRightBottom.x - ptLeftTop.x;
-        this.h = ptRightBottom.y - ptLeftTop.y;
-        return this;
-    };
-    return CRect;
-}());
 var EasySheet;
 (function (EasySheet) {
-    var CSheet = (function () {
-        function CSheet(appId) {
-            this.appId = appId;
-            this.$app = $('#' + appId);
-            this.w = this.$app.width();
-            this.h = this.$app.height();
-            this.canvas = new EasySheet.CCanvas(this.appId, this.w, this.h);
-            this.table = new EasySheet.CTable(1000, 52);
+    var CTopBar = (function (_super) {
+        __extends(CTopBar, _super);
+        function CTopBar(nCols) {
+            var _this = _super.call(this) || this;
+            _this.nCols = nCols;
+            _this.cols = [];
+            for (var i = 0; i < _this.nCols; i++) {
+                _this.cols.push(TOP_BAR_CELL_WIDTH);
+            }
+            return _this;
         }
-        CSheet.prototype.run = function () {
-            this.canvas.bootstrap();
+        CTopBar.prototype.onDragStart = function (ptCursor) {
+            this.inDrag = true;
         };
-        return CSheet;
-    }());
-    EasySheet.CSheet = CSheet;
+        CTopBar.prototype.onDragging = function (ptCursor) {
+        };
+        CTopBar.prototype.onDragEnd = function (ptCursor) {
+            this.inDrag = false;
+        };
+        CTopBar.prototype.getColName = function (index) {
+            var name = '';
+            var i = Math.floor(index / 26);
+            if (i > 0) {
+                name += this.getColName(i - 1);
+            }
+            return name + String.fromCharCode(index % 26 + 65);
+        };
+        CTopBar.prototype.draw = function () {
+            var _this = this;
+            var wTotal = LEFT_BAR_CELL_WIDTH;
+            this.cols.forEach(function (v, i) {
+                ctx.save();
+                var name = _this.getColName(i);
+                ctx.fillStyle = CLR_BAR_FILL;
+                ctx.fillRect(wTotal, 0, v, BAR_CELL_HEIGHT);
+                ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+                ctx.textBaseline = "middle";
+                ctx.textAlign = 'center';
+                ctx.fillStyle = CLR_BAR_TEXT;
+                ctx.fillText(name, wTotal + v / 2, BAR_CELL_HEIGHT / 2);
+                wTotal += v;
+                ctx.strokeStyle = CLR_BAR_SEP;
+                ctx.moveTo(wTotal, 0);
+                ctx.lineTo(wTotal, BAR_CELL_HEIGHT);
+                ctx.stroke();
+                ctx.restore();
+            });
+        };
+        return CTopBar;
+    }(EasySheet.CDraggable));
+    EasySheet.CTopBar = CTopBar;
 })(EasySheet || (EasySheet = {}));
-var ctx;
-var currentSheet = new EasySheet.CSheet('#easy-sheet');
-currentSheet.run();
 var EasySheet;
 (function (EasySheet) {
     var CTable = (function () {
@@ -362,9 +440,6 @@ var EasySheet;
         CTable.prototype.draw = function () {
             this.leftBar.draw();
             this.topBar.draw();
-            this.rows.forEach(function (v) {
-                v.draw();
-            });
         };
         return CTable;
     }());
@@ -372,57 +447,25 @@ var EasySheet;
 })(EasySheet || (EasySheet = {}));
 var EasySheet;
 (function (EasySheet) {
-    var CTopBar = (function (_super) {
-        __extends(CTopBar, _super);
-        function CTopBar(nCols) {
-            var _this = _super.call(this) || this;
-            _this.nCols = nCols;
-            _this.cols = [];
-            return _this;
+    var CSheet = (function () {
+        function CSheet(appId) {
+            this.appId = appId;
+            this.$app = $('#' + appId);
+            this.w = this.$app.width();
+            this.h = this.$app.height();
+            this.canvas = new EasySheet.CCanvas(this.appId, this.w, this.h);
+            this.table = new EasySheet.CTable(1000, 52);
         }
-        CTopBar.prototype.onDragStart = function (ptCursor) {
-            this.inDrag = true;
+        CSheet.prototype.run = function () {
+            this.canvas.bootstrap();
+            ctx.translate(0.5, 0.5);
+            this.table.draw();
         };
-        CTopBar.prototype.onDragging = function (ptCursor) {
-        };
-        CTopBar.prototype.onDragEnd = function (ptCursor) {
-            this.inDrag = false;
-        };
-        CTopBar.prototype.draw = function () {
-            this.nCols.forEach(function (v) {
-                v.draw();
-            });
-        };
-        return CTopBar;
-    }(EasySheet.CDraggable));
-    EasySheet.CTopBar = CTopBar;
+        return CSheet;
+    }());
+    EasySheet.CSheet = CSheet;
 })(EasySheet || (EasySheet = {}));
-function isPointInRect(pt, rect) {
-    return (pt.x >= rect.x && pt.x <= rect.x
-        && pt.y >= rect.y && pt.y <= rect.y);
-}
-function isRectEmpty(rect) {
-    return (rect.w == 0 || rect.h == 0);
-}
-function makeRect(pt1, pt2) {
-    var ptTopLeft;
-    var ptRightBottom;
-    if ((pt1.x >= pt2.x) && (pt1.y >= pt2.y)) {
-        ptTopLeft = pt1;
-        ptRightBottom = pt2;
-    }
-    else if ((pt1.x >= pt2.x) && (pt1.y <= pt2.y)) {
-        ptTopLeft = new CPoint(pt2.x, pt1.y);
-        ptRightBottom = new CPoint(pt1.x, pt2.y);
-    }
-    else if ((pt1.x <= pt2.x) && (pt1.y >= pt2.y)) {
-        ptTopLeft = new CPoint(pt1.x, pt2.y);
-        ptRightBottom = new CPoint(pt2.x, pt1.y);
-    }
-    else if ((pt1.x <= pt2.x) && (pt1.y <= pt2.y)) {
-        ptTopLeft = pt2;
-        ptRightBottom = pt1;
-    }
-    return (new CRect()).setRect(ptTopLeft, ptRightBottom);
-}
+var ctx;
+var currentSheet = new EasySheet.CSheet('easy-sheet');
+currentSheet.run();
 //# sourceMappingURL=easy-sheet.js.map
