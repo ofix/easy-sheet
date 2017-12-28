@@ -22,6 +22,7 @@ namespace EasySheet{
         protected h:number;
         protected bFixed:boolean;
         protected zIndex:string;
+        protected div:HTMLDivElement;
         protected canvas:HTMLCanvasElement;
         protected render2D:CanvasRenderingContext2D;
         constructor(name:string,zIndex:string,x:number,y:number,width:number,height:number,bFixed:boolean=false) {
@@ -38,15 +39,22 @@ namespace EasySheet{
             return this._name;
         }
         createCanvas(): void {
+            this.div = document.createElement('div');
+            this.div.id = 'div-'+this.name;
+            this.div.style.position = this.bFixed?"fixed":"absolute";
+            this.div.style.left = this.x+"px";
+            this.div.style.top = this.y+"px";
+            this.div.style.zIndex = this.zIndex;
+
             this.canvas = document.createElement('canvas');
             this.canvas.id = this.name;
-            this.canvas.style.position = this.bFixed?"fixed":"absolute";
-            this.canvas.style.left = this.x+"px";
-            this.canvas.style.top = this.y+"px";
-            this.canvas.style.zIndex = this.zIndex;
+            this.canvas.style.position = "relative";
+            this.canvas.style.left ="0px";
+            this.canvas.style.top = "0px";
             this.canvas.width = this.w;
             this.canvas.height = this.h;
-            document.body.appendChild(this.canvas);
+            this.div.appendChild(this.canvas);
+            document.body.appendChild(this.div);
             CWndManager.instance().registerWnd(this);
             this.render2D = this.canvas.getContext("2d");
             this.render2D.translate(0.5,0.5);

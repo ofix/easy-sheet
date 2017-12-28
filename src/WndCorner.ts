@@ -14,7 +14,7 @@
  */
 /// <reference path="Wnd.ts"/>
 namespace EasySheet{
-    export class CCorner{
+    export class CWndCorner{
         protected wnd:CWnd;
         protected ctx:CanvasRenderingContext2D;
         protected x:number;
@@ -26,13 +26,17 @@ namespace EasySheet{
             this.y = 0;
             this.w = width;
             this.h = height;
-            this.wnd = new CWnd("corner","999",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT,true);
+            this.wnd = new CWnd("wnd-corner","2999",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT,true);
             this.ctx = this.wnd.context;
         }
         draw(){
-            let ctx = this.ctx;
+            let ctx = this.ctx;;
             ctx.save();
-            ctx.strokeRect(this.x,this.y,this.w,this.h);
+            ctx.strokeStyle = CLR_BAR_SEP
+            ctx.moveTo(this.w,0);
+            ctx.lineTo(this.w,this.h);
+            ctx.lineTo(0,this.h);
+            ctx.stroke();
             ctx.restore();
         }
     }

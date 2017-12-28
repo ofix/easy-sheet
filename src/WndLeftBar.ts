@@ -15,8 +15,9 @@
 /// <reference path="Cell.ts"/>
 /// <reference path="Draggable.ts"/>
 /// <reference path="Wnd.ts"/>
+/// <reference path="Const.ts"/>
  namespace EasySheet{
-     export class CLeftBar extends CDraggable{
+     export class CWndLeftBar extends CDraggable{
          protected nRows:number;
          protected rows:number[];
          protected wnd:CWnd;
@@ -25,7 +26,7 @@
              super();
              this.nRows = maxRow;
              this.rows = [];
-             this.wnd = new CWnd("left_bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
+             this.wnd = new CWnd("wnd-left-bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
              this.ctx = this.wnd.context;
              for(let i=0; i<this.nRows;i++){
                  this.rows.push(BAR_CELL_HEIGHT);

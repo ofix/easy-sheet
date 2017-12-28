@@ -16,15 +16,9 @@
 /// <reference path="Table.ts"/>
 /// <reference path="Wnd.ts"/>
 namespace EasySheet {
-    export class CSheet{
-        protected w:number;
-        protected h:number;
-        protected wnd:CWnd;
-        protected ctx:CanvasRenderingContext2D;
+    export class CApp{
         protected table:CTable;
         constructor(){
-            this.wnd = new CWnd("easy-sheet","100",LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT,4500,9000);
-            this.ctx = this.wnd.context;
             this.table = new CTable(1000,52);
         }
         run(){
@@ -35,5 +29,5 @@ namespace EasySheet {
 }
 
 let ctx:CanvasRenderingContext2D;
-let currentSheet:EasySheet.CSheet = new EasySheet.CSheet();
+let currentSheet:EasySheet.CApp = new EasySheet.CApp();
 currentSheet.run();

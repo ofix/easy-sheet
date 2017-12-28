@@ -12,31 +12,31 @@
  * @Date      2017/12/23
  * @Time      22:31
  */
-/// <reference path="LeftBar.ts"/>
-/// <reference path="TopBar.ts"/>
+/// <reference path="WndLeftBar.ts"/>
+/// <reference path="WndTopBar.ts"/>
+/// <reference path="WndCorner.ts"/>
+/// <reference path="WndData.ts"/>
 namespace EasySheet {
     export class CTable{
         protected nRow:number;
         protected nCol:number;
-        protected corner:CCorner;//左上角
-        protected leftBar:CLeftBar;//顶部行
-        protected topBar:CTopBar;//左侧列
-        protected rows:any[];//数据区
+        protected data:CWndData;   // 数据区
+        protected corner:CWndCorner;  // 左上角
+        protected leftBar:CWndLeftBar;// 顶部行
+        protected topBar:CWndTopBar;  // 左侧列
         constructor(nRow:number,nCol:number){
             this.nRow=nRow;
             this.nCol=nCol;
-            this.leftBar=new CLeftBar(nRow);
-            this.topBar=new CTopBar(nCol);
-            this.corner = new CCorner(LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT);
-            this.rows=[];
+            this.leftBar=new CWndLeftBar(nRow);
+            this.topBar=new CWndTopBar(nCol);
+            this.corner=new CWndCorner(LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT);
+            this.data=new CWndData(nRow,nCol);
         }
         draw(){
             this.leftBar.draw();
             this.topBar.draw();
             this.corner.draw();
-            // this.rows.forEach((v)=>{
-            //     v.draw();
-            // });
+            this.data.draw();
         }
     }
 }
