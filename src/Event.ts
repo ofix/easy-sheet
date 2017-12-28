@@ -14,13 +14,8 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 $(function(){
-    $(document).on("mousewheel","#wnd-left-bar",function(event, delta){
-        app.wndLeftBar.onScroll(delta);
-        if(delta>0) {
-            console.log("向上滚动");
-        }else{
-            console.log("向下滚动");
-        }
+    $(document).on("mousewheel","#wnd-left-bar",function(event, delta, deltaX, deltaY){
+        app.wndLeftBar.onScroll(deltaY);
     });
     $(document).on("scroll","#wnd-data",function(){
         console.log("我在滚动 wnd-data!");

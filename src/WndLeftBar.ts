@@ -43,12 +43,46 @@
              this.inDrag = false;
          }
          onScroll(delta:number):void{
-                this.yScrollDelta += delta;
+             console.log("delta = ",delta);
+             if(CWndLeftBar.sameSign(delta,this.yScrollDelta)){
+                 this.yScrollDelta += (delta*53);
+             }else{
+                 this.yScrollDelta = 0;
+                 this.yScrollDelta += delta*53;
+             }
+             this.invalidate();
+         }
+         static sameSign(x,y){
+             return ((x<0 && y<0) ||(x>0 && y>0));
+         }
+         invalidate():void{
+             this.draw();
+         }
+         static now():string{
+             let date:Date = new Date();
+             let hour:string = CWndLeftBar.padZero(date.getHours());
+             let minute:string = CWndLeftBar.padZero(date.getMinutes());
+             let second:string = CWndLeftBar.padZero(date.getSeconds());
+             let millSecond:string = CWndLeftBar.padZero(date.getMilliseconds());
+             console.log(hour,minute,second,millSecond);
+             return (hour+":"+minute+":"+second+":"+millSecond);
+         }
+         static padZero(number:number):string{
+             if(number<10){
+                 return '0'+number;
+             }
+             return ''+number;
          }
          draw():void{
             let hTotal:number=0;
+            this.ctx.translate(0.5,this.yScrollDelta);
+            console.log("yScrollDelta = ",this.yScrollDelta);
+            this.ctx.save();
+            CWndLeftBar.now();
+            this.ctx.fillStyle=CLR_BAR_FILL;
+            this.ctx.fillRect(0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows);
+            this.ctx.restore();
             this.rows.forEach((v,i)=>{
-                this.ctx.translate(0,this.yScrollDelta);
                 this.ctx.save();
                 let name:string = ""+i;
                 this.ctx.fillStyle=CLR_BAR_FILL;
@@ -67,6 +101,7 @@
                 this.ctx.stroke();
                 this.ctx.restore();
             });
+             CWndLeftBar.now();
          }
          drawDragLine():void{
 

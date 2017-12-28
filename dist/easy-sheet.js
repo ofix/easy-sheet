@@ -261,13 +261,48 @@ var EasySheet;
             this.inDrag = false;
         };
         CWndLeftBar.prototype.onScroll = function (delta) {
-            this.yScrollDelta += delta;
+            console.log("delta = ", delta);
+            if (CWndLeftBar.sameSign(delta, this.yScrollDelta)) {
+                this.yScrollDelta += (delta * 53);
+            }
+            else {
+                this.yScrollDelta = 0;
+                this.yScrollDelta += delta * 53;
+            }
+            this.invalidate();
+        };
+        CWndLeftBar.sameSign = function (x, y) {
+            return ((x < 0 && y < 0) || (x > 0 && y > 0));
+        };
+        CWndLeftBar.prototype.invalidate = function () {
+            this.draw();
+        };
+        CWndLeftBar.now = function () {
+            var date = new Date();
+            var hour = CWndLeftBar.padZero(date.getHours());
+            var minute = CWndLeftBar.padZero(date.getMinutes());
+            var second = CWndLeftBar.padZero(date.getSeconds());
+            var millSecond = CWndLeftBar.padZero(date.getMilliseconds());
+            console.log(hour, minute, second, millSecond);
+            return (hour + ":" + minute + ":" + second + ":" + millSecond);
+        };
+        CWndLeftBar.padZero = function (number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return '' + number;
         };
         CWndLeftBar.prototype.draw = function () {
             var _this = this;
             var hTotal = 0;
+            this.ctx.translate(0.5, this.yScrollDelta);
+            console.log("yScrollDelta = ", this.yScrollDelta);
+            this.ctx.save();
+            CWndLeftBar.now();
+            this.ctx.fillStyle = CLR_BAR_FILL;
+            this.ctx.fillRect(0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * this.nRows);
+            this.ctx.restore();
             this.rows.forEach(function (v, i) {
-                _this.ctx.translate(0, _this.yScrollDelta);
                 _this.ctx.save();
                 var name = "" + i;
                 _this.ctx.fillStyle = CLR_BAR_FILL;
@@ -286,6 +321,7 @@ var EasySheet;
                 _this.ctx.stroke();
                 _this.ctx.restore();
             });
+            CWndLeftBar.now();
         };
         CWndLeftBar.prototype.drawDragLine = function () {
         };
@@ -569,14 +605,8 @@ var EasySheet;
     EasySheet.CEdit = CEdit;
 })(EasySheet || (EasySheet = {}));
 $(function () {
-    $(document).on("mousewheel", "#wnd-left-bar", function (event, delta) {
-        app.wndLeftBar.onScroll(delta);
-        if (delta > 0) {
-            console.log("向上滚动");
-        }
-        else {
-            console.log("向下滚动");
-        }
+    $(document).on("mousewheel", "#wnd-left-bar", function (event, delta, deltaX, deltaY) {
+        app.wndLeftBar.onScroll(deltaY);
     });
     $(document).on("scroll", "#wnd-data", function () {
         console.log("我在滚动 wnd-data!");
