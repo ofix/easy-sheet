@@ -32,6 +32,18 @@ namespace EasySheet {
             this.corner=new CWndCorner(LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT);
             this.data=new CWndData(nRow,nCol);
         }
+        get wndLeftBar():CWndLeftBar{
+            return this.leftBar;
+        }
+        get wndCorner():CWndCorner{
+            return this.corner;
+        }
+        get wndTopBar():CWndTopBar{
+            return this.topBar;
+        }
+        get wndData():CWndData{
+            return this.data;
+        }
         draw(){
             this.leftBar.draw();
             this.topBar.draw();

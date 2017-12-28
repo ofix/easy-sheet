@@ -22,12 +22,14 @@
          protected rows:number[];
          protected wnd:CWnd;
          protected ctx:CanvasRenderingContext2D;
+         protected yScrollDelta:number;
          constructor(maxRow:number=100){
              super();
              this.nRows = maxRow;
              this.rows = [];
              this.wnd = new CWnd("wnd-left-bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
              this.ctx = this.wnd.context;
+             this.yScrollDelta = 0;
              for(let i=0; i<this.nRows;i++){
                  this.rows.push(BAR_CELL_HEIGHT);
              }
@@ -36,14 +38,17 @@
             this.inDrag = true;
          }
          onDragging(ptCursor:CPoint):void{
-
          }
          onDragEnd(ptCursor:CPoint):void{
              this.inDrag = false;
          }
+         onScroll(delta:number):void{
+                this.yScrollDelta += delta;
+         }
          draw():void{
             let hTotal:number=0;
             this.rows.forEach((v,i)=>{
+                this.ctx.translate(0,this.yScrollDelta);
                 this.ctx.save();
                 let name:string = ""+i;
                 this.ctx.fillStyle=CLR_BAR_FILL;

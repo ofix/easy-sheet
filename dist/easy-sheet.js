@@ -140,7 +140,6 @@ var EasySheet;
             this.wndList.push(wnd);
         };
         CWndManager.prototype.print = function () {
-            console.log(JSON.stringify(this.wndList));
         };
         CWndManager.prototype.setWndTopMost = function (wnd) {
             if (this.isWndExist(wnd)) {
@@ -247,6 +246,7 @@ var EasySheet;
             _this.rows = [];
             _this.wnd = new EasySheet.CWnd("wnd-left-bar", "990", 0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * _this.nRows, true);
             _this.ctx = _this.wnd.context;
+            _this.yScrollDelta = 0;
             for (var i = 0; i < _this.nRows; i++) {
                 _this.rows.push(BAR_CELL_HEIGHT);
             }
@@ -260,10 +260,14 @@ var EasySheet;
         CWndLeftBar.prototype.onDragEnd = function (ptCursor) {
             this.inDrag = false;
         };
+        CWndLeftBar.prototype.onScroll = function (delta) {
+            this.yScrollDelta += delta;
+        };
         CWndLeftBar.prototype.draw = function () {
             var _this = this;
             var hTotal = 0;
             this.rows.forEach(function (v, i) {
+                _this.ctx.translate(0, _this.yScrollDelta);
                 _this.ctx.save();
                 var name = "" + i;
                 _this.ctx.fillStyle = CLR_BAR_FILL;
@@ -404,10 +408,10 @@ var EasySheet;
         CWndData.prototype.onDragEnd = function (ptCursor) {
             this.inDrag = false;
         };
-        CWndData.prototype.getItemXY = function (nRow, nCol) {
+        CWndData.prototype.getItemXY = function (iRow, iCol) {
             var pt = new CPoint();
-            pt.x = nCol * TOP_BAR_CELL_WIDTH;
-            pt.y = nRow * BAR_CELL_HEIGHT;
+            pt.x = iCol * TOP_BAR_CELL_WIDTH;
+            pt.y = iRow * BAR_CELL_HEIGHT;
             return pt;
         };
         CWndData.prototype.draw = function () {
@@ -441,6 +445,34 @@ var EasySheet;
             this.corner = new EasySheet.CWndCorner(LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT);
             this.data = new EasySheet.CWndData(nRow, nCol);
         }
+        Object.defineProperty(CTable.prototype, "wndLeftBar", {
+            get: function () {
+                return this.leftBar;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CTable.prototype, "wndCorner", {
+            get: function () {
+                return this.corner;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CTable.prototype, "wndTopBar", {
+            get: function () {
+                return this.topBar;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CTable.prototype, "wndData", {
+            get: function () {
+                return this.data;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CTable.prototype.draw = function () {
             this.leftBar.draw();
             this.topBar.draw();
@@ -461,13 +493,41 @@ var EasySheet;
             this.table.draw();
             EasySheet.CWndManager.instance().print();
         };
+        Object.defineProperty(CApp.prototype, "wndLeftBar", {
+            get: function () {
+                return this.table.wndLeftBar;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CApp.prototype, "wndTopBar", {
+            get: function () {
+                return this.table.wndTopBar;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CApp.prototype, "wndCorner", {
+            get: function () {
+                return this.table.wndCorner;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CApp.prototype, "wndData", {
+            get: function () {
+                return this.table.wndData;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return CApp;
     }());
     EasySheet.CApp = CApp;
 })(EasySheet || (EasySheet = {}));
 var ctx;
-var currentSheet = new EasySheet.CApp();
-currentSheet.run();
+var app = new EasySheet.CApp();
+app.run();
 var EasySheet;
 (function (EasySheet) {
     var CCanvas = (function () {
@@ -508,6 +568,23 @@ var EasySheet;
     }());
     EasySheet.CEdit = CEdit;
 })(EasySheet || (EasySheet = {}));
+$(function () {
+    $(document).on("mousewheel", "#wnd-left-bar", function (event, delta) {
+        app.wndLeftBar.onScroll(delta);
+        if (delta > 0) {
+            console.log("向上滚动");
+        }
+        else {
+            console.log("向下滚动");
+        }
+    });
+    $(document).on("scroll", "#wnd-data", function () {
+        console.log("我在滚动 wnd-data!");
+    });
+    $(document).on('click', '#wnd-left-bar', function () {
+        console.log("wozai 单击");
+    });
+});
 var CRect = (function () {
     function CRect(x, y, w, h) {
         if (x === void 0) { x = 0; }

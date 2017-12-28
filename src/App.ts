@@ -14,7 +14,10 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 /// <reference path="Table.ts"/>
-/// <reference path="Wnd.ts"/>
+/// <reference path="WndLeftBar.ts"/>
+/// <reference path="WndCorner.ts"/>
+/// <reference path="WndLeftBar.ts"/>
+/// <reference path="WndTopBar.ts"/>
 namespace EasySheet {
     export class CApp{
         protected table:CTable;
@@ -25,9 +28,21 @@ namespace EasySheet {
            this.table.draw();
            CWndManager.instance().print();
         }
+        get wndLeftBar():CWndLeftBar{
+           return this.table.wndLeftBar;
+        }
+        get wndTopBar():CWndTopBar{
+            return this.table.wndTopBar;
+        }
+        get wndCorner():CWndCorner{
+            return this.table.wndCorner;
+        }
+        get wndData():CWndData{
+            return this.table.wndData;
+        }
     }
 }
 
 let ctx:CanvasRenderingContext2D;
-let currentSheet:EasySheet.CApp = new EasySheet.CApp();
-currentSheet.run();
+let app:EasySheet.CApp = new EasySheet.CApp();
+app.run();

@@ -32,7 +32,7 @@ namespace EasySheet{
             this.wndList.push(wnd);
         }
         print():void{
-            console.log(JSON.stringify(this.wndList));
+            //console.log(JSON.stringify(this.wndList));
         }
         setWndTopMost(wnd:CWnd):void{
             if(this.isWndExist(wnd)){

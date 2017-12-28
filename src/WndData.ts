@@ -49,10 +49,10 @@ namespace EasySheet{
         onDragEnd(ptCursor:CPoint):void{
             this.inDrag = false;
         }
-        getItemXY(nRow:number,nCol:number):CPoint{
+        getItemXY(iRow:number,iCol:number):CPoint{
             let pt = new CPoint();
-            pt.x = nCol*TOP_BAR_CELL_WIDTH;
-            pt.y = nRow*BAR_CELL_HEIGHT;
+            pt.x = iCol*TOP_BAR_CELL_WIDTH;
+            pt.y = iRow*BAR_CELL_HEIGHT;
             return pt;
         }
         draw():void{
