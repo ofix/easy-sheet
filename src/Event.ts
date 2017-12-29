@@ -15,13 +15,8 @@
 /// <reference path="lib/jquery.d.ts"/>
 $(function(){
     $("#wnd-left-bar").bind("mousewheel DOMMouseScroll",function(event, delta, deltaX, deltaY){
-        app.wndLeftBar.scrollY(deltaY);
-    });
-    $(document).on("scroll","#wnd-data",function(){
-        console.log("我在滚动 wnd-data!");
-    });
-    $(document).on('click','#wnd-left-bar',function(){
-       console.log("wozai 单击");
+        app.rowCtrl.scrollY(deltaY);
+        $("#wnd-data").css("top+=",deltaY*53);
     });
 });
 

@@ -13,7 +13,7 @@
  * @Time      23:31
  */
  namespace EasySheet{
-     export class CEdit{
+     export class CEditCtrl{
 
      }
  }

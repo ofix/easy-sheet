@@ -13,36 +13,34 @@
  * @Time      10:43
  */
 /// <reference path="lib/jquery.d.ts"/>
-/// <reference path="Table.ts"/>
-/// <reference path="WndLeftBar.ts"/>
-/// <reference path="WndCorner.ts"/>
-/// <reference path="WndLeftBar.ts"/>
-/// <reference path="WndTopBar.ts"/>
+/// <reference path="View.ts"/>
+/// <reference path="RowCtrl.ts"/>
+/// <reference path="ColumnCtrl.ts"/>
+/// <reference path="GridCtrl.ts"/>
 namespace EasySheet {
     export class CApp{
-        protected table:CTable;
+        protected _colCtrl:CColumnCtrl;
+        protected _view:CView;
         constructor(){
-            this.table = new CTable(1000,52);
+            this._view = new CView(1024,52);
         }
         run(){
-           this.table.draw();
-           CWndManager.instance().print();
+            this._colCtrl.Draw();
+            this._view.Draw();
         }
-        get wndLeftBar():CWndLeftBar{
-           return this.table.wndLeftBar;
+        get view():CView{
+            return this._view;
         }
-        get wndTopBar():CWndTopBar{
-            return this.table.wndTopBar;
+        get rowCtrl():CRowCtrl{
+            return this._view.rowCtrl;
         }
-        get wndCorner():CWndCorner{
-            return this.table.wndCorner;
+        get gridCtrl():CGridCtrl{
+            return this._view.gridCtrl;
         }
-        get wndData():CWndData{
-            return this.table.wndData;
+        get colCtrl():CColumnCtrl{
+            return this._colCtrl;
         }
     }
 }
-
-let ctx:CanvasRenderingContext2D;
 let app:EasySheet.CApp = new EasySheet.CApp();
 app.run();

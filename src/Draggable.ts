@@ -14,13 +14,9 @@
  */
 
 namespace EasySheet{
-   export abstract class CDraggable{
-        protected inDrag:boolean;
-        constructor(){
-            this.inDrag=false;
-        }
-        abstract onDragStart(ptCursor:CPoint):void;
-        abstract onDragging(ptCursor:CPoint):void;
-        abstract onDragEnd(ptCursor:CPoint):void;
+   export interface IDraggable{
+        OnDragStart(ptCursor:CPoint):void;
+        OnDragging(ptCursor:CPoint):void;
+        OnDragEnd(ptCursor:CPoint):void;
     }
 }

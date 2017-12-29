@@ -16,57 +16,63 @@
 namespace EasySheet{
     export class CWnd{
         protected _name:string;
-        protected x:number;
-        protected y:number;
-        protected w:number;
-        protected h:number;
-        protected bFixed:boolean;
-        protected zIndex:string;
-        protected div:HTMLDivElement;
-        protected canvas:HTMLCanvasElement;
-        protected render2D:CanvasRenderingContext2D;
-        constructor(name:string,zIndex:string,x:number,y:number,width:number,height:number,bFixed:boolean=false) {
-            this.x=x;
-            this.y=y;
-            this.w = width;
-            this.h = height;
+        protected _x:number;
+        protected _y:number;
+        protected _w:number;
+        protected _h:number;
+        protected _bFixed:boolean;
+        protected _zIndex:string;
+        protected _div:HTMLDivElement;
+        protected _canvas:HTMLCanvasElement;
+        protected _ctx:CanvasRenderingContext2D;
+        constructor(name:string){
             this._name = name;
-            this.zIndex = zIndex;
-            this.bFixed = bFixed;
-            this.createCanvas();
+        }
+        CreateWindow(zIndex:string,x:number,y:number,width:number,height:number,bFixed:boolean=false) {
+            this._x=x;
+            this._y=y;
+            this._w = width;
+            this._h = height;
+            this._name = name;
+            this._zIndex = zIndex;
+            this._bFixed = bFixed;
+            this.CreateCanvas();
+        }
+        get zIndex():string{
+            return this._zIndex;
         }
         get name():string{
             return this._name;
         }
         get visualHeight():number{
-            return this.div.clientHeight;
+            return this._div.clientHeight;
         }
         get contentHeight():number{
-            return this.h;
-        }
-        createCanvas(): void {
-            this.div = document.createElement('div');
-            this.div.id = 'div-'+this.name;
-            this.div.style.position = this.bFixed?"fixed":"absolute";
-            this.div.style.left = this.x+"px";
-            this.div.style.top = this.y+"px";
-            this.div.style.zIndex = this.zIndex;
-
-            this.canvas = document.createElement('canvas');
-            this.canvas.id = this.name;
-            this.canvas.style.position = "relative";
-            this.canvas.style.left ="0px";
-            this.canvas.style.top = "0px";
-            this.canvas.width = this.w;
-            this.canvas.height = this.h;
-            this.div.appendChild(this.canvas);
-            document.body.appendChild(this.div);
-            CWndManager.instance().registerWnd(this);
-            this.render2D = this.canvas.getContext("2d");
-            this.render2D.translate(0.5,0.5);
+            return this._h;
         }
         get context():CanvasRenderingContext2D{
-            return this.render2D;
+            return this._ctx;
+        }
+        CreateCanvas(): void {
+            this._div = document.createElement('div');
+            this._div.id = 'div-'+this.name;
+            this._div.style.position = this._bFixed?"fixed":"absolute";
+            this._div.style.left = this._x+"px";
+            this._div.style.top = this._y+"px";
+            this._div.style.zIndex = this._zIndex;
+
+            this._canvas = document.createElement('canvas');
+            this._canvas.id = this.name;
+            this._canvas.style.position = "relative";
+            this._canvas.style.left ="0px";
+            this._canvas.style.top = "0px";
+            this._canvas.width = this._w;
+            this._canvas.height = this._h;
+            this._div.appendChild(this._canvas);
+            document.body.appendChild(this._div);
+            CWndManager.instance().registerWnd(this);
+            this._ctx = this._canvas.getContext("2d");
+            this._ctx.translate(0.5,0.5);
         }
     }
 }
