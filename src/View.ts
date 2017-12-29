@@ -15,12 +15,14 @@
 /// <reference path="Wnd.ts"/>
 /// <reference path="RowCtrl.ts"/>
 /// <reference path="GridCtrl.ts"/>
+/// <reference path="ScrollBarCtrl.ts"/>
 namespace EasySheet{
     export class CView extends CWnd{
         protected _nRows:number;
         protected _nCols:number;
         protected _rowCtrl:CRowCtrl;
         protected _gridCtrl:CGridCtrl;
+        protected _scrollBarCtrl:CScrollBarCtrl;
         constructor(nRows:number,nCols:number){
             super("es-view");
             this.CreateWindow("100",0,0,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
@@ -28,6 +30,9 @@ namespace EasySheet{
             this._nCols = nCols;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
+            this._scrollBarCtrl = new CScrollBarCtrl(this,"scroll-bar",CScrollBarCtrl.SBC_HORZ,120,300,200);
+            this._scrollBarCtrl.SetPageSize(1000);
+            this._scrollBarCtrl.SetViewSize(500);
         }
         get gridCtrl():CGridCtrl{
             return this._gridCtrl;
@@ -44,6 +49,7 @@ namespace EasySheet{
         Draw(){
             this._gridCtrl.Draw();
             this._rowCtrl.Draw();
+            this._scrollBarCtrl.Draw();
         }
     }
 }

@@ -380,6 +380,127 @@ var EasySheet;
 })(EasySheet || (EasySheet = {}));
 var EasySheet;
 (function (EasySheet) {
+    var CScrollBarCtrl = (function () {
+        function CScrollBarCtrl(parentWnd, name, barStyle, x, y, width, height) {
+            if (name === void 0) { name = "scroll-bar"; }
+            if (barStyle === void 0) { barStyle = CScrollBarCtrl.SBC_HORZ; }
+            if (height === void 0) { height = 18; }
+            this._parent = parentWnd;
+            this._name = name;
+            this._bar_style = barStyle;
+            this._x = x;
+            this._y = y;
+            this._w = width;
+            this._h = height;
+            this._vw = this._w;
+            this._ctx = parentWnd.context;
+            this._barClr = "#C1C1C1";
+            this._bkClr = "#F1F1F1";
+            this._triClr = "#505050";
+            this._pos = 0;
+            this._page = 0;
+            this._view = 0;
+        }
+        Object.defineProperty(CScrollBarCtrl.prototype, "barColor", {
+            get: function () {
+                return this._barClr;
+            },
+            set: function (color) {
+                this._barClr = color;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CScrollBarCtrl.prototype, "bkColor", {
+            get: function () {
+                return this._bkClr;
+            },
+            set: function (color) {
+                this._bkClr = color;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CScrollBarCtrl.prototype, "triangleColor", {
+            get: function () {
+                return this._triClr;
+            },
+            set: function (color) {
+                this._triClr = color;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CScrollBarCtrl.prototype.SetScrollPos = function (value) {
+            this._pos = value;
+        };
+        CScrollBarCtrl.prototype.GetScrollPos = function () {
+            return this._pos;
+        };
+        CScrollBarCtrl.prototype.SetPageSize = function (size) {
+            this._page = size;
+        };
+        CScrollBarCtrl.prototype.GetPageSize = function () {
+            return this._page;
+        };
+        CScrollBarCtrl.prototype.SetViewSize = function (size) {
+            this._view = size;
+        };
+        CScrollBarCtrl.prototype.GetViewSize = function () {
+            return this._view;
+        };
+        CScrollBarCtrl.prototype.Draw = function () {
+            this._ctx.translate(0.5, 0.5);
+            this.DrawBk();
+            this.DrawLeftTriangle();
+            this.DrawRightTriangle();
+            this.DrawBar();
+        };
+        CScrollBarCtrl.prototype.DrawLeftTriangle = function () {
+            this._ctx.save();
+            this._ctx.fillStyle = this._triClr;
+            this._ctx.strokeStyle = this._triClr;
+            this._ctx.beginPath();
+            this._ctx.moveTo(this._x + 12, this._y + 6);
+            this._ctx.lineTo(this._x + 12, this._y + this._h - 6);
+            this._ctx.lineTo(this._x + 8, this._y + this._h / 2);
+            this._ctx.closePath();
+            this._ctx.fill();
+            this._ctx.restore();
+        };
+        CScrollBarCtrl.prototype.DrawRightTriangle = function () {
+            this._ctx.save();
+            this._ctx.fillStyle = this._triClr;
+            this._ctx.strokeStyle = this._triClr;
+            this._ctx.beginPath();
+            this._ctx.moveTo(this._x + this._w - 12, this._y + 6);
+            this._ctx.lineTo(this._x + this._w - 12, this._y + this._h - 6);
+            this._ctx.lineTo(this._x + this._w - 8, this._y + this._h / 2);
+            this._ctx.closePath();
+            this._ctx.fill();
+            this._ctx.restore();
+        };
+        CScrollBarCtrl.prototype.DrawBk = function () {
+            this._ctx.save();
+            this._ctx.fillStyle = this._bkClr;
+            this._ctx.fillRect(this._x, this._y, this._w, this._h);
+            this._ctx.restore();
+        };
+        CScrollBarCtrl.prototype.DrawBar = function () {
+            this._ctx.save();
+            this._ctx.fillStyle = this._barClr;
+            var w = Math.floor((this._w - 40) * (this._view / this._page));
+            this._ctx.fillRect(this._x + 18, this._y + 2, w, this._h - 4);
+            this._ctx.restore();
+        };
+        CScrollBarCtrl.SBC_HORZ = 0;
+        CScrollBarCtrl.SBC_VERT = 1;
+        return CScrollBarCtrl;
+    }());
+    EasySheet.CScrollBarCtrl = CScrollBarCtrl;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
     var CView = (function (_super) {
         __extends(CView, _super);
         function CView(nRows, nCols) {
@@ -389,6 +510,9 @@ var EasySheet;
             _this._nCols = nCols;
             _this._gridCtrl = new EasySheet.CGridCtrl(_this, nRows, nCols);
             _this._rowCtrl = new EasySheet.CRowCtrl(_this, nRows);
+            _this._scrollBarCtrl = new EasySheet.CScrollBarCtrl(_this, "scroll-bar", EasySheet.CScrollBarCtrl.SBC_HORZ, 120, 300, 200);
+            _this._scrollBarCtrl.SetPageSize(1000);
+            _this._scrollBarCtrl.SetViewSize(500);
             return _this;
         }
         Object.defineProperty(CView.prototype, "gridCtrl", {
@@ -414,6 +538,7 @@ var EasySheet;
         CView.prototype.Draw = function () {
             this._gridCtrl.Draw();
             this._rowCtrl.Draw();
+            this._scrollBarCtrl.Draw();
         };
         return CView;
     }(EasySheet.CWnd));
@@ -478,7 +603,7 @@ var EasySheet;
 (function (EasySheet) {
     var CApp = (function () {
         function CApp() {
-            this._view = new EasySheet.CView(1024, 52);
+            this._view = new EasySheet.CView(256, 52);
             this._colCtrl = new EasySheet.CColumnCtrl(52);
         }
         CApp.prototype.run = function () {
