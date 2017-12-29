@@ -261,13 +261,18 @@ var EasySheet;
             this.inDrag = false;
         };
         CWndLeftBar.prototype.onScroll = function (delta) {
-            console.log("delta = ", delta);
             if (CWndLeftBar.sameSign(delta, this.yScrollDelta)) {
                 this.yScrollDelta += (delta * 53);
             }
             else {
-                this.yScrollDelta = 0;
                 this.yScrollDelta += delta * 53;
+            }
+            console.log(this.yScrollDelta);
+            if (this.yScrollDelta > 0) {
+                this.yScrollDelta = 0;
+            }
+            if (this.yScrollDelta < (-BAR_CELL_HEIGHT * this.nRows + 800)) {
+                this.yScrollDelta = (-BAR_CELL_HEIGHT * this.nRows + 800);
             }
             this.invalidate();
         };
@@ -295,9 +300,7 @@ var EasySheet;
         CWndLeftBar.prototype.draw = function () {
             var _this = this;
             var hTotal = 0;
-            this.ctx.translate(0.5, this.yScrollDelta);
-            console.log("yScrollDelta = ", this.yScrollDelta);
-            CWndLeftBar.now();
+            this.ctx.translate(0, this.yScrollDelta);
             this.ctx.save();
             this.ctx.fillStyle = CLR_BAR_FILL;
             this.ctx.fillRect(0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * this.nRows);
@@ -318,7 +321,6 @@ var EasySheet;
                 _this.ctx.stroke();
             });
             this.ctx.restore();
-            CWndLeftBar.now();
         };
         CWndLeftBar.prototype.drawDragLine = function () {
         };
