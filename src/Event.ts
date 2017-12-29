@@ -14,7 +14,7 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 $(function(){
-    $(document).on("mousewheel","#wnd-left-bar",function(event, delta, deltaX, deltaY){
+    $("#wnd-left-bar").bind("mousewheel DOMMouseScroll",function(event, delta, deltaX, deltaY){
         app.wndLeftBar.onScroll(deltaY);
     });
     $(document).on("scroll","#wnd-data",function(){

@@ -297,30 +297,27 @@ var EasySheet;
             var hTotal = 0;
             this.ctx.translate(0.5, this.yScrollDelta);
             console.log("yScrollDelta = ", this.yScrollDelta);
-            this.ctx.save();
             CWndLeftBar.now();
+            this.ctx.save();
             this.ctx.fillStyle = CLR_BAR_FILL;
             this.ctx.fillRect(0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * this.nRows);
-            this.ctx.restore();
+            this.ctx.fillStyle = CLR_BAR_TEXT;
+            this.ctx.strokeStyle = CLR_BAR_SEP;
+            this.ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+            this.ctx.textBaseline = "middle";
+            this.ctx.textAlign = "center";
             this.rows.forEach(function (v, i) {
-                _this.ctx.save();
-                var name = "" + i;
-                _this.ctx.fillStyle = CLR_BAR_FILL;
-                _this.ctx.fillRect(0, hTotal, LEFT_BAR_CELL_WIDTH, v);
                 if (i > 0) {
-                    _this.ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                    _this.ctx.textBaseline = "middle";
-                    _this.ctx.textAlign = "center";
-                    _this.ctx.fillStyle = CLR_BAR_TEXT;
-                    _this.ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                    var name_1 = "" + i;
+                    _this.ctx.fillText(name_1, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
                 }
                 hTotal += v;
-                _this.ctx.strokeStyle = CLR_BAR_SEP;
+                _this.ctx.beginPath();
                 _this.ctx.moveTo(0, hTotal);
                 _this.ctx.lineTo(LEFT_BAR_CELL_WIDTH, hTotal);
                 _this.ctx.stroke();
-                _this.ctx.restore();
             });
+            this.ctx.restore();
             CWndLeftBar.now();
         };
         CWndLeftBar.prototype.drawDragLine = function () {
@@ -605,7 +602,7 @@ var EasySheet;
     EasySheet.CEdit = CEdit;
 })(EasySheet || (EasySheet = {}));
 $(function () {
-    $(document).on("mousewheel", "#wnd-left-bar", function (event, delta, deltaX, deltaY) {
+    $("#wnd-left-bar").bind("mousewheel DOMMouseScroll", function (event, delta, deltaX, deltaY) {
         app.wndLeftBar.onScroll(deltaY);
     });
     $(document).on("scroll", "#wnd-data", function () {
