@@ -33,7 +33,6 @@ namespace EasySheet{
             this._y=y;
             this._w = width;
             this._h = height;
-            this._name = name;
             this._zIndex = zIndex;
             this._bFixed = bFixed;
             this.CreateCanvas();
@@ -55,7 +54,7 @@ namespace EasySheet{
         }
         CreateCanvas(): void {
             this._div = document.createElement('div');
-            this._div.id = 'div-'+this.name;
+            this._div.id = 'd-'+this.name;
             this._div.style.position = this._bFixed?"fixed":"absolute";
             this._div.style.left = this._x+"px";
             this._div.style.top = this._y+"px";

@@ -32,10 +32,12 @@ namespace EasySheet{
         protected _ctx:CanvasRenderingContext2D;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
-            this._x = LEFT_BAR_CELL_WIDTH;
-            this._y = BAR_CELL_HEIGHT;
             this._nRows = nRows;
             this._nCols = nCols;
+            this._x = FIXED_CELL_WIDTH;
+            this._y = CELL_HEIGHT;
+            this._w = nCols * CELL_WIDTH;
+            this._h = nRows * CELL_HEIGHT;
             this._rows = [];
             this._cols = [];
             this._ctx = this._parent.context;
@@ -49,22 +51,22 @@ namespace EasySheet{
         OnDragEnd(ptCursor:CPoint):void{
             this._inDrag = false;
         }
-        static GetItemXY(iRow:number,iCol:number):CPoint{
+        GetItemXY(iRow:number,iCol:number):CPoint{
             let pt = new CPoint();
-            pt.x = iCol*TOP_BAR_CELL_WIDTH;
-            pt.y = iRow*BAR_CELL_HEIGHT;
+            pt.x = iCol*CELL_WIDTH+this._x;
+            pt.y = iRow*CELL_HEIGHT;
             return pt;
         }
         Draw():void{
             for(let i=0; i<this._nRows; i++){
                 for(let j=0; j<this._nCols; j++){
                     this._ctx.save();
-                    let xy = CGridCtrl.GetItemXY(i,j);
+                    let xy = this.GetItemXY(i,j);
                     this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
                     this._ctx.textBaseline="middle";
                     this._ctx.textAlign = "center";
                     this._ctx.fillStyle = "#000";
-                    this._ctx.fillText(""+i+j,xy.x+TOP_BAR_CELL_WIDTH/2,xy.y+BAR_CELL_HEIGHT/2);
+                    this._ctx.fillText(""+i+j,xy.x+CELL_WIDTH/2,xy.y+CELL_HEIGHT/2);
                     this._ctx.stroke();
                     this._ctx.restore();
                 }

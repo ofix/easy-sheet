@@ -37,7 +37,7 @@
              this._yScrollDelta=0;
              this._ctx = this._parent.context;
              for(let i=0; i<this._nRows;i++){
-                 this._rows.push(BAR_CELL_HEIGHT);
+                 this._rows.push(CELL_HEIGHT);
              }
          }
          get x():number{
@@ -71,7 +71,7 @@
             this._ctx.translate(0,this._yScrollDelta);
             this._ctx.save();
             this._ctx.fillStyle=CLR_BAR_FILL;
-            this._ctx.fillRect(0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this._nRows);
+            this._ctx.fillRect(0,0,FIXED_CELL_WIDTH,CELL_HEIGHT*this._nRows);
             this._ctx.fillStyle = CLR_BAR_TEXT;
             this._ctx.strokeStyle = CLR_BAR_SEP;
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
@@ -80,12 +80,12 @@
             this._rows.forEach((v,i)=>{
                 if(i>0) {
                     let name:string = ""+i;
-                    this._ctx.fillText(name, LEFT_BAR_CELL_WIDTH / 2, hTotal + BAR_CELL_HEIGHT / 2);
+                    this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
                 }
                 hTotal+=v;
                 this._ctx.beginPath();
                 this._ctx.moveTo(0,hTotal);
-                this._ctx.lineTo(LEFT_BAR_CELL_WIDTH,hTotal);
+                this._ctx.lineTo(FIXED_CELL_WIDTH,hTotal);
                 this._ctx.stroke();
             });
             this._ctx.restore();

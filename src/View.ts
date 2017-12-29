@@ -14,7 +14,7 @@
  */
 /// <reference path="Wnd.ts"/>
 /// <reference path="RowCtrl.ts"/>
-/// <referenct path="GridCtrl.ts"/>
+/// <reference path="GridCtrl.ts"/>
 namespace EasySheet{
     export class CView extends CWnd{
         protected _nRows:number;
@@ -22,8 +22,8 @@ namespace EasySheet{
         protected _rowCtrl:CRowCtrl;
         protected _gridCtrl:CGridCtrl;
         constructor(nRows:number,nCols:number){
-            super("easy-sheet-view");
-            super.CreateWindow("100",0,0,nRows*TOP_BAR_CELL_WIDTH,nCols*BAR_CELL_HEIGHT);
+            super("es-view");
+            this.CreateWindow("100",0,0,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
             this._nRows = nRows;
             this._nCols = nCols;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);

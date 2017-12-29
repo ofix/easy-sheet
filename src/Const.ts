@@ -25,9 +25,9 @@ const DEFAULT_COLS:number = 52;
 const DEFAULT_BACK_COLOR:string="#FFF";
 const DEFAULT_FORE_COLOR:string="#000";
 const DEFAULT_SELECT_CELL_COLOR:string="#FF0000";
-const TOP_BAR_CELL_WIDTH:number=72;
-const LEFT_BAR_CELL_WIDTH:number=34;
-const BAR_CELL_HEIGHT:number=20;
+const CELL_WIDTH:number=72;
+const FIXED_CELL_WIDTH:number=34;
+const CELL_HEIGHT:number=20;
 
 const MODE_NORMAL:number=0;
 const MODE_IN_EDIT:number=1;
