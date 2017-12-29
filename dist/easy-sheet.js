@@ -256,17 +256,32 @@ var EasySheet;
         function CWndLeftBar(maxRow) {
             if (maxRow === void 0) { maxRow = 100; }
             var _this = _super.call(this) || this;
+            _this._x = 0;
+            _this._y = 0;
             _this.nRows = maxRow;
             _this.rows = [];
             _this.wnd = new EasySheet.CWnd("wnd-left-bar", "990", 0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * _this.nRows, true);
             _this.ctx = _this.wnd.context;
-            _this.y = 0;
             _this.yScrollDelta = 0;
             for (var i = 0; i < _this.nRows; i++) {
                 _this.rows.push(BAR_CELL_HEIGHT);
             }
             return _this;
         }
+        Object.defineProperty(CWndLeftBar.prototype, "x", {
+            get: function () {
+                return this._x;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWndLeftBar.prototype, "y", {
+            get: function () {
+                return this._y;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CWndLeftBar.prototype.onDragStart = function (ptCursor) {
             this.inDrag = true;
         };
@@ -275,36 +290,18 @@ var EasySheet;
         CWndLeftBar.prototype.onDragEnd = function (ptCursor) {
             this.inDrag = false;
         };
-        CWndLeftBar.prototype.onScroll = function (delta) {
+        CWndLeftBar.prototype.scrollY = function (delta) {
             this.yScrollDelta = delta * 53;
-            this.y += this.yScrollDelta;
-            if (this.y > 0) {
-                this.y = 0;
+            this._y += this.yScrollDelta;
+            if (this._y > 0) {
+                this._y = 0;
                 this.yScrollDelta = 0;
             }
-            if (this.y < (this.wnd.visualHeight - this.wnd.contentHeight)) {
-                this.y = this.wnd.visualHeight - this.wnd.contentHeight;
+            if (this._y < (this.wnd.visualHeight - this.wnd.contentHeight)) {
+                this._y = this.wnd.visualHeight - this.wnd.contentHeight;
                 this.yScrollDelta = 0;
             }
             this.draw();
-        };
-        CWndLeftBar.sameSign = function (x, y) {
-            return ((x < 0 && y < 0) || (x > 0 && y > 0));
-        };
-        CWndLeftBar.now = function () {
-            var date = new Date();
-            var hour = CWndLeftBar.padZero(date.getHours());
-            var minute = CWndLeftBar.padZero(date.getMinutes());
-            var second = CWndLeftBar.padZero(date.getSeconds());
-            var millSecond = CWndLeftBar.padZero(date.getMilliseconds());
-            console.log(hour, minute, second, millSecond);
-            return (hour + ":" + minute + ":" + second + ":" + millSecond);
-        };
-        CWndLeftBar.padZero = function (number) {
-            if (number < 10) {
-                return '0' + number;
-            }
-            return '' + number;
         };
         CWndLeftBar.prototype.draw = function () {
             var _this = this;
@@ -614,7 +611,7 @@ var EasySheet;
 })(EasySheet || (EasySheet = {}));
 $(function () {
     $("#wnd-left-bar").bind("mousewheel DOMMouseScroll", function (event, delta, deltaX, deltaY) {
-        app.wndLeftBar.onScroll(deltaY);
+        app.wndLeftBar.scrollY(deltaY);
     });
     $(document).on("scroll", "#wnd-data", function () {
         console.log("我在滚动 wnd-data!");
@@ -670,6 +667,23 @@ function makeRect(pt1, pt2) {
         ptRightBottom = pt1;
     }
     return (new CRect()).setRect(ptTopLeft, ptRightBottom);
+}
+function now() {
+    var date = new Date();
+    var hour = padZero(date.getHours());
+    var minute = padZero(date.getMinutes());
+    var second = padZero(date.getSeconds());
+    var millSecond = padZero(date.getMilliseconds());
+    return (hour + ":" + minute + ":" + second + ":" + millSecond);
+}
+function padZero(digit) {
+    if (digit < 10) {
+        return "0" + digit;
+    }
+    return digit + "";
+}
+function sameSign(x, y) {
+    return ((x < 0 && y < 0) || (x > 0 && y > 0));
 }
 var EasySheet;
 (function (EasySheet) {

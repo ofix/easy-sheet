@@ -40,3 +40,20 @@ function makeRect(pt1:CPoint,pt2:CPoint):CRect{
     }
     return (new CRect()).setRect(ptTopLeft,ptRightBottom);
 }
+function now():string{
+    let date:Date = new Date();
+    let hour:string = padZero(date.getHours());
+    let minute:string = padZero(date.getMinutes());
+    let second:string = padZero(date.getSeconds());
+    let millSecond:string = padZero(date.getMilliseconds());
+    return (hour+":"+minute+":"+second+":"+millSecond);
+}
+function padZero(digit:number):string{
+    if(digit<10){
+        return "0"+digit;
+    }
+    return digit+"";
+}
+function sameSign(x:number,y:number){
+    return ((x<0 && y<0) ||(x>0 && y>0));
+}

@@ -23,18 +23,26 @@
          protected wnd:CWnd;
          protected ctx:CanvasRenderingContext2D;
          protected yScrollDelta:number;
-         protected y:number;
+         protected _x:number;
+         protected _y:number;
          constructor(maxRow:number=100){
              super();
+             this._x=0;
+             this._y=0;
              this.nRows = maxRow;
              this.rows = [];
              this.wnd = new CWnd("wnd-left-bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
              this.ctx = this.wnd.context;
-             this.y= 0;
              this.yScrollDelta=0;
              for(let i=0; i<this.nRows;i++){
                  this.rows.push(BAR_CELL_HEIGHT);
              }
+         }
+         get x():number{
+             return this._x;
+         }
+         get y():number{
+             return this._y;
          }
          onDragStart(ptCursor:CPoint):void{
             this.inDrag = true;
@@ -44,36 +52,18 @@
          onDragEnd(ptCursor:CPoint):void{
              this.inDrag = false;
          }
-         onScroll(delta:number):void{
+         scrollY(delta:number):void{
              this.yScrollDelta = delta*53;
-             this.y += this.yScrollDelta;
-             if(this.y>0){
-                 this.y=0;
+             this._y += this.yScrollDelta;
+             if(this._y>0){
+                 this._y=0;
                  this.yScrollDelta =0;
              }
-             if(this.y<(this.wnd.visualHeight-this.wnd.contentHeight)){
-                 this.y = this.wnd.visualHeight - this.wnd.contentHeight;
+             if(this._y<(this.wnd.visualHeight-this.wnd.contentHeight)){
+                 this._y = this.wnd.visualHeight - this.wnd.contentHeight;
                  this.yScrollDelta = 0;
              }
              this.draw();
-         }
-         static sameSign(x,y){
-             return ((x<0 && y<0) ||(x>0 && y>0));
-         }
-         static now():string{
-             let date:Date = new Date();
-             let hour:string = CWndLeftBar.padZero(date.getHours());
-             let minute:string = CWndLeftBar.padZero(date.getMinutes());
-             let second:string = CWndLeftBar.padZero(date.getSeconds());
-             let millSecond:string = CWndLeftBar.padZero(date.getMilliseconds());
-             console.log(hour,minute,second,millSecond);
-             return (hour+":"+minute+":"+second+":"+millSecond);
-         }
-         static padZero(number:number):string{
-             if(number<10){
-                 return '0'+number;
-             }
-             return ''+number;
          }
          draw():void{
             let hTotal:number=0;
