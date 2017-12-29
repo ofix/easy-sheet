@@ -23,13 +23,15 @@
          protected wnd:CWnd;
          protected ctx:CanvasRenderingContext2D;
          protected yScrollDelta:number;
+         protected y:number;
          constructor(maxRow:number=100){
              super();
              this.nRows = maxRow;
              this.rows = [];
              this.wnd = new CWnd("wnd-left-bar","990",0,0,LEFT_BAR_CELL_WIDTH,BAR_CELL_HEIGHT*this.nRows,true);
              this.ctx = this.wnd.context;
-             this.yScrollDelta = 0;
+             this.y= 0;
+             this.yScrollDelta=0;
              for(let i=0; i<this.nRows;i++){
                  this.rows.push(BAR_CELL_HEIGHT);
              }
@@ -43,25 +45,20 @@
              this.inDrag = false;
          }
          onScroll(delta:number):void{
-             if(CWndLeftBar.sameSign(delta,this.yScrollDelta)){
-                 this.yScrollDelta += (delta*53);
-             }else{
-                 this.yScrollDelta += delta*53;
+             this.yScrollDelta = delta*53;
+             this.y += this.yScrollDelta;
+             if(this.y>0){
+                 this.y=0;
+                 this.yScrollDelta =0;
              }
-             console.log(this.yScrollDelta);
-             if(this.yScrollDelta >0){
+             if(this.y<(this.wnd.visualHeight-this.wnd.contentHeight)){
+                 this.y = this.wnd.visualHeight - this.wnd.contentHeight;
                  this.yScrollDelta = 0;
              }
-             if(this.yScrollDelta < (-BAR_CELL_HEIGHT*this.nRows+800)){
-                 this.yScrollDelta = (-BAR_CELL_HEIGHT*this.nRows+800);
-             }
-             this.invalidate();
+             this.draw();
          }
          static sameSign(x,y){
              return ((x<0 && y<0) ||(x>0 && y>0));
-         }
-         invalidate():void{
-             this.draw();
          }
          static now():string{
              let date:Date = new Date();

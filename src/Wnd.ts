@@ -38,6 +38,12 @@ namespace EasySheet{
         get name():string{
             return this._name;
         }
+        get visualHeight():number{
+            return this.div.clientHeight;
+        }
+        get contentHeight():number{
+            return this.h;
+        }
         createCanvas(): void {
             this.div = document.createElement('div');
             this.div.id = 'div-'+this.name;

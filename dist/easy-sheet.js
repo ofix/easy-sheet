@@ -184,6 +184,20 @@ var EasySheet;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(CWnd.prototype, "visualHeight", {
+            get: function () {
+                return this.div.clientHeight;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "contentHeight", {
+            get: function () {
+                return this.h;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CWnd.prototype.createCanvas = function () {
             this.div = document.createElement('div');
             this.div.id = 'div-' + this.name;
@@ -246,6 +260,7 @@ var EasySheet;
             _this.rows = [];
             _this.wnd = new EasySheet.CWnd("wnd-left-bar", "990", 0, 0, LEFT_BAR_CELL_WIDTH, BAR_CELL_HEIGHT * _this.nRows, true);
             _this.ctx = _this.wnd.context;
+            _this.y = 0;
             _this.yScrollDelta = 0;
             for (var i = 0; i < _this.nRows; i++) {
                 _this.rows.push(BAR_CELL_HEIGHT);
@@ -261,26 +276,20 @@ var EasySheet;
             this.inDrag = false;
         };
         CWndLeftBar.prototype.onScroll = function (delta) {
-            if (CWndLeftBar.sameSign(delta, this.yScrollDelta)) {
-                this.yScrollDelta += (delta * 53);
-            }
-            else {
-                this.yScrollDelta += delta * 53;
-            }
-            console.log(this.yScrollDelta);
-            if (this.yScrollDelta > 0) {
+            this.yScrollDelta = delta * 53;
+            this.y += this.yScrollDelta;
+            if (this.y > 0) {
+                this.y = 0;
                 this.yScrollDelta = 0;
             }
-            if (this.yScrollDelta < (-BAR_CELL_HEIGHT * this.nRows + 800)) {
-                this.yScrollDelta = (-BAR_CELL_HEIGHT * this.nRows + 800);
+            if (this.y < (this.wnd.visualHeight - this.wnd.contentHeight)) {
+                this.y = this.wnd.visualHeight - this.wnd.contentHeight;
+                this.yScrollDelta = 0;
             }
-            this.invalidate();
+            this.draw();
         };
         CWndLeftBar.sameSign = function (x, y) {
             return ((x < 0 && y < 0) || (x > 0 && y > 0));
-        };
-        CWndLeftBar.prototype.invalidate = function () {
-            this.draw();
         };
         CWndLeftBar.now = function () {
             var date = new Date();
