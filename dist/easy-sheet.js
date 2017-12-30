@@ -633,13 +633,55 @@ var EasySheet;
 })(EasySheet || (EasySheet = {}));
 var EasySheet;
 (function (EasySheet) {
+    var CCornerCtrl = (function (_super) {
+        __extends(CCornerCtrl, _super);
+        function CCornerCtrl() {
+            var _this = _super.call(this, "es-corner-ctrl") || this;
+            _this._x = 0;
+            _this._y = 0;
+            _this._w = FIXED_CELL_WIDTH;
+            _this._h = CELL_HEIGHT;
+            _this.CreateWindow("10000", 0, 0, FIXED_CELL_WIDTH, CELL_HEIGHT, true);
+            return _this;
+        }
+        CCornerCtrl.prototype.DrawTri = function () {
+            this._ctx.save();
+            this._ctx.beginPath();
+            this._ctx.fillStyle = "#B8B8B8";
+            this._ctx.moveTo(this._x + this._w - 4, this._y + 4);
+            this._ctx.lineTo(this._x + this._w - 4, this._y + this._h - 4);
+            this._ctx.lineTo(this._x + this._w - 16, this._y + this._h - 4);
+            this._ctx.closePath();
+            this._ctx.fill();
+            this._ctx.restore();
+        };
+        CCornerCtrl.prototype.Draw = function () {
+            this._ctx.save();
+            this._ctx.strokeStyle = CLR_BAR_SEP;
+            this._ctx.fillStyle = CLR_BAR_FILL;
+            this._ctx.fillRect(this._x, this._y, this._w, this._h);
+            this._ctx.moveTo(this._x + this._w, this._y);
+            this._ctx.lineTo(this._x + this._w, this._y + CELL_HEIGHT);
+            this._ctx.lineTo(this._x, this._y + CELL_HEIGHT);
+            this._ctx.stroke();
+            this._ctx.restore();
+            this.DrawTri();
+        };
+        return CCornerCtrl;
+    }(EasySheet.CWnd));
+    EasySheet.CCornerCtrl = CCornerCtrl;
+})(EasySheet || (EasySheet = {}));
+var EasySheet;
+(function (EasySheet) {
     var CApp = (function () {
         function CApp() {
             this._view = new EasySheet.CView(256, 52);
             this._colCtrl = new EasySheet.CColumnCtrl(52);
+            this._cornerCtrl = new EasySheet.CCornerCtrl();
         }
         CApp.prototype.run = function () {
             this._colCtrl.Draw();
+            this._cornerCtrl.Draw();
             this._view.Draw();
         };
         Object.defineProperty(CApp.prototype, "view", {
@@ -666,6 +708,13 @@ var EasySheet;
         Object.defineProperty(CApp.prototype, "colCtrl", {
             get: function () {
                 return this._colCtrl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CApp.prototype, "cornerCtrl", {
+            get: function () {
+                return this._cornerCtrl;
             },
             enumerable: true,
             configurable: true

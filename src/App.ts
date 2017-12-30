@@ -17,16 +17,20 @@
 /// <reference path="RowCtrl.ts"/>
 /// <reference path="ColumnCtrl.ts"/>
 /// <reference path="GridCtrl.ts"/>
+/// <reference path="CornerCtrl.ts"/>
 namespace EasySheet {
     export class CApp{
+        protected _cornerCtrl:CCornerCtrl;
         protected _colCtrl:CColumnCtrl;
         protected _view:CView;
         constructor(){
             this._view = new CView(256,52);
             this._colCtrl = new CColumnCtrl(52);
+            this._cornerCtrl = new CCornerCtrl();
         }
         run(){
             this._colCtrl.Draw();
+            this._cornerCtrl.Draw();
             this._view.Draw();
         }
         get view():CView{
@@ -40,6 +44,9 @@ namespace EasySheet {
         }
         get colCtrl():CColumnCtrl{
             return this._colCtrl;
+        }
+        get cornerCtrl():CCornerCtrl{
+            return this._cornerCtrl;
         }
     }
 }
