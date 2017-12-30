@@ -25,16 +25,19 @@ namespace EasySheet{
         protected _h:number;
         protected _nRows:number;
         protected _nCols:number;
-
         protected _rows:any[];
         protected _cols:any[];
         protected _inDrag:boolean;
         protected _parent:CView;
+        protected _scrollX:number;
+        protected _scrollY:number;
         protected _ctx:CanvasRenderingContext2D;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
             this._nCols = nCols;
+            this._scrollX = 0;
+            this._scrollY = 0;
             this._x = FIXED_CELL_WIDTH;
             this._y = CELL_HEIGHT;
             this._w = nCols * CELL_WIDTH;
@@ -48,6 +51,12 @@ namespace EasySheet{
                 this._cols.push(CELL_WIDTH);
             }
             this._ctx = this._parent.context;
+        }
+        get clientWidth():number{
+            return this._parent.clientWidth;
+        }
+        get clientHeight():number{
+            return this._parent.clientHeight;
         }
         OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
@@ -70,9 +79,25 @@ namespace EasySheet{
             pt.y = iRow*CELL_HEIGHT;
             return pt;
         }
+        //利用图片函数滚动窗口
+        ScrollWindow(deltaX:number,deltaY:number):void{
+            console.log("scrollWindow 1",now());
+            if((deltaX>0) && (deltaX<this.clientWidth)) {
+                this._ctx.save();
+                let data: ImageData = this._ctx.getImageData(this._scrollX+deltaX, this._scrollY, this.clientWidth, this.clientHeight);
+                this._ctx.putImageData(data,this._scrollX + deltaX, this._scrollY);
+                this._ctx.restore();
+            }
+            console.log("scrollWindow 2",now());
+            if((deltaY>0) && (deltaY<this.clientHeight)) {
+                this._ctx.save();
+                let data:ImageData = this._ctx.getImageData(this._scrollX,this._scrollY+deltaY,this.clientWidth,this.clientHeight);
+                this._ctx.putImageData(data,this._scrollX,this._scrollY + deltaY);
+                this._ctx.restore();
+            }
+        }
         Draw():void{
             //画横线
-            console.log("before_grid",now());
             this._ctx.save();
             this._ctx.fillStyle = "#FFF";
             this._ctx.fillRect(this._x,this._y,this._w,this._h);
@@ -107,7 +132,6 @@ namespace EasySheet{
                 }
             }
             this._ctx.restore();
-            console.log("after_grid",now());
         }
     }
 }

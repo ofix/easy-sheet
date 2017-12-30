@@ -20,7 +20,7 @@ namespace EasySheet {
         protected _inDrag:boolean;
         constructor(nCols:number){
             super("es-col-ctrl");
-            this.CreateWindow("1000",0,0,nCols*CELL_WIDTH,CELL_HEIGHT,true);
+            this.CreateWindow("1000",0,0,nCols*CELL_WIDTH,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
             for(let i=0; i<this._nCols; i++){

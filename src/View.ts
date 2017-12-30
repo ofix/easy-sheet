@@ -23,11 +23,17 @@ namespace EasySheet{
         protected _rowCtrl:CRowCtrl;
         protected _gridCtrl:CGridCtrl;
         protected _scrollBarCtrl:CScrollBarCtrl;
+        protected _scrollX:number;
+        protected _scrollY:number;
         constructor(nRows:number,nCols:number){
             super("es-view");
-            this.CreateWindow("100",0,0,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
+            let clientW = $(document.body).width();
+            let clientH = $(document.body).height();
+            this.CreateWindow("100",0,0,clientW,clientH,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
             this._nRows = nRows;
             this._nCols = nCols;
+            this._scrollX = 0;
+            this._scrollY = 0;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
             this._scrollBarCtrl = new CScrollBarCtrl(this,"scroll-bar",CScrollBarCtrl.SBC_HORZ,120,300,200);
@@ -40,8 +46,23 @@ namespace EasySheet{
         get rowCtrl():CRowCtrl{
             return this._rowCtrl;
         }
-        ScrollX(delta:number):void{
-            this._rowCtrl.ScrollX(delta);
+        ScrollWindow(scrollX:number,scrollY:number):void{
+            this.ScrollX(scrollX);
+            this.ScrollY(scrollY);
+        }
+        ScrollX(scrollX:number):void{
+            if(this._scrollX != scrollX) {
+                let delta:number = scrollX - this._scrollX;
+                this._scrollX = scrollX;
+                this._rowCtrl.ScrollX(scrollX);
+                this._gridCtrl.ScrollWindow(delta,0);
+                this._rowCtrl.Draw();
+            }
+        }
+        ScrollY(scrollY:number):void{
+            if(this._scrollY != scrollY){
+                this._scrollY = scrollY;
+            }
         }
         GetRowCount():number{
             return this._nRows;

@@ -24,7 +24,7 @@ namespace EasySheet {
             this._y = 0;
             this._w = FIXED_CELL_WIDTH;
             this._h = CELL_HEIGHT;
-            this.CreateWindow("10000",0,0,FIXED_CELL_WIDTH,CELL_HEIGHT,true);
+            this.CreateWindow("10000",0,0,FIXED_CELL_WIDTH,CELL_HEIGHT,FIXED_CELL_WIDTH,CELL_HEIGHT,true);
         }
         protected DrawTri(){
             this._ctx.save();

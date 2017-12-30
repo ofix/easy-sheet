@@ -20,6 +20,8 @@ namespace EasySheet{
         protected _y:number;
         protected _w:number;
         protected _h:number;
+        protected _clientW:number;
+        protected _clientH:number;
         protected _bFixed:boolean;
         protected _zIndex:string;
         protected _div:HTMLDivElement;
@@ -28,14 +30,34 @@ namespace EasySheet{
         constructor(name:string){
             this._name = name;
         }
-        CreateWindow(zIndex:string,x:number,y:number,width:number,height:number,bFixed:boolean=false) {
+        CreateWindow(zIndex:string,x:number,y:number,clientWidth:number,clientHeight:number,width:number,height:number,bFixed:boolean=false) {
             this._x=x;
             this._y=y;
             this._w = width;
             this._h = height;
+            this._clientW = width;
+            this._clientH = height;
             this._zIndex = zIndex;
             this._bFixed = bFixed;
             this.CreateCanvas();
+        }
+        get x():number{
+            return this._x;
+        }
+        get y():number{
+            return this._y;
+        }
+        get width():number{
+            return this._w;
+        }
+        get height():number{
+            return this._h;
+        }
+        get clientWidth():number{
+            return this._clientW;
+        }
+        get clientHeight():number{
+            return this._clientH;
         }
         get zIndex():string{
             return this._zIndex;

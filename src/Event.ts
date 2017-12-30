@@ -14,12 +14,8 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 $(function(){
-    $("#d-es-view").scroll(function(){
-        let scrollLeft:number = $('#d-es-view').scrollLeft();
-        console.log("before_scroll",now());
-        app.view.ScrollX(scrollLeft);
-        app.view.Draw();
-        console.log("after_scroll",now());
+    $("#d-es-view").scroll(function(e){
+        app.view.ScrollWindow($(this).scrollLeft(),$(this).scrollTop());
     });
 });
 

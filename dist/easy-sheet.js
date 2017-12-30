@@ -54,16 +54,60 @@ var EasySheet;
         function CWnd(name) {
             this._name = name;
         }
-        CWnd.prototype.CreateWindow = function (zIndex, x, y, width, height, bFixed) {
+        CWnd.prototype.CreateWindow = function (zIndex, x, y, clientWidth, clientHeight, width, height, bFixed) {
             if (bFixed === void 0) { bFixed = false; }
             this._x = x;
             this._y = y;
             this._w = width;
             this._h = height;
+            this._clientW = width;
+            this._clientH = height;
             this._zIndex = zIndex;
             this._bFixed = bFixed;
             this.CreateCanvas();
         };
+        Object.defineProperty(CWnd.prototype, "x", {
+            get: function () {
+                return this._x;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "y", {
+            get: function () {
+                return this._y;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "width", {
+            get: function () {
+                return this._w;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "height", {
+            get: function () {
+                return this._h;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "clientWidth", {
+            get: function () {
+                return this._clientW;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CWnd.prototype, "clientHeight", {
+            get: function () {
+                return this._clientH;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(CWnd.prototype, "zIndex", {
             get: function () {
                 return this._zIndex;
@@ -337,6 +381,8 @@ var EasySheet;
             this._parent = parentWnd;
             this._nRows = nRows;
             this._nCols = nCols;
+            this._scrollX = 0;
+            this._scrollY = 0;
             this._x = FIXED_CELL_WIDTH;
             this._y = CELL_HEIGHT;
             this._w = nCols * CELL_WIDTH;
@@ -351,6 +397,20 @@ var EasySheet;
             }
             this._ctx = this._parent.context;
         }
+        Object.defineProperty(CGridCtrl.prototype, "clientWidth", {
+            get: function () {
+                return this._parent.clientWidth;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CGridCtrl.prototype, "clientHeight", {
+            get: function () {
+                return this._parent.clientHeight;
+            },
+            enumerable: true,
+            configurable: true
+        });
         CGridCtrl.prototype.OnDragStart = function (ptCursor) {
             this._inDrag = true;
         };
@@ -371,8 +431,23 @@ var EasySheet;
             pt.y = iRow * CELL_HEIGHT;
             return pt;
         };
+        CGridCtrl.prototype.ScrollWindow = function (deltaX, deltaY) {
+            console.log("scrollWindow 1", now());
+            if ((deltaX > 0) && (deltaX < this.clientWidth)) {
+                this._ctx.save();
+                var data = this._ctx.getImageData(this._scrollX + deltaX, this._scrollY, this.clientWidth, this.clientHeight);
+                this._ctx.putImageData(data, this._scrollX + deltaX, this._scrollY);
+                this._ctx.restore();
+            }
+            console.log("scrollWindow 2", now());
+            if ((deltaY > 0) && (deltaY < this.clientHeight)) {
+                this._ctx.save();
+                var data = this._ctx.getImageData(this._scrollX, this._scrollY + deltaY, this.clientWidth, this.clientHeight);
+                this._ctx.putImageData(data, this._scrollX, this._scrollY + deltaY);
+                this._ctx.restore();
+            }
+        };
         CGridCtrl.prototype.Draw = function () {
-            console.log("before_grid", now());
             this._ctx.save();
             this._ctx.fillStyle = "#FFF";
             this._ctx.fillRect(this._x, this._y, this._w, this._h);
@@ -406,7 +481,6 @@ var EasySheet;
                 }
             }
             this._ctx.restore();
-            console.log("after_grid", now());
         };
         return CGridCtrl;
     }());
@@ -539,9 +613,13 @@ var EasySheet;
         __extends(CView, _super);
         function CView(nRows, nCols) {
             var _this = _super.call(this, "es-view") || this;
-            _this.CreateWindow("100", 0, 0, nCols * CELL_WIDTH, nRows * CELL_HEIGHT);
+            var clientW = $(document.body).width();
+            var clientH = $(document.body).height();
+            _this.CreateWindow("100", 0, 0, clientW, clientH, nCols * CELL_WIDTH, nRows * CELL_HEIGHT);
             _this._nRows = nRows;
             _this._nCols = nCols;
+            _this._scrollX = 0;
+            _this._scrollY = 0;
             _this._gridCtrl = new EasySheet.CGridCtrl(_this, nRows, nCols);
             _this._rowCtrl = new EasySheet.CRowCtrl(_this, nRows);
             _this._scrollBarCtrl = new EasySheet.CScrollBarCtrl(_this, "scroll-bar", EasySheet.CScrollBarCtrl.SBC_HORZ, 120, 300, 200);
@@ -563,8 +641,23 @@ var EasySheet;
             enumerable: true,
             configurable: true
         });
-        CView.prototype.ScrollX = function (delta) {
-            this._rowCtrl.ScrollX(delta);
+        CView.prototype.ScrollWindow = function (scrollX, scrollY) {
+            this.ScrollX(scrollX);
+            this.ScrollY(scrollY);
+        };
+        CView.prototype.ScrollX = function (scrollX) {
+            if (this._scrollX != scrollX) {
+                var delta = scrollX - this._scrollX;
+                this._scrollX = scrollX;
+                this._rowCtrl.ScrollX(scrollX);
+                this._gridCtrl.ScrollWindow(delta, 0);
+                this._rowCtrl.Draw();
+            }
+        };
+        CView.prototype.ScrollY = function (scrollY) {
+            if (this._scrollY != scrollY) {
+                this._scrollY = scrollY;
+            }
         };
         CView.prototype.GetRowCount = function () {
             return this._nRows;
@@ -586,7 +679,7 @@ var EasySheet;
         __extends(CColumnCtrl, _super);
         function CColumnCtrl(nCols) {
             var _this = _super.call(this, "es-col-ctrl") || this;
-            _this.CreateWindow("1000", 0, 0, nCols * CELL_WIDTH, CELL_HEIGHT, true);
+            _this.CreateWindow("1000", 0, 0, nCols * CELL_WIDTH, CELL_HEIGHT, nCols * CELL_WIDTH, CELL_HEIGHT, true);
             _this._nCols = nCols;
             _this._cols = [];
             for (var i = 0; i < _this._nCols; i++) {
@@ -645,7 +738,7 @@ var EasySheet;
             _this._y = 0;
             _this._w = FIXED_CELL_WIDTH;
             _this._h = CELL_HEIGHT;
-            _this.CreateWindow("10000", 0, 0, FIXED_CELL_WIDTH, CELL_HEIGHT, true);
+            _this.CreateWindow("10000", 0, 0, FIXED_CELL_WIDTH, CELL_HEIGHT, FIXED_CELL_WIDTH, CELL_HEIGHT, true);
             return _this;
         }
         CCornerCtrl.prototype.DrawTri = function () {
@@ -739,12 +832,8 @@ var EasySheet;
     EasySheet.CEditCtrl = CEditCtrl;
 })(EasySheet || (EasySheet = {}));
 $(function () {
-    $("#d-es-view").scroll(function () {
-        var scrollLeft = $('#d-es-view').scrollLeft();
-        console.log("before_scroll", now());
-        app.view.ScrollX(scrollLeft);
-        app.view.Draw();
-        console.log("after_scroll", now());
+    $("#d-es-view").scroll(function (e) {
+        app.view.ScrollWindow($(this).scrollLeft(), $(this).scrollTop());
     });
 });
 var CRect = (function () {
