@@ -40,6 +40,9 @@ namespace EasySheet{
         get rowCtrl():CRowCtrl{
             return this._rowCtrl;
         }
+        ScrollX(delta:number):void{
+            this._rowCtrl.ScrollX(delta);
+        }
         GetRowCount():number{
             return this._nRows;
         }
@@ -49,7 +52,7 @@ namespace EasySheet{
         Draw(){
             this._gridCtrl.Draw();
             this._rowCtrl.Draw();
-            this._scrollBarCtrl.Draw();
+            //this._scrollBarCtrl.Draw();
         }
     }
 }

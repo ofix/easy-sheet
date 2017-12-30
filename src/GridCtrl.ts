@@ -25,6 +25,7 @@ namespace EasySheet{
         protected _h:number;
         protected _nRows:number;
         protected _nCols:number;
+
         protected _rows:any[];
         protected _cols:any[];
         protected _inDrag:boolean;
@@ -71,7 +72,10 @@ namespace EasySheet{
         }
         Draw():void{
             //画横线
+            console.log("before_grid",now());
             this._ctx.save();
+            this._ctx.fillStyle = "#FFF";
+            this._ctx.fillRect(this._x,this._y,this._w,this._h);
             this._ctx.strokeStyle="#C5C5C5";
             let yOffset:number = this._y;
             for(let i=0;i<this._nRows;i++){
@@ -90,21 +94,20 @@ namespace EasySheet{
                 xOffset += this._cols[j];
                 this._ctx.stroke();
             }
-            this._ctx.restore();
 
+            this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+            this._ctx.textBaseline="middle";
+            this._ctx.textAlign = "center";
+            this._ctx.fillStyle = "#000";
             for(let i=0; i<this._nRows; i++){
                 for(let j=0; j<this._nCols; j++){
-                    this._ctx.save();
                     let xy = this.GetItemXY(i,j);
-                    this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                    this._ctx.textBaseline="middle";
-                    this._ctx.textAlign = "center";
-                    this._ctx.fillStyle = "#000";
                     this._ctx.fillText(""+i+j,xy.x+CELL_WIDTH/2,xy.y+CELL_HEIGHT/2);
                     this._ctx.stroke();
-                    this._ctx.restore();
                 }
             }
+            this._ctx.restore();
+            console.log("after_grid",now());
         }
     }
 }

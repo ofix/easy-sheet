@@ -23,10 +23,10 @@
          protected _parent:CView;
          protected _rows:number[];
          protected _ctx:CanvasRenderingContext2D;
-         protected _yScrollDelta:number;
          protected _x:number;
          protected _y:number;
          protected _inDrag:boolean;
+         protected _scrollX:number;
          constructor(parentWnd:CView,nRows:number){
              super("es-row-ctrl");
              this._parent = parentWnd;
@@ -34,7 +34,7 @@
              this._y=0;
              this._nRows = nRows;
              this._rows = [];
-             this._yScrollDelta=0;
+             this._scrollX=0;
              this._ctx = this._parent.context;
              for(let i=0; i<this._nRows;i++){
                  this._rows.push(CELL_HEIGHT);
@@ -54,24 +54,14 @@
          OnDragEnd(ptCursor:CPoint):void{
              this._inDrag = false;
          }
-         scrollY(delta:number):void{
-             // this._yScrollDelta = delta*53;
-             // this._y += this._yScrollDelta;
-             // if(this._y>0){
-             //     this._y=0;
-             //     this._yScrollDelta =0;
-             // }
-             // if(this._y<(this.wnd.visualHeight-this.wnd.contentHeight)){
-             //     this._y = this.wnd.visualHeight - this.wnd.contentHeight;
-             //     this._yScrollDelta = 0;
-             // }
+         ScrollX(delta:number):void{
+             this._scrollX = delta;
          }
          Draw():void{
             let hTotal:number=0;
-            this._ctx.translate(0,this._yScrollDelta);
             this._ctx.save();
             this._ctx.fillStyle=CLR_BAR_FILL;
-            this._ctx.fillRect(0,0,FIXED_CELL_WIDTH,CELL_HEIGHT*this._nRows);
+            this._ctx.fillRect(this._scrollX,0,FIXED_CELL_WIDTH,CELL_HEIGHT*this._nRows);
             this._ctx.fillStyle = CLR_BAR_TEXT;
             this._ctx.strokeStyle = CLR_BAR_SEP;
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
@@ -80,12 +70,12 @@
             this._rows.forEach((v,i)=>{
                 if(i>0) {
                     let name:string = ""+i;
-                    this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                    this._ctx.fillText(name, this._scrollX+FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
                 }
                 hTotal+=v;
                 this._ctx.beginPath();
-                this._ctx.moveTo(0,hTotal);
-                this._ctx.lineTo(FIXED_CELL_WIDTH,hTotal);
+                this._ctx.moveTo(this._scrollX,hTotal);
+                this._ctx.lineTo(this._scrollX+FIXED_CELL_WIDTH,hTotal);
                 this._ctx.stroke();
             });
             this._ctx.restore();

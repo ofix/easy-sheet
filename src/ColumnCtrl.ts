@@ -49,7 +49,7 @@ namespace EasySheet {
                 this._ctx.save();
                 let name:string = this.getColName(i);
                 this._ctx.fillStyle=CLR_BAR_FILL;
-                this._ctx.fillRect(wTotal,0,v,CELL_HEIGHT);
+                this._ctx.fillRect(wTotal,-1,v,CELL_HEIGHT);
                 this._ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
                 this._ctx.textBaseline = "middle";
                 this._ctx.textAlign = 'center';

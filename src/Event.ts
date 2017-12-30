@@ -14,9 +14,12 @@
  */
 /// <reference path="lib/jquery.d.ts"/>
 $(function(){
-    $("#wnd-left-bar").bind("mousewheel DOMMouseScroll",function(event, delta, deltaX, deltaY){
-        app.rowCtrl.scrollY(deltaY);
-        $("#wnd-data").css("top+=",deltaY*53);
+    $("#d-es-view").scroll(function(){
+        let scrollLeft:number = $('#d-es-view').scrollLeft();
+        console.log("before_scroll",now());
+        app.view.ScrollX(scrollLeft);
+        app.view.Draw();
+        console.log("after_scroll",now());
     });
 });
 

@@ -259,7 +259,7 @@ var EasySheet;
             _this._y = 0;
             _this._nRows = nRows;
             _this._rows = [];
-            _this._yScrollDelta = 0;
+            _this._scrollX = 0;
             _this._ctx = _this._parent.context;
             for (var i = 0; i < _this._nRows; i++) {
                 _this._rows.push(CELL_HEIGHT);
@@ -288,15 +288,15 @@ var EasySheet;
         CRowCtrl.prototype.OnDragEnd = function (ptCursor) {
             this._inDrag = false;
         };
-        CRowCtrl.prototype.scrollY = function (delta) {
+        CRowCtrl.prototype.ScrollX = function (delta) {
+            this._scrollX = delta;
         };
         CRowCtrl.prototype.Draw = function () {
             var _this = this;
             var hTotal = 0;
-            this._ctx.translate(0, this._yScrollDelta);
             this._ctx.save();
             this._ctx.fillStyle = CLR_BAR_FILL;
-            this._ctx.fillRect(0, 0, FIXED_CELL_WIDTH, CELL_HEIGHT * this._nRows);
+            this._ctx.fillRect(this._scrollX, 0, FIXED_CELL_WIDTH, CELL_HEIGHT * this._nRows);
             this._ctx.fillStyle = CLR_BAR_TEXT;
             this._ctx.strokeStyle = CLR_BAR_SEP;
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
@@ -305,12 +305,12 @@ var EasySheet;
             this._rows.forEach(function (v, i) {
                 if (i > 0) {
                     var name_1 = "" + i;
-                    _this._ctx.fillText(name_1, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                    _this._ctx.fillText(name_1, _this._scrollX + FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
                 }
                 hTotal += v;
                 _this._ctx.beginPath();
-                _this._ctx.moveTo(0, hTotal);
-                _this._ctx.lineTo(FIXED_CELL_WIDTH, hTotal);
+                _this._ctx.moveTo(_this._scrollX, hTotal);
+                _this._ctx.lineTo(_this._scrollX + FIXED_CELL_WIDTH, hTotal);
                 _this._ctx.stroke();
             });
             this._ctx.restore();
@@ -372,7 +372,10 @@ var EasySheet;
             return pt;
         };
         CGridCtrl.prototype.Draw = function () {
+            console.log("before_grid", now());
             this._ctx.save();
+            this._ctx.fillStyle = "#FFF";
+            this._ctx.fillRect(this._x, this._y, this._w, this._h);
             this._ctx.strokeStyle = "#C5C5C5";
             var yOffset = this._y;
             for (var i = 0; i < this._nRows; i++) {
@@ -391,20 +394,19 @@ var EasySheet;
                 xOffset += this._cols[j];
                 this._ctx.stroke();
             }
-            this._ctx.restore();
+            this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+            this._ctx.textBaseline = "middle";
+            this._ctx.textAlign = "center";
+            this._ctx.fillStyle = "#000";
             for (var i = 0; i < this._nRows; i++) {
                 for (var j = 0; j < this._nCols; j++) {
-                    this._ctx.save();
                     var xy = this.GetItemXY(i, j);
-                    this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-                    this._ctx.textBaseline = "middle";
-                    this._ctx.textAlign = "center";
-                    this._ctx.fillStyle = "#000";
                     this._ctx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
                     this._ctx.stroke();
-                    this._ctx.restore();
                 }
             }
+            this._ctx.restore();
+            console.log("after_grid", now());
         };
         return CGridCtrl;
     }());
@@ -561,6 +563,9 @@ var EasySheet;
             enumerable: true,
             configurable: true
         });
+        CView.prototype.ScrollX = function (delta) {
+            this._rowCtrl.ScrollX(delta);
+        };
         CView.prototype.GetRowCount = function () {
             return this._nRows;
         };
@@ -570,7 +575,6 @@ var EasySheet;
         CView.prototype.Draw = function () {
             this._gridCtrl.Draw();
             this._rowCtrl.Draw();
-            this._scrollBarCtrl.Draw();
         };
         return CView;
     }(EasySheet.CWnd));
@@ -613,7 +617,7 @@ var EasySheet;
                 _this._ctx.save();
                 var name = _this.getColName(i);
                 _this._ctx.fillStyle = CLR_BAR_FILL;
-                _this._ctx.fillRect(wTotal, 0, v, CELL_HEIGHT);
+                _this._ctx.fillRect(wTotal, -1, v, CELL_HEIGHT);
                 _this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
                 _this._ctx.textBaseline = "middle";
                 _this._ctx.textAlign = 'center';
@@ -659,7 +663,7 @@ var EasySheet;
             this._ctx.save();
             this._ctx.strokeStyle = CLR_BAR_SEP;
             this._ctx.fillStyle = CLR_BAR_FILL;
-            this._ctx.fillRect(this._x, this._y, this._w, this._h);
+            this._ctx.fillRect(this._x, this._y - 1, this._w, this._h);
             this._ctx.moveTo(this._x + this._w, this._y);
             this._ctx.lineTo(this._x + this._w, this._y + CELL_HEIGHT);
             this._ctx.lineTo(this._x, this._y + CELL_HEIGHT);
@@ -735,9 +739,12 @@ var EasySheet;
     EasySheet.CEditCtrl = CEditCtrl;
 })(EasySheet || (EasySheet = {}));
 $(function () {
-    $("#wnd-left-bar").bind("mousewheel DOMMouseScroll", function (event, delta, deltaX, deltaY) {
-        app.rowCtrl.scrollY(deltaY);
-        $("#wnd-data").css("top+=", deltaY * 53);
+    $("#d-es-view").scroll(function () {
+        var scrollLeft = $('#d-es-view').scrollLeft();
+        console.log("before_scroll", now());
+        app.view.ScrollX(scrollLeft);
+        app.view.Draw();
+        console.log("after_scroll", now());
     });
 });
 var CRect = (function () {
