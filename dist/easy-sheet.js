@@ -343,6 +343,12 @@ var EasySheet;
             this._h = nRows * CELL_HEIGHT;
             this._rows = [];
             this._cols = [];
+            for (var i = 0; i < nRows; i++) {
+                this._rows.push(CELL_HEIGHT);
+            }
+            for (var j = 0; j < nCols; j++) {
+                this._cols.push(CELL_WIDTH);
+            }
             this._ctx = this._parent.context;
         }
         CGridCtrl.prototype.OnDragStart = function (ptCursor) {
@@ -353,6 +359,12 @@ var EasySheet;
         CGridCtrl.prototype.OnDragEnd = function (ptCursor) {
             this._inDrag = false;
         };
+        CGridCtrl.prototype.GetRowWidth = function () {
+            return this._w;
+        };
+        CGridCtrl.prototype.GetColHeight = function () {
+            return this._h;
+        };
         CGridCtrl.prototype.GetItemXY = function (iRow, iCol) {
             var pt = new CPoint();
             pt.x = iCol * CELL_WIDTH + this._x;
@@ -360,6 +372,26 @@ var EasySheet;
             return pt;
         };
         CGridCtrl.prototype.Draw = function () {
+            this._ctx.save();
+            this._ctx.strokeStyle = "#C5C5C5";
+            var yOffset = this._y;
+            for (var i = 0; i < this._nRows; i++) {
+                this._ctx.beginPath();
+                this._ctx.moveTo(this._x, yOffset + this._rows[i]);
+                this._ctx.lineTo(this._x + this._w, yOffset + this._rows[i]);
+                yOffset += this._rows[i];
+                this._ctx.closePath();
+                this._ctx.stroke();
+            }
+            var xOffset = this._x;
+            for (var j = 0; j < this._nCols; j++) {
+                this._ctx.beginPath();
+                this._ctx.moveTo(xOffset + this._cols[j], this._y);
+                this._ctx.lineTo(xOffset + this._cols[j], this._y + this._h);
+                xOffset += this._cols[j];
+                this._ctx.stroke();
+            }
+            this._ctx.restore();
             for (var i = 0; i < this._nRows; i++) {
                 for (var j = 0; j < this._nCols; j++) {
                     this._ctx.save();

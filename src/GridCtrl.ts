@@ -40,6 +40,12 @@ namespace EasySheet{
             this._h = nRows * CELL_HEIGHT;
             this._rows = [];
             this._cols = [];
+            for(let i=0; i<nRows;i++){
+                this._rows.push(CELL_HEIGHT);
+            }
+            for(let j=0; j<nCols;j++){
+                this._cols.push(CELL_WIDTH);
+            }
             this._ctx = this._parent.context;
         }
         OnDragStart(ptCursor:CPoint):void{
@@ -51,6 +57,12 @@ namespace EasySheet{
         OnDragEnd(ptCursor:CPoint):void{
             this._inDrag = false;
         }
+        GetRowWidth():number{
+            return this._w;
+        }
+        GetColHeight():number{
+            return this._h;
+        }
         GetItemXY(iRow:number,iCol:number):CPoint{
             let pt = new CPoint();
             pt.x = iCol*CELL_WIDTH+this._x;
@@ -58,6 +70,28 @@ namespace EasySheet{
             return pt;
         }
         Draw():void{
+            //画横线
+            this._ctx.save();
+            this._ctx.strokeStyle="#C5C5C5";
+            let yOffset:number = this._y;
+            for(let i=0;i<this._nRows;i++){
+                this._ctx.beginPath();
+                this._ctx.moveTo(this._x,yOffset+this._rows[i]);
+                this._ctx.lineTo(this._x+this._w,yOffset+this._rows[i]);
+                yOffset += this._rows[i];
+                this._ctx.closePath();
+                this._ctx.stroke();
+            }
+            let xOffset:number=this._x;
+            for(let j=0;j<this._nCols;j++){
+                this._ctx.beginPath();
+                this._ctx.moveTo(xOffset+this._cols[j],this._y);
+                this._ctx.lineTo(xOffset+this._cols[j],this._y+this._h);
+                xOffset += this._cols[j];
+                this._ctx.stroke();
+            }
+            this._ctx.restore();
+
             for(let i=0; i<this._nRows; i++){
                 for(let j=0; j<this._nCols; j++){
                     this._ctx.save();
