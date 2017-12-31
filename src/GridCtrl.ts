@@ -48,8 +48,8 @@ namespace EasySheet{
             this._scrollY = 0;
             this._x = 0;
             this._y = 0;
-            this._w = nCols * CELL_WIDTH;
-            this._h = nRows * CELL_HEIGHT;
+            this._w = parentWnd.clientWidth;
+            this._h = parentWnd.clientHeight;
             this._vx = this._x;
             this._vy = this._y;
             this._vw = this._w;
@@ -146,13 +146,16 @@ namespace EasySheet{
         }
         DrawInCache():void{
             console.log("draw grid cache 1",now());
+            console.log("vw","vh",this._vw,this._vh);
             //清空左侧行
+            console.log("time 01 =",now());
             this._cacheCtx.save();
             this._cacheCtx.fillStyle = "#FFF";
             this._cacheCtx.fillRect(this._vx,this._vy,this._vw,this._vh);
             this._cacheCtx.strokeStyle="#C5C5C5";
             this._cacheCtx.restore();
             //画背景横线
+            console.log("time 02 =",now());
             this._cacheCtx.save();
             this._cacheCtx.translate(0.5,0.5);
             this._cacheCtx.beginPath();
@@ -164,6 +167,7 @@ namespace EasySheet{
             }
             this._cacheCtx.stroke();
             //画背景竖线
+            console.log("time 03 =",now());
             this._cacheCtx.beginPath();
             let xOffset:number=this._vx;
             for(let j=0;j<this._nCols;j++){
@@ -173,6 +177,7 @@ namespace EasySheet{
             }
             this._cacheCtx.stroke();
             //画Cell单元格
+            console.log("time 04 =",now());
             this._cacheCtx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
             this._cacheCtx.textBaseline="middle";
             this._cacheCtx.textAlign = "center";
@@ -183,6 +188,7 @@ namespace EasySheet{
                     this._cacheCtx.fillText(""+i+j,xy.x+CELL_WIDTH/2,xy.y+CELL_HEIGHT/2);
                 }
             }
+            console.log("time 05 =",now());
             this._cacheCtx.restore();
             this._cacheExist = true;
             console.log("draw grid cache 2",now());

@@ -25,6 +25,7 @@ namespace EasySheet{
         protected _bFixed:boolean;
         protected _zIndex:string;
         protected _div:HTMLDivElement;
+        protected _subDiv:HTMLDivElement;
         protected _canvas:HTMLCanvasElement;
         protected _ctx:CanvasRenderingContext2D;
         constructor(name:string){
@@ -82,14 +83,24 @@ namespace EasySheet{
             this._div.style.top = this._y+"px";
             this._div.style.zIndex = this._zIndex;
 
+            this._subDiv = document.createElement('div');
+            this._subDiv.id = 'di-' +this.name;
+            this._subDiv.style.position = 'relative';
+            this._subDiv.style.left = "0px";
+            this._subDiv.style.top = "0px";
+            this._subDiv.style.width = this._w+"px";
+            this._subDiv.style.height = this._h+"px";
+
             this._canvas = document.createElement('canvas');
             this._canvas.id = this.name;
             this._canvas.style.position = "relative";
             this._canvas.style.left ="0px";
             this._canvas.style.top = "0px";
-            this._canvas.width = this._w;
-            this._canvas.height = this._h;
-            this._div.appendChild(this._canvas);
+            this._canvas.width = this._clientW;
+            this._canvas.height = this._clientH;
+
+            this._div.appendChild(this._subDiv);
+            this._subDiv.appendChild(this._canvas);
             document.body.appendChild(this._div);
             CWndManager.instance().registerWnd(this);
             this._ctx = this._canvas.getContext("2d");
