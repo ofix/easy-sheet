@@ -24,7 +24,7 @@ namespace EasySheet {
         protected _colCtrl:CColumnCtrl;
         protected _view:CView;
         constructor(){
-            this._view = new CView(256,52);
+            this._view = new CView(1000,126);
             this._colCtrl = new CColumnCtrl(52);
             this._cornerCtrl = new CCornerCtrl();
         }

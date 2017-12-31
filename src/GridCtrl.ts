@@ -39,14 +39,15 @@ namespace EasySheet{
         protected _ctx:CanvasRenderingContext2D;
         protected _cacheCanvas:HTMLCanvasElement;
         protected _cacheCtx:CanvasRenderingContext2D;
+        protected _canvasList:any[];
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
             this._nCols = nCols;
             this._scrollX = 0;
             this._scrollY = 0;
-            this._x = FIXED_CELL_WIDTH;
-            this._y = CELL_HEIGHT;
+            this._x = 0;
+            this._y = 0;
             this._w = nCols * CELL_WIDTH;
             this._h = nRows * CELL_HEIGHT;
             this._vx = this._x;
@@ -55,6 +56,7 @@ namespace EasySheet{
             this._vh = this._h;
             this._rows = [];
             this._cols = [];
+            this._canvasList = [];
             this._cacheExist = false;
             for(let i=0; i<nRows;i++){
                 this._rows.push(CELL_HEIGHT);
@@ -64,12 +66,28 @@ namespace EasySheet{
             }
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
+            this.makeCanvasList();
         }
         get clientWidth():number{
             return this._parent.clientWidth;
         }
         get clientHeight():number{
             return this._parent.clientHeight;
+        }
+        makeCanvasList():void{
+            console.log("make-list 1 ",now());
+            for(let i=0; i<1000;i++) {
+                let canvas: HTMLCanvasElement;
+                let ctx: CanvasRenderingContext2D;
+                canvas = document.createElement("canvas");
+                canvas.width = this._w;
+                canvas.height = this._h;
+                ctx = canvas.getContext("2d");
+                this._canvasList.push(canvas);
+                this._canvasList.push(ctx);
+            }
+            console.log("canvas_list = ",this._canvasList.length);
+            console.log("make-list 2 ",now());
         }
         CreateCacheCtx():void{
             this._cacheCanvas = document.createElement("canvas");
@@ -100,52 +118,60 @@ namespace EasySheet{
         }
         //利用图片函数滚动窗口
         ScrollWindow(deltaX:number,deltaY:number):void{
-            console.log("scrollWindow 1",now());
-            if((deltaX>0) && (deltaX<this.clientWidth)) {
-                this._ctx.save();
-                let data: ImageData = this._ctx.getImageData(this._scrollX+deltaX, this._scrollY, this.clientWidth, this.clientHeight);
-                this._ctx.putImageData(data,this._scrollX + deltaX, this._scrollY);
-                this._ctx.restore();
+            this._scrollX = this._scrollX+deltaX;
+            this._scrollY = this._scrollY+deltaY;
+            if((deltaX>0)) {
+                this._vx = this._scrollX;
+                this._vy = this._scrollY;
+                this.Draw();
             }
-            console.log("scrollWindow 2",now());
             if((deltaY>0) && (deltaY<this.clientHeight)) {
-                this._ctx.save();
-                let data:ImageData = this._ctx.getImageData(this._scrollX,this._scrollY+deltaY,this.clientWidth,this.clientHeight);
-                this._ctx.putImageData(data,this._scrollX,this._scrollY + deltaY);
-                this._ctx.restore();
+                this._vx = this._scrollX;
+                this._vy = this._scrollY;
+                this.Draw();
             }
         }
         Draw():void{
             if(!this._cacheExist){
                 this.DrawInCache();
+                console.log("写入缓存");
             }
-            this._ctx.drawImage(this._cacheCanvas,this._vx,this._vy,this._vw,this._vh);
+            console.log("GridCtrl 1",now());
+            this._ctx.save();
+            console.log(this._vx,this._vy,this.clientWidth,this.clientHeight);
+            this._ctx.drawImage(this._cacheCanvas,this._vx,this._vy,this.clientWidth,this.clientHeight,
+                this._vx,this._vy,this.clientWidth,this.clientHeight);
+            this._ctx.restore();
+            console.log("GridCtrl 2",now());
         }
         DrawInCache():void{
+            console.log("draw grid cache 1",now());
             //清空左侧行
             this._cacheCtx.save();
             this._cacheCtx.fillStyle = "#FFF";
-            this._cacheCtx.fillRect(this._x,this._y,this._w,this._h);
+            this._cacheCtx.fillRect(this._vx,this._vy,this._vw,this._vh);
             this._cacheCtx.strokeStyle="#C5C5C5";
+            this._cacheCtx.restore();
             //画背景横线
+            this._cacheCtx.save();
+            this._cacheCtx.translate(0.5,0.5);
             this._cacheCtx.beginPath();
-            let yOffset:number = this._y;
+            let yOffset:number = this._vy;
             for(let i=0;i<this._nRows;i++){
-                this._cacheCtx.moveTo(this._x,yOffset+this._rows[i]);
-                this._cacheCtx.lineTo(this._x+this._w,yOffset+this._rows[i]);
+                this._cacheCtx.moveTo(this._vx,yOffset+this._rows[i]);
+                this._cacheCtx.lineTo(this._vx+this._vw,yOffset+this._rows[i]);
                 yOffset += this._rows[i];
             }
             this._cacheCtx.stroke();
             //画背景竖线
             this._cacheCtx.beginPath();
-            let xOffset:number=this._x;
+            let xOffset:number=this._vx;
             for(let j=0;j<this._nCols;j++){
-                this._cacheCtx.moveTo(xOffset+this._cols[j],this._y);
-                this._cacheCtx.lineTo(xOffset+this._cols[j],this._y+this._h);
+                this._cacheCtx.moveTo(xOffset+this._cols[j],this._vy);
+                this._cacheCtx.lineTo(xOffset+this._cols[j],this._vy+this._vh);
                 xOffset += this._cols[j];
             }
             this._cacheCtx.stroke();
-            this._cacheCtx.beginPath();
             //画Cell单元格
             this._cacheCtx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
             this._cacheCtx.textBaseline="middle";
@@ -157,9 +183,9 @@ namespace EasySheet{
                     this._cacheCtx.fillText(""+i+j,xy.x+CELL_WIDTH/2,xy.y+CELL_HEIGHT/2);
                 }
             }
-            this._cacheCtx.stroke();
             this._cacheCtx.restore();
             this._cacheExist = true;
+            console.log("draw grid cache 2",now());
         }
     }
 }

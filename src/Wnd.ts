@@ -35,8 +35,8 @@ namespace EasySheet{
             this._y=y;
             this._w = width;
             this._h = height;
-            this._clientW = width;
-            this._clientH = height;
+            this._clientW = clientWidth;
+            this._clientH = clientHeight;
             this._zIndex = zIndex;
             this._bFixed = bFixed;
             this.CreateCanvas();
@@ -93,7 +93,6 @@ namespace EasySheet{
             document.body.appendChild(this._div);
             CWndManager.instance().registerWnd(this);
             this._ctx = this._canvas.getContext("2d");
-            this._ctx.translate(0.5,0.5);
         }
     }
 }

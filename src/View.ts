@@ -56,7 +56,7 @@ namespace EasySheet{
                 this._scrollX = scrollX;
                 this._rowCtrl.ScrollX(scrollX);
                 this._gridCtrl.ScrollWindow(delta,0);
-                this._rowCtrl.Draw();
+                //this._rowCtrl.Draw();
             }
         }
         ScrollY(scrollY:number):void{
@@ -72,7 +72,7 @@ namespace EasySheet{
         }
         Draw(){
             this._gridCtrl.Draw();
-            this._rowCtrl.Draw();
+            //this._rowCtrl.Draw();
             //this._scrollBarCtrl.Draw();
         }
     }
