@@ -32,6 +32,8 @@ namespace EasySheet{
         protected _scrollX:number;
         protected _scrollY:number;
         protected _ctx:CanvasRenderingContext2D;
+        protected _cacheCanvas:HTMLCanvasElement;
+        protected _cacheCtx:CanvasRenderingContext2D;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
@@ -51,12 +53,19 @@ namespace EasySheet{
                 this._cols.push(CELL_WIDTH);
             }
             this._ctx = this._parent.context;
+            this.CreateCacheRender();
         }
         get clientWidth():number{
             return this._parent.clientWidth;
         }
         get clientHeight():number{
             return this._parent.clientHeight;
+        }
+        CreateCacheRender():void{
+            this._cacheCanvas = document.createElement("canvas");
+            this._cacheCanvas.width = this._w;
+            this._cacheCanvas.height = this._h;
+            this._cacheCtx = this._cacheCanvas.getContext("2d");
         }
         OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
