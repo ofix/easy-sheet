@@ -185,7 +185,9 @@ namespace EasySheet{
             for(let i=0; i<this._nRows; i++){
                 for(let j=0; j<this._nCols; j++){
                     let xy = this.GetItemXY(i,j);
-                    this._cacheCtx.fillText(""+i+j,xy.x+CELL_WIDTH/2,xy.y+CELL_HEIGHT/2);
+                    if(xy.x < this.clientWidth && xy.y < this.clientHeight) {
+                        this._cacheCtx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
+                    }
                 }
             }
             console.log("time 05 =",now());
