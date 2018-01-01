@@ -159,6 +159,42 @@ namespace EasySheet{
             }
             return rng;
         }
+        DrawVisibleCellRange(rng:CCellRange,xPad:number,yPad:number):void{
+            this._ctx.save();
+            this._ctx.translate(xPad,yPad);
+            // Fill Background
+            this._ctx.fillStyle = "#FFF";
+            this._ctx.fillRect(0,0,this.clientWidth,this.clientHeight);
+            // Draw Row Lines
+            for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
+                this._ctx.moveTo(xPad,yPad+this._rows[i]);
+                this._ctx.lineTo(xPad+this._vw,yPad+this._rows[i]);
+                yPad += this._rows[i];
+            }
+            this._ctx.stroke();
+            // Draw Column Lines
+            for(let j=0;j<this._nCols;j++){
+                this._ctx.moveTo(xPad+this._cols[j],yPad);
+                this._ctx.lineTo(xPad+this._cols[j],yPad+this._vh);
+                xPad += this._cols[j];
+            }
+            // Draw Grid Cells
+            console.log("time 04 =",now());
+            this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+            this._ctx.textBaseline="middle";
+            this._ctx.textAlign = "center";
+            this._ctx.fillStyle = "#000";
+            console.log("time 05 =",now());
+            for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
+                for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
+                    let xy = this.GetItemXY(i,j);
+                    if(xy.x < this.clientWidth && xy.y < this.clientHeight) {
+                        this._ctx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
+                    }
+                }
+            }
+            this._ctx.restore();
+        }
         Draw():void{
             if(!this._cacheExist){
                 this.DrawInCache();
