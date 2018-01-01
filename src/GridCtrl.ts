@@ -17,6 +17,7 @@
 /// <reference path="Wnd.ts"/>
 /// <reference path="Const.ts"/>
 /// <reference path="Point.ts"/>
+/// <reference path="CellRange.ts"/>
 namespace EasySheet{
     export class CGridCtrl implements IDraggable{
         protected _x:number;
@@ -131,6 +132,33 @@ namespace EasySheet{
                 this.Draw();
             }
         }
+        GetVisibleCellRange(xOffset:number,yOffset:number):CCellRange{
+            let x:number =0;
+            let y:number =0;
+            let rng = new CCellRange(-1,-1,-1,-1);
+            for(let i=0; i<this._nRows;i++){
+                x+= this._nRows[i];
+                if(x>= xOffset){
+                    rng.rowStartIndex = i;
+                }
+                if((x+this.clientWidth)>=xOffset){
+                    rng.rowEndIndex = i;
+                    break;
+                }
+            }
+
+            for(let j=0; j<this._nCols;j++){
+                y+=this._nCols[j];
+                if(y>=yOffset){
+                    rng.colStartIndex = j;
+                }
+                if((x+this.clientHeight)>=yOffset){
+                    rng.colEndIndex = j;
+                    break;
+                }
+            }
+            return rng;
+        }
         Draw():void{
             if(!this._cacheExist){
                 this.DrawInCache();
@@ -182,6 +210,7 @@ namespace EasySheet{
             this._cacheCtx.textBaseline="middle";
             this._cacheCtx.textAlign = "center";
             this._cacheCtx.fillStyle = "#000";
+            console.log("time 05 =",now());
             for(let i=0; i<this._nRows; i++){
                 for(let j=0; j<this._nCols; j++){
                     let xy = this.GetItemXY(i,j);
@@ -190,7 +219,7 @@ namespace EasySheet{
                     }
                 }
             }
-            console.log("time 05 =",now());
+            console.log("time 06 =",now());
             this._cacheCtx.restore();
             this._cacheExist = true;
             console.log("draw grid cache 2",now());
