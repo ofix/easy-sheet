@@ -90,17 +90,20 @@ namespace EasySheet{
             this._subDiv.style.top = "0px";
             this._subDiv.style.width = this._w+"px";
             this._subDiv.style.height = this._h+"px";
+            this._subDiv.innerHTML="asdfasdfasdf";
 
             this._canvas = document.createElement('canvas');
             this._canvas.id = this.name;
-            this._canvas.style.position = "relative";
+            this._canvas.style.position = "fixed";
             this._canvas.style.left ="0px";
             this._canvas.style.top = "0px";
+            this._canvas.style.width = this._clientW+"px";
+            this._canvas.style.height = this._clientH+"px";
             this._canvas.width = this._clientW;
             this._canvas.height = this._clientH;
 
             this._div.appendChild(this._subDiv);
-            this._subDiv.appendChild(this._canvas);
+            this._div.appendChild(this._canvas);
             document.body.appendChild(this._div);
             CWndManager.instance().registerWnd(this);
             this._ctx = this._canvas.getContext("2d");

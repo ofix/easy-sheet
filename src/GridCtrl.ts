@@ -142,7 +142,6 @@ namespace EasySheet{
             let y:number =0;
             let flagX = true;
             let flagY = true;
-            console.log("clientWidth",this.clientWidth,"clientHeight",this.clientHeight);
             let rng = new CCellRange(0,0,0,0,0,0);
             for(let i=0; i<this._nRows;i++){
                 x+= this._rows[i];
@@ -153,7 +152,7 @@ namespace EasySheet{
                     }
                     flagX = false;
                 }
-                if(x >=(xOffset+this.clientWidth)){
+                if(x >=(xOffset+this.clientHeight)){
                     rng.rowEndIndex = i;
                     break;
                 }
@@ -168,7 +167,7 @@ namespace EasySheet{
                     }
                     flagY = false;
                 }
-                if(y>=(yOffset+this.clientHeight)){
+                if(y>=(yOffset+this.clientWidth)){
                     rng.colEndIndex = j;
                     break;
                 }
@@ -176,28 +175,27 @@ namespace EasySheet{
             return rng;
         }
         DrawVisibleCellRange(rng:CCellRange):void{
-            let xPad:number = rng.xPad;
-            let yPad:number = rng.yPad;
+            let x:number = rng.xPad;
+            let y:number = rng.yPad;
             this._ctx.save();
-            console.log("xPad",xPad,"yPad",yPad);
-            console.log("[Range]"+JSON.stringify(rng));
-            this._ctx.translate(xPad,yPad);
+            this._ctx.translate(x+0.5,y+0.5);
             // Fill Background
             this._ctx.fillStyle = "#FFF";
             this._ctx.fillRect(0,0,this.clientWidth,this.clientHeight);
             // Draw Row Lines
+            this._ctx.beginPath();
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
-                this._ctx.moveTo(xPad,yPad+this._rows[i]);
-                this._ctx.lineTo(xPad+this._w,yPad+this._rows[i]);
-                yPad += this._rows[i];
+                this._ctx.moveTo(x,y+this._rows[i]);
+                this._ctx.lineTo(x+this._w,y+this._rows[i]);
+                y += this._rows[i];
             }
-            this._ctx.stroke();
             // Draw Column Lines
             for(let j=rng.colStartIndex;j<rng.colEndIndex;j++){
-                this._ctx.moveTo(xPad+this._cols[j],yPad);
-                this._ctx.lineTo(xPad+this._cols[j],yPad+this._h);
-                xPad += this._cols[j];
+                this._ctx.moveTo(x+this._cols[j],0);
+                this._ctx.lineTo(x+this._cols[j],this._h);
+                x += this._cols[j];
             }
+            this._ctx.stroke();
             // Draw Grid Cells
             console.log("time 04 =",now());
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
@@ -207,7 +205,7 @@ namespace EasySheet{
             console.log("time 05 =",now());
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
                 for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
-                    let xy = this.GetItemXY(i,j);
+                    let xy = this.GetItemXY(i-rng.rowStartIndex,j-rng.colStartIndex);
                     if(xy.x < this.clientWidth && xy.y < this.clientHeight) {
                         this._ctx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
                     }

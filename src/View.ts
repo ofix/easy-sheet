@@ -27,8 +27,8 @@ namespace EasySheet{
         protected _scrollY:number;
         constructor(nRows:number,nCols:number){
             super("es-view");
-            let clientW = $(document.body).width();
-            let clientH = $(document.body).height();
+            let clientW = $(window).width();
+            let clientH = $(window).height();
             this.CreateWindow("100",0,0,clientW,clientH,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
             this._nRows = nRows;
             this._nCols = nCols;
