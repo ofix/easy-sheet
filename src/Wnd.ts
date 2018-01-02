@@ -76,22 +76,6 @@ namespace EasySheet{
             return this._ctx;
         }
         CreateCanvas(): void {
-            this._div = document.createElement('div');
-            this._div.id = 'd-'+this.name;
-            this._div.style.position = this._bFixed?"fixed":"absolute";
-            this._div.style.left = this._x+"px";
-            this._div.style.top = this._y+"px";
-            this._div.style.zIndex = this._zIndex;
-
-            this._subDiv = document.createElement('div');
-            this._subDiv.id = 'di-' +this.name;
-            this._subDiv.style.position = 'relative';
-            this._subDiv.style.left = "0px";
-            this._subDiv.style.top = "0px";
-            this._subDiv.style.width = this._w+"px";
-            this._subDiv.style.height = this._h+"px";
-            this._subDiv.innerHTML="asdfasdfasdf";
-
             this._canvas = document.createElement('canvas');
             this._canvas.id = this.name;
             this._canvas.style.position = "fixed";
@@ -99,12 +83,10 @@ namespace EasySheet{
             this._canvas.style.top = "0px";
             this._canvas.style.width = this._clientW+"px";
             this._canvas.style.height = this._clientH+"px";
+            this._canvas.style.zIndex = this._zIndex;
             this._canvas.width = this._clientW;
             this._canvas.height = this._clientH;
-
-            this._div.appendChild(this._subDiv);
-            this._div.appendChild(this._canvas);
-            document.body.appendChild(this._div);
+            document.body.appendChild(this._canvas);
             CWndManager.instance().registerWnd(this);
             this._ctx = this._canvas.getContext("2d");
         }
