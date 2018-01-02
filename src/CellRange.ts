@@ -18,11 +18,15 @@
          public rowEndIndex;
          public colStartIndex;
          public colEndIndex;
-         constructor(rowStartIndex:number,rowEndIndex:number,colStartIndex:number,colEndIndex){
+         public xPad;
+         public yPad;
+         constructor(rowStartIndex:number,rowEndIndex:number,colStartIndex:number,colEndIndex:number,xPad:number,yPad:number){
              this.rowStartIndex = rowStartIndex;
              this.rowEndIndex = rowEndIndex;
              this.colStartIndex = colStartIndex;
              this.colEndIndex = colEndIndex;
+             this.xPad = xPad;
+             this.yPad = yPad;
          }
      }
  }

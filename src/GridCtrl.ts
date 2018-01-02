@@ -111,6 +111,9 @@ namespace EasySheet{
         GetColHeight():number{
             return this._h;
         }
+        SetItemText(iRow:number,iCol:number,text:string):void{
+
+        }
         GetItemXY(iRow:number,iCol:number):CPoint{
             let pt = new CPoint();
             pt.x = iCol*CELL_WIDTH+this._x;
@@ -132,14 +135,17 @@ namespace EasySheet{
                 this.Draw();
             }
         }
-        GetVisibleCellRange(xOffset:number,yOffset:number):CCellRange{
+        GetVisibleCellRange():CCellRange{
+            let xOffset:number = this._scrollX;
+            let yOffset:number = this._scrollY;
             let x:number =0;
             let y:number =0;
-            let rng = new CCellRange(-1,-1,-1,-1);
+            let rng = new CCellRange(0,0,0,0,0,0);
             for(let i=0; i<this._nRows;i++){
                 x+= this._nRows[i];
                 if(x>= xOffset){
                     rng.rowStartIndex = i;
+                    rng.xPad = xOffset -  x;
                 }
                 if((x+this.clientWidth)>=xOffset){
                     rng.rowEndIndex = i;
@@ -151,6 +157,7 @@ namespace EasySheet{
                 y+=this._nCols[j];
                 if(y>=yOffset){
                     rng.colStartIndex = j;
+                    rng.yPad = yOffset - y;
                 }
                 if((x+this.clientHeight)>=yOffset){
                     rng.colEndIndex = j;
@@ -159,7 +166,9 @@ namespace EasySheet{
             }
             return rng;
         }
-        DrawVisibleCellRange(rng:CCellRange,xPad:number,yPad:number):void{
+        DrawVisibleCellRange(rng:CCellRange):void{
+            let xPad:number = rng.xPad;
+            let yPad:number = rng.yPad;
             this._ctx.save();
             this._ctx.translate(xPad,yPad);
             // Fill Background
@@ -195,18 +204,12 @@ namespace EasySheet{
             }
             this._ctx.restore();
         }
+        protected DrawInner():void{
+            let rng:CCellRange = this.GetVisibleCellRange();
+            this.DrawVisibleCellRange(rng);
+        }
         Draw():void{
-            if(!this._cacheExist){
-                this.DrawInCache();
-                console.log("写入缓存");
-            }
-            console.log("GridCtrl 1",now());
-            this._ctx.save();
-            console.log(this._vx,this._vy,this.clientWidth,this.clientHeight);
-            this._ctx.drawImage(this._cacheCanvas,this._vx,this._vy,this.clientWidth,this.clientHeight,
-                this._vx,this._vy,this.clientWidth,this.clientHeight);
-            this._ctx.restore();
-            console.log("GridCtrl 2",now());
+            this.DrawInner();
         }
         DrawInCache():void{
             console.log("draw grid cache 1",now());
@@ -259,6 +262,19 @@ namespace EasySheet{
             this._cacheCtx.restore();
             this._cacheExist = true;
             console.log("draw grid cache 2",now());
+        }
+        DrawOld():void{
+            if(!this._cacheExist){
+                this.DrawInCache();
+                console.log("写入缓存");
+            }
+            console.log("GridCtrl 1",now());
+            this._ctx.save();
+            console.log(this._vx,this._vy,this.clientWidth,this.clientHeight);
+            this._ctx.drawImage(this._cacheCanvas,this._vx,this._vy,this.clientWidth,this.clientHeight,
+                this._vx,this._vy,this.clientWidth,this.clientHeight);
+            this._ctx.restore();
+            console.log("GridCtrl 2",now());
         }
     }
 }
