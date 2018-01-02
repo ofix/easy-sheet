@@ -13,8 +13,9 @@
  * @Time      20:26
  */
 /// <reference path="View.ts"/>
+/// <reference path="Wnd.ts"/>
 namespace EasySheet{
-    export class CScrollBarCtrl{
+    export class CScrollBarCtrl extends CWnd implements IDraggable{
         public static readonly SBC_HORZ = 0;
         public static readonly SBC_VERT = 1;
         protected _x:number;
@@ -32,7 +33,9 @@ namespace EasySheet{
         protected _pos:number;
         protected _page:number;
         protected _view:number;
+        protected _inDrag:boolean;
         constructor(parentWnd:CView,name:string="scroll-bar",barStyle:number=CScrollBarCtrl.SBC_HORZ, x:number,y:number,width:number,height:number=18){
+            super("es-scrollbar-ctrl");
             this._parent = parentWnd;
             this._name = name;
             this._bar_style = barStyle;
@@ -48,6 +51,14 @@ namespace EasySheet{
             this._pos = 0;
             this._page = 0;
             this._view = 0;
+        }
+        OnDragStart(ptCursor:CPoint):void{
+            this._inDrag = true;
+        }
+        OnDragging(ptCursor:CPoint):void{
+        }
+        OnDragEnd(ptCursor:CPoint):void{
+            this._inDrag = false;
         }
         get barColor():string{
             return this._barClr;

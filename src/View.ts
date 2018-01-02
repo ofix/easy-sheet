@@ -36,7 +36,7 @@ namespace EasySheet{
             this._scrollY = 0;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
-            this._scrollBarCtrl = new CScrollBarCtrl(this,"scroll-bar",CScrollBarCtrl.SBC_HORZ,120,300,200);
+            this._scrollBarCtrl = new CScrollBarCtrl(this,"scroll-bar",CScrollBarCtrl.SBC_HORZ,0,clientH-CELL_HEIGHT,clientW,34);
             this._scrollBarCtrl.SetPageSize(1000);
             this._scrollBarCtrl.SetViewSize(500);
         }
@@ -56,7 +56,6 @@ namespace EasySheet{
                 this._scrollX = scrollX;
                 this._rowCtrl.ScrollX(scrollX);
                 this._gridCtrl.ScrollWindow(delta,0);
-                //this._rowCtrl.Draw();
             }
         }
         ScrollY(scrollY:number):void{
@@ -72,8 +71,8 @@ namespace EasySheet{
         }
         Draw(){
             this._gridCtrl.Draw();
-            //this._rowCtrl.Draw();
-            //this._scrollBarCtrl.Draw();
+            this._rowCtrl.Draw();
+            this._scrollBarCtrl.Draw();
         }
     }
 }
