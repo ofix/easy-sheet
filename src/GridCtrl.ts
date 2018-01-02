@@ -140,26 +140,35 @@ namespace EasySheet{
             let yOffset:number = this._scrollY;
             let x:number =0;
             let y:number =0;
+            let flagX = true;
+            let flagY = true;
+            console.log("clientWidth",this.clientWidth,"clientHeight",this.clientHeight);
             let rng = new CCellRange(0,0,0,0,0,0);
             for(let i=0; i<this._nRows;i++){
-                x+= this._nRows[i];
-                if(x>= xOffset){
+                x+= this._rows[i];
+                if(flagX && x>= xOffset){
                     rng.rowStartIndex = i;
-                    rng.xPad = xOffset -  x;
+                    if(xOffset >0) {
+                        rng.xPad = xOffset - x;
+                    }
+                    flagX = false;
                 }
-                if((x+this.clientWidth)>=xOffset){
+                if(x >=(xOffset+this.clientWidth)){
                     rng.rowEndIndex = i;
                     break;
                 }
             }
 
             for(let j=0; j<this._nCols;j++){
-                y+=this._nCols[j];
-                if(y>=yOffset){
+                y+=this._cols[j];
+                if(flagY && y>=yOffset){
                     rng.colStartIndex = j;
-                    rng.yPad = yOffset - y;
+                    if(yOffset>0) {
+                        rng.yPad = yOffset - y;
+                    }
+                    flagY = false;
                 }
-                if((x+this.clientHeight)>=yOffset){
+                if(y>=(yOffset+this.clientHeight)){
                     rng.colEndIndex = j;
                     break;
                 }
@@ -170,6 +179,8 @@ namespace EasySheet{
             let xPad:number = rng.xPad;
             let yPad:number = rng.yPad;
             this._ctx.save();
+            console.log("xPad",xPad,"yPad",yPad);
+            console.log("[Range]"+JSON.stringify(rng));
             this._ctx.translate(xPad,yPad);
             // Fill Background
             this._ctx.fillStyle = "#FFF";
@@ -177,14 +188,14 @@ namespace EasySheet{
             // Draw Row Lines
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                 this._ctx.moveTo(xPad,yPad+this._rows[i]);
-                this._ctx.lineTo(xPad+this._vw,yPad+this._rows[i]);
+                this._ctx.lineTo(xPad+this._w,yPad+this._rows[i]);
                 yPad += this._rows[i];
             }
             this._ctx.stroke();
             // Draw Column Lines
-            for(let j=0;j<this._nCols;j++){
+            for(let j=rng.colStartIndex;j<rng.colEndIndex;j++){
                 this._ctx.moveTo(xPad+this._cols[j],yPad);
-                this._ctx.lineTo(xPad+this._cols[j],yPad+this._vh);
+                this._ctx.lineTo(xPad+this._cols[j],yPad+this._h);
                 xPad += this._cols[j];
             }
             // Draw Grid Cells
