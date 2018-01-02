@@ -34,15 +34,22 @@ namespace EasySheet{
         protected _page:number;
         protected _view:number;
         protected _inDrag:boolean;
-        constructor(parentWnd:CView,name:string="scroll-bar",barStyle:number=CScrollBarCtrl.SBC_HORZ, x:number,y:number,width:number,height:number=18){
+        constructor(parentWnd:CView,name:string="scroll-bar",barStyle:number=CScrollBarCtrl.SBC_HORZ){
             super("es-scrollbar-ctrl");
             this._parent = parentWnd;
             this._name = name;
             this._bar_style = barStyle;
-            this._x = x;
-            this._y = y;
-            this._w = width;
-            this._h = height;
+            if(this._bar_style == CScrollBarCtrl.SBC_HORZ) {
+                this._x = 0;
+                this._y = parentWnd.clientHeight-18;
+                this._w = parentWnd.clientWidth;
+                this._h = 18;
+            }else{
+                this._x = parentWnd.clientWidth-18;
+                this._y =0;
+                this._w = 18;
+                this._h = parentWnd.clientHeight;
+            }
             this._vw = this._w;
             this._ctx = parentWnd.context;
             this._barClr = "#C1C1C1";

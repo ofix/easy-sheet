@@ -22,7 +22,8 @@ namespace EasySheet{
         protected _nCols:number;
         protected _rowCtrl:CRowCtrl;
         protected _gridCtrl:CGridCtrl;
-        protected _scrollBarCtrl:CScrollBarCtrl;
+        protected _xScrollBar:CScrollBarCtrl;
+        protected _yScrollBar:CScrollBarCtrl;
         protected _scrollX:number;
         protected _scrollY:number;
         constructor(nRows:number,nCols:number){
@@ -36,9 +37,12 @@ namespace EasySheet{
             this._scrollY = 0;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
-            this._scrollBarCtrl = new CScrollBarCtrl(this,"scroll-bar",CScrollBarCtrl.SBC_HORZ,0,clientH-CELL_HEIGHT,clientW,34);
-            this._scrollBarCtrl.SetPageSize(1000);
-            this._scrollBarCtrl.SetViewSize(500);
+            this._xScrollBar = new CScrollBarCtrl(this,"horizontal-scroll-bar",CScrollBarCtrl.SBC_HORZ);
+            this._xScrollBar.SetPageSize(1000);
+            this._xScrollBar.SetViewSize(500);
+            this._yScrollBar = new CScrollBarCtrl(this,"vertical-scroll-bar",CScrollBarCtrl.SBC_VERT);
+            this._yScrollBar.SetPageSize(1000);
+            this._yScrollBar.SetViewSize(500);
         }
         get gridCtrl():CGridCtrl{
             return this._gridCtrl;
@@ -72,7 +76,8 @@ namespace EasySheet{
         Draw(){
             this._gridCtrl.Draw();
             this._rowCtrl.Draw();
-            this._scrollBarCtrl.Draw();
+            this._xScrollBar.Draw();
+            this._yScrollBar.Draw();
         }
     }
 }
