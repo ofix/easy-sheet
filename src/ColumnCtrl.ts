@@ -39,6 +39,7 @@ namespace EasySheet {
         }
         OnSize(wWin:number,hWin:number):void{
             this._clientW = wWin-18;
+            this._clientH = CELL_HEIGHT;
             this.Draw();
         }
         getColName(index:number){
@@ -63,6 +64,7 @@ namespace EasySheet {
             this._ctx.fillStyle=CLR_BAR_TEXT;
             this._cols.forEach((v, i)=>{
                 let name:string = this.getColName(i);
+                console.log(name,wTotal+v/2,CELL_HEIGHT/2);
                 this._ctx.fillText(name,wTotal+v/2,CELL_HEIGHT/2);
                 wTotal+=v;
                 this._ctx.moveTo(wTotal,0);
