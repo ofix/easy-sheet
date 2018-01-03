@@ -30,7 +30,7 @@
              super("es-row-ctrl");
              this._parent = parentWnd;
              this._x=0;
-             this._y=0;
+             this._y=CELL_HEIGHT;
              this._w=this.rowOffset;
              this._h=this.clientHeight;
              this._nRows = nRows;
@@ -47,10 +47,10 @@
              return this._parent.rowOffset;
          }
          get clientWidth():number{
-             return FIXED_CELL_WIDTH;
+             return this._w;
          }
          get clientHeight():number{
-             return this._nRows*CELL_HEIGHT;
+             return this._parent.clientHeight;
          }
          get x():number{
              return this._x;
@@ -92,12 +92,11 @@
          }
          Draw():void{
              let rng:CCellRange = this.GetVisibleCellRange();
-             console.log("rng",JSON.stringify(rng));
-             let hTotal:number=0;
+             let hTotal:number=this._y;
              this._ctx.translate(0.5,0.5);
              this._ctx.save();
              this._ctx.fillStyle=CLR_BAR_FILL;
-             this._ctx.fillRect(0,0,this._w,this.clientHeight);
+             this._ctx.fillRect(this._x,this._y,this._w,this.clientHeight);
              this._ctx.fillStyle = CLR_BAR_TEXT;
              this._ctx.strokeStyle = CLR_BAR_SEP;
              this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
@@ -105,7 +104,7 @@
              this._ctx.textAlign = "center";
              this._ctx.beginPath();
              for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
-                 let name:string = ""+i;
+                 let name:string = i+"";
                  this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
                  hTotal+=this._rows[i];
                  this._ctx.moveTo(this._x,hTotal);
