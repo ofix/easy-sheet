@@ -39,11 +39,12 @@ namespace EasySheet {
         }
         Draw(){
                 this._ctx.save();
+                this._ctx.translate(0.5,0.5);
                 this._ctx.strokeStyle=CLR_BAR_SEP;
                 this._ctx.fillStyle = CLR_BAR_FILL;
                 this._ctx.fillRect(this._x,this._y,this._w,this._h);
-                this._ctx.moveTo(this._x+this._w+1,this._y);
-                this._ctx.lineTo(this._x+this._w+1,this._y+CELL_HEIGHT);
+                this._ctx.moveTo(this._x+this._w,this._y);
+                this._ctx.lineTo(this._x+this._w,this._y+CELL_HEIGHT-1);
                 this._ctx.lineTo(this._x,this._y+CELL_HEIGHT-1);
                 this._ctx.stroke();
                 this._ctx.restore();
