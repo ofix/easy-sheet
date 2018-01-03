@@ -96,8 +96,8 @@
          Draw():void{
              let rng:CCellRange = this.GetVisibleCellRange();
              let hTotal:number=this._y;
-             this._ctx.translate(0.5,0.5);
              this._ctx.save();
+             this._ctx.translate(0.5,0.5);
              this._ctx.fillStyle=CLR_BAR_FILL;
              this._ctx.fillRect(this._x,this._y,this._w,this.clientHeight);
              this._ctx.fillStyle = CLR_BAR_TEXT;
