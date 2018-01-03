@@ -52,6 +52,9 @@
          get clientHeight():number{
              return this._parent.clientHeight;
          }
+         OnSize(wWin:number,hWin:number):void{
+            this.Draw();
+         }
          get x():number{
              return this._x;
          }

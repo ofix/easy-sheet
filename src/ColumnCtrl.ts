@@ -21,8 +21,8 @@ namespace EasySheet {
         protected _inDrag:boolean;
         constructor(nCols:number){
             super("es-col-ctrl");
-            let clientW = $(window).width();
-            this.CreateWindow("1000",FIXED_CELL_WIDTH,0,clientW-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
+            let wWin = $(window).width();
+            this.CreateWindow("1000",FIXED_CELL_WIDTH,0,wWin-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
             for(let i=0; i<this._nCols; i++){
@@ -36,6 +36,10 @@ namespace EasySheet {
         }
         OnDragEnd(ptCursor:CPoint):void{
             this._inDrag = false;
+        }
+        OnSize(wWin:number,hWin:number):void{
+            this._clientH = wWin-18;
+            this.Draw();
         }
         getColName(index:number){
             let name = '';
@@ -67,7 +71,6 @@ namespace EasySheet {
             this._ctx.strokeStyle = CLR_BAR_SEP;
             this._ctx.moveTo(this._x,this._h-1);
             this._ctx.lineTo(this._x+this.clientWidth-18,this._h-1);
-            console.log(this._x,this._h,this._x+this.clientWidth-18,this._h);
             this._ctx.stroke();
             this._ctx.restore();
         }

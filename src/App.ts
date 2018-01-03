@@ -33,6 +33,12 @@ namespace EasySheet {
             this._cornerCtrl.Draw();
             this._view.Draw();
         }
+        OnSize(){
+            let wWin = $(window).width();
+            let hWin = $(window).height();
+            this._colCtrl.OnSize(wWin,hWin);
+            this._view.OnSize(wWin,hWin);
+        }
         get view():CView{
             return this._view;
         }

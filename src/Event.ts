@@ -13,9 +13,10 @@
  * @Time      11:00
  */
 /// <reference path="lib/jquery.d.ts"/>
+/// <reference path="app.ts"/>
 $(function(){
-    $("#d-es-view").scroll(function(e){
-        app.view.ScrollWindow($(this).scrollLeft(),$(this).scrollTop());
+    $(window).resize(function() {
+        app.OnSize();
     });
 });
 

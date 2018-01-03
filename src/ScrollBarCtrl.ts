@@ -60,6 +60,19 @@ namespace EasySheet{
             this._page = 0;
             this._view = 0;
         }
+        OnSize(wWin:number,hWin:number):void{
+            if(this._bar_style == CScrollBarCtrl.SBC_HORZ) {
+                this._x = 0;
+                this._y = hWin-18;
+                this._w = wWin;
+                this._h = 18;
+            }else{
+                this._x = wWin-18;
+                this._y = 0;
+                this._w = 18;
+                this._h = hWin;
+            }
+        }
         OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
         }

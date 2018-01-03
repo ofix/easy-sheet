@@ -30,9 +30,9 @@ namespace EasySheet{
         protected _scrollY:number;
         constructor(nRows:number,nCols:number){
             super("es-view");
-            let clientW = $(window).width();
-            let clientH = $(window).height();
-            this.CreateWindow("100",0,0,clientW,clientH,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
+            let wWin = $(window).width();
+            let hWin = $(window).height();
+            this.CreateWindow("100",0,0,wWin,hWin,nCols*CELL_WIDTH,nRows*CELL_HEIGHT);
             this._nRows = nRows;
             this._nCols = nCols;
             this._scrollX = 0;
@@ -60,8 +60,17 @@ namespace EasySheet{
         get rowOffset():number{
             return this._rowOffset;
         }
-        OnSize(){
-
+        OnSize(wWin:number,hWin:number):void{
+            this._clientW = wWin;
+            this._clientH = hWin;
+            this._canvas.width = wWin;
+            this._canvas.height = hWin;
+            this._canvas.style.width = this._clientW+"px";
+            this._canvas.style.height = this._clientH+"px";
+            this._rowCtrl.OnSize(wWin,hWin);
+            this._xScrollBar.OnSize(wWin,hWin);
+            this._yScrollBar.OnSize(wWin,hWin);
+            this.Draw();
         }
         ScrollWindow(scrollX:number,scrollY:number):void{
             this.ScrollX(scrollX);
