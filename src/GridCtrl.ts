@@ -114,13 +114,12 @@ namespace EasySheet{
         }
         GetItemXY(iRow:number,iCol:number):CPoint{
             let pt = new CPoint(this.rowOffset,this.colOffset);
-            for(let i=0; i< iRow;i++){
+            for(let i=0; i<iCol;i++){
                 pt.x += this._cols[i];
             }
-            for(let j=0; j<iCol; j++){
+            for(let j=0; j<iRow; j++){
                 pt.y += this._rows[j];
             }
-            console.log("(iRow,iCol,x,y)",iRow,iCol,pt.x,pt.y);
             return pt;
         }
         //利用图片函数滚动窗口
@@ -185,7 +184,6 @@ namespace EasySheet{
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                 this._ctx.moveTo(x,y+this._rows[i]);
                 this._ctx.lineTo(x+this._w,y+this._rows[i]);
-                console.log("(x1,y1,x2,y2)",x,y+this._rows[i],x+this._w,y+this._rows[i]);
                 y += this._rows[i];
             }
             // Draw Column Lines
@@ -196,15 +194,13 @@ namespace EasySheet{
             }
             this._ctx.stroke();
             // Draw Grid Cells
-            console.log("time 04 =",now());
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
             this._ctx.textBaseline="middle";
             this._ctx.textAlign = "center";
             this._ctx.fillStyle = "#000";
-            console.log("time 05 =",now());
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
                 for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
-                    let xy = this.GetItemXY(i-rng.rowStartIndex,j-rng.colStartIndex);
+                    let xy = this.GetItemXY(i,j);
                     this._ctx.fillText(i + j+"", xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
                 }
             }

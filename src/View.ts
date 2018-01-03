@@ -88,7 +88,7 @@ namespace EasySheet{
         }
         Draw(){
             this._gridCtrl.Draw();
-            //this._rowCtrl.Draw();
+            this._rowCtrl.Draw();
             this._xScrollBar.Draw();
             this._yScrollBar.Draw();
         }

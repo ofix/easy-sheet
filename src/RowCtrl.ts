@@ -23,41 +23,28 @@
          protected _parent:CView;
          protected _rows:number[];
          protected _ctx:CanvasRenderingContext2D;
-         protected _cacheCanvas:HTMLCanvasElement;
-         protected _cacheCtx:CanvasRenderingContext2D;
-         protected _cacheCreated;
          protected _x:number;
          protected _y:number;
-         protected _vx:number;
-         protected _vy:number;
-         protected _vw:number;
-         protected _vh:number;
          protected _inDrag:boolean;
-         protected _scrollX:number;
          constructor(parentWnd:CView,nRows:number){
              super("es-row-ctrl");
              this._parent = parentWnd;
              this._x=0;
              this._y=0;
-             this._vx=0;
-             this._vy=0;
-             this._vw=0;
-             this._vh=0;
+             this._w=this.rowOffset;
+             this._h=this.clientHeight;
              this._nRows = nRows;
              this._rows = [];
-             this._scrollX=0;
-             this._cacheCreated = false;
              this._ctx = this._parent.context;
              for(let i=0; i<this._nRows;i++){
                  this._rows.push(CELL_HEIGHT);
              }
-             this.CreateCacheCtx();
          }
-         CreateCacheCtx():void{
-             this._cacheCanvas = document.createElement("canvas");
-             this._cacheCanvas.width = this.clientWidth;
-             this._cacheCanvas.height = this.clientHeight;
-             this._cacheCtx = this._cacheCanvas.getContext("2d");
+         get colOffset():number{
+             return this._parent.colOffset;
+         }
+         get rowOffset():number{
+             return this._parent.rowOffset;
          }
          get clientWidth():number{
              return FIXED_CELL_WIDTH;
@@ -80,42 +67,54 @@
              this._inDrag = false;
          }
          ScrollX(delta:number):void{
-             this._scrollX = delta;
-             this._vx = delta;
+             this._x = delta;
+         }
+         GetVisibleCellRange():CCellRange{
+             let scrollY:number = this._y;
+             let y:number =0;
+             let flag = true;
+             let rng = new CCellRange(0,0,0,0,0,0);
+             for(let i=0; i<this._nRows;i++){
+                 y+= this._rows[i];
+                 if(flag && y>= scrollY){
+                     rng.rowStartIndex = i;
+                     if(scrollY>0) {
+                         rng.xPad = scrollY - y;
+                     }
+                     flag = false;
+                 }
+                 if(y >= (scrollY+this.clientHeight)){
+                     rng.rowEndIndex = i;
+                     break;
+                 }
+             }
+             return rng;
          }
          Draw():void{
-             if(!this._cacheCreated){
-                 this.DrawInCache();
-                 console.log("row cache");
-             }
-             console.log("row draw 1",now());
+             let rng:CCellRange = this.GetVisibleCellRange();
+             console.log("rng",JSON.stringify(rng));
+             let hTotal:number=0;
+             this._ctx.translate(0.5,0.5);
              this._ctx.save();
-             this._ctx.drawImage(this._cacheCanvas,0,0,this.clientWidth,this.clientHeight,
-                 this._vx,this._vy,this.clientWidth,this.clientHeight);
+             this._ctx.fillStyle=CLR_BAR_FILL;
+             this._ctx.fillRect(0,0,this._w,this.clientHeight);
+             this._ctx.fillStyle = CLR_BAR_TEXT;
+             this._ctx.strokeStyle = CLR_BAR_SEP;
+             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
+             this._ctx.textBaseline = "middle";
+             this._ctx.textAlign = "center";
+             this._ctx.beginPath();
+             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
+                 let name:string = ""+i;
+                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                 hTotal+=this._rows[i];
+                 this._ctx.moveTo(this._x,hTotal);
+                 this._ctx.lineTo(this._x+this._w,hTotal);
+             }
+             this._ctx.moveTo(this._x+this._w,0);
+             this._ctx.lineTo(this._x+this._w,this.clientHeight);
+             this._ctx.stroke();
              this._ctx.restore();
-             console.log("row draw 2",now());
-         }
-         DrawInCache():void{
-            let hTotal:number=0;
-            this._cacheCtx.save();
-            this._cacheCtx.fillStyle=CLR_BAR_FILL;
-            this._cacheCtx.fillRect(0,0,FIXED_CELL_WIDTH,CELL_HEIGHT*this._nRows);
-            this._cacheCtx.fillStyle = CLR_BAR_TEXT;
-            this._cacheCtx.strokeStyle = CLR_BAR_SEP;
-            this._cacheCtx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-            this._cacheCtx.textBaseline = "middle";
-            this._cacheCtx.textAlign = "center";
-            this._cacheCtx.beginPath();
-            this._rows.forEach((v,i)=>{
-                let name:string = ""+i;
-                this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
-                hTotal+=v;
-                this._cacheCtx.moveTo(0,hTotal);
-                this._cacheCtx.lineTo(FIXED_CELL_WIDTH,hTotal);
-            });
-            this._cacheCtx.stroke();
-            this._cacheCtx.restore();
-            this._cacheCreated = true;
          }
          drawDragLine():void{
 

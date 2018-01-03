@@ -22,7 +22,7 @@ namespace EasySheet {
         constructor(nCols:number){
             super("es-col-ctrl");
             let clientW = $(window).width();
-            this.CreateWindow("1000",0,0,clientW-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
+            this.CreateWindow("1000",FIXED_CELL_WIDTH,0,clientW-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
             for(let i=0; i<this._nCols; i++){
@@ -47,23 +47,29 @@ namespace EasySheet {
         }
         Draw(){
             let wTotal:number=FIXED_CELL_WIDTH;
+            this._ctx.translate(0.5,0.5);
+            this._ctx.save();
+            this._ctx.fillStyle=CLR_BAR_FILL;
+            this._ctx.fillRect(this._x,this._y,this.clientWidth,this.clientHeight);
+
+            this._ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
+            this._ctx.textBaseline = "middle";
+            this._ctx.textAlign = 'center';
+            this._ctx.strokeStyle=CLR_BAR_SEP;
+            this._ctx.fillStyle=CLR_BAR_TEXT;
             this._cols.forEach((v, i)=>{
-                this._ctx.save();
                 let name:string = this.getColName(i);
-                this._ctx.fillStyle=CLR_BAR_FILL;
-                this._ctx.fillRect(wTotal,-1,v,CELL_HEIGHT);
-                this._ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
-                this._ctx.textBaseline = "middle";
-                this._ctx.textAlign = 'center';
-                this._ctx.fillStyle=CLR_BAR_TEXT;
                 this._ctx.fillText(name,wTotal+v/2,CELL_HEIGHT/2);
                 wTotal+=v;
-                this._ctx.strokeStyle=CLR_BAR_SEP;
                 this._ctx.moveTo(wTotal,0);
                 this._ctx.lineTo(wTotal,CELL_HEIGHT);
-                this._ctx.stroke();
-                this._ctx.restore();
             });
+            this._ctx.strokeStyle = CLR_BAR_SEP;
+            this._ctx.moveTo(this._x,this._h-1);
+            this._ctx.lineTo(this._x+this.clientWidth-18,this._h-1);
+            console.log(this._x,this._h,this._x+this.clientWidth-18,this._h);
+            this._ctx.stroke();
+            this._ctx.restore();
         }
     }
 }
