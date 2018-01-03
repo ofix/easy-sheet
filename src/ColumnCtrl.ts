@@ -15,12 +15,14 @@
 /// <reference path="Draggable.ts"/>
 namespace EasySheet {
     export class CColumnCtrl extends CWnd implements IDraggable{
+        readonly CELL_BLANK:number = 16;
         protected _nCols;
         protected _cols:number[];
         protected _inDrag:boolean;
         constructor(nCols:number){
             super("es-col-ctrl");
-            this.CreateWindow("1000",0,0,nCols*CELL_WIDTH,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
+            let clientW = $(window).width();
+            this.CreateWindow("1000",0,0,clientW-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
             for(let i=0; i<this._nCols; i++){

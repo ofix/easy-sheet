@@ -33,10 +33,6 @@ namespace EasySheet{
         protected _scrollX:number;
         protected _scrollY:number;
         protected _cacheExist:boolean;
-        protected _vx:number;
-        protected _vy:number;
-        protected _vw:number;
-        protected _vh:number;
         protected _ctx:CanvasRenderingContext2D;
         protected _cacheCanvas:HTMLCanvasElement;
         protected _cacheCtx:CanvasRenderingContext2D;
@@ -51,10 +47,6 @@ namespace EasySheet{
             this._y = 0;
             this._w = parentWnd.clientWidth;
             this._h = parentWnd.clientHeight;
-            this._vx = this._x;
-            this._vy = this._y;
-            this._vw = this._w;
-            this._vh = this._h;
             this._rows = [];
             this._cols = [];
             this._canvasList = [];
@@ -69,6 +61,12 @@ namespace EasySheet{
             this.CreateCacheCtx();
             this.makeCanvasList();
         }
+        get colOffset():number{
+            return this._parent.colOffset;
+        }
+        get rowOffset():number{
+            return this._parent.rowOffset;
+        }
         get clientWidth():number{
             return this._parent.clientWidth;
         }
@@ -76,19 +74,19 @@ namespace EasySheet{
             return this._parent.clientHeight;
         }
         makeCanvasList():void{
-            console.log("make-list 1 ",now());
-            for(let i=0; i<1000;i++) {
-                let canvas: HTMLCanvasElement;
-                let ctx: CanvasRenderingContext2D;
-                canvas = document.createElement("canvas");
-                canvas.width = this._w;
-                canvas.height = this._h;
-                ctx = canvas.getContext("2d");
-                this._canvasList.push(canvas);
-                this._canvasList.push(ctx);
-            }
-            console.log("canvas_list = ",this._canvasList.length);
-            console.log("make-list 2 ",now());
+            // console.log("make-list 1 ",now());
+            // for(let i=0; i<1000;i++) {
+            //     let canvas: HTMLCanvasElement;
+            //     let ctx: CanvasRenderingContext2D;
+            //     canvas = document.createElement("canvas");
+            //     canvas.width = this._w;
+            //     canvas.height = this._h;
+            //     ctx = canvas.getContext("2d");
+            //     this._canvasList.push(canvas);
+            //     this._canvasList.push(ctx);
+            // }
+            // console.log("canvas_list = ",this._canvasList.length);
+            // console.log("make-list 2 ",now());
         }
         CreateCacheCtx():void{
             this._cacheCanvas = document.createElement("canvas");
@@ -115,23 +113,21 @@ namespace EasySheet{
 
         }
         GetItemXY(iRow:number,iCol:number):CPoint{
-            let pt = new CPoint();
-            pt.x = iCol*CELL_WIDTH+this._x;
-            pt.y = iRow*CELL_HEIGHT;
+            let pt = new CPoint(this.rowOffset,this.colOffset);
+            for(let i=0; i< iRow;i++){
+                pt.x += this._cols[i];
+            }
+            for(let j=0; j<iCol; j++){
+                pt.y += this._rows[j];
+            }
+            console.log("(iRow,iCol,x,y)",iRow,iCol,pt.x,pt.y);
             return pt;
         }
         //利用图片函数滚动窗口
         ScrollWindow(deltaX:number,deltaY:number):void{
             this._scrollX = this._scrollX+deltaX;
             this._scrollY = this._scrollY+deltaY;
-            if((deltaX>0)) {
-                this._vx = this._scrollX;
-                this._vy = this._scrollY;
-                this.Draw();
-            }
-            if((deltaY>0) && (deltaY<this.clientHeight)) {
-                this._vx = this._scrollX;
-                this._vy = this._scrollY;
+            if((deltaX>0) || ((deltaY>0) && (deltaY<this.clientHeight))) {
                 this.Draw();
             }
         }
@@ -175,18 +171,21 @@ namespace EasySheet{
             return rng;
         }
         DrawVisibleCellRange(rng:CCellRange):void{
-            let x:number = rng.xPad;
-            let y:number = rng.yPad;
+            let x:number = rng.xPad+this.rowOffset;
+            let y:number = rng.yPad+this.colOffset;
+            console.log("rng",JSON.stringify(rng));
             this._ctx.save();
-            this._ctx.translate(x+0.5,y+0.5);
+            this._ctx.translate(rng.xPad+0.5,rng.yPad+0.5);
             // Fill Background
             this._ctx.fillStyle = "#FFF";
             this._ctx.fillRect(0,0,this.clientWidth,this.clientHeight);
+            this._ctx.strokeStyle = "#C5C5C5";
             // Draw Row Lines
             this._ctx.beginPath();
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                 this._ctx.moveTo(x,y+this._rows[i]);
                 this._ctx.lineTo(x+this._w,y+this._rows[i]);
+                console.log("(x1,y1,x2,y2)",x,y+this._rows[i],x+this._w,y+this._rows[i]);
                 y += this._rows[i];
             }
             // Draw Column Lines
@@ -206,84 +205,14 @@ namespace EasySheet{
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
                 for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
                     let xy = this.GetItemXY(i-rng.rowStartIndex,j-rng.colStartIndex);
-                    if(xy.x < this.clientWidth && xy.y < this.clientHeight) {
-                        this._ctx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
-                    }
+                    this._ctx.fillText(i + j+"", xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
                 }
             }
             this._ctx.restore();
-        }
-        protected DrawInner():void{
-            let rng:CCellRange = this.GetVisibleCellRange();
-            this.DrawVisibleCellRange(rng);
         }
         Draw():void{
-            this.DrawInner();
-        }
-        DrawInCache():void{
-            console.log("draw grid cache 1",now());
-            console.log("vw","vh",this._vw,this._vh);
-            //清空左侧行
-            console.log("time 01 =",now());
-            this._cacheCtx.save();
-            this._cacheCtx.fillStyle = "#FFF";
-            this._cacheCtx.fillRect(this._vx,this._vy,this._vw,this._vh);
-            this._cacheCtx.strokeStyle="#C5C5C5";
-            this._cacheCtx.restore();
-            //画背景横线
-            console.log("time 02 =",now());
-            this._cacheCtx.save();
-            this._cacheCtx.translate(0.5,0.5);
-            this._cacheCtx.beginPath();
-            let yOffset:number = this._vy;
-            for(let i=0;i<this._nRows;i++){
-                this._cacheCtx.moveTo(this._vx,yOffset+this._rows[i]);
-                this._cacheCtx.lineTo(this._vx+this._vw,yOffset+this._rows[i]);
-                yOffset += this._rows[i];
-            }
-            this._cacheCtx.stroke();
-            //画背景竖线
-            console.log("time 03 =",now());
-            this._cacheCtx.beginPath();
-            let xOffset:number=this._vx;
-            for(let j=0;j<this._nCols;j++){
-                this._cacheCtx.moveTo(xOffset+this._cols[j],this._vy);
-                this._cacheCtx.lineTo(xOffset+this._cols[j],this._vy+this._vh);
-                xOffset += this._cols[j];
-            }
-            this._cacheCtx.stroke();
-            //画Cell单元格
-            console.log("time 04 =",now());
-            this._cacheCtx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
-            this._cacheCtx.textBaseline="middle";
-            this._cacheCtx.textAlign = "center";
-            this._cacheCtx.fillStyle = "#000";
-            console.log("time 05 =",now());
-            for(let i=0; i<this._nRows; i++){
-                for(let j=0; j<this._nCols; j++){
-                    let xy = this.GetItemXY(i,j);
-                    if(xy.x < this.clientWidth && xy.y < this.clientHeight) {
-                        this._cacheCtx.fillText("" + i + j, xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
-                    }
-                }
-            }
-            console.log("time 06 =",now());
-            this._cacheCtx.restore();
-            this._cacheExist = true;
-            console.log("draw grid cache 2",now());
-        }
-        DrawOld():void{
-            if(!this._cacheExist){
-                this.DrawInCache();
-                console.log("写入缓存");
-            }
-            console.log("GridCtrl 1",now());
-            this._ctx.save();
-            console.log(this._vx,this._vy,this.clientWidth,this.clientHeight);
-            this._ctx.drawImage(this._cacheCanvas,this._vx,this._vy,this.clientWidth,this.clientHeight,
-                this._vx,this._vy,this.clientWidth,this.clientHeight);
-            this._ctx.restore();
-            console.log("GridCtrl 2",now());
+            let rng:CCellRange = this.GetVisibleCellRange();
+            this.DrawVisibleCellRange(rng);
         }
     }
 }

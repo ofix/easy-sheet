@@ -18,6 +18,8 @@
 /// <reference path="ScrollBarCtrl.ts"/>
 namespace EasySheet{
     export class CView extends CWnd{
+        protected _colOffset:number;
+        protected _rowOffset:number;
         protected _nRows:number;
         protected _nCols:number;
         protected _rowCtrl:CRowCtrl;
@@ -35,6 +37,8 @@ namespace EasySheet{
             this._nCols = nCols;
             this._scrollX = 0;
             this._scrollY = 0;
+            this._rowOffset = FIXED_CELL_WIDTH;
+            this._colOffset = CELL_HEIGHT;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
             this._xScrollBar = new CScrollBarCtrl(this,"horizontal-scroll-bar",CScrollBarCtrl.SBC_HORZ);
@@ -49,6 +53,15 @@ namespace EasySheet{
         }
         get rowCtrl():CRowCtrl{
             return this._rowCtrl;
+        }
+        get colOffset():number{
+            return this._colOffset;
+        }
+        get rowOffset():number{
+            return this._rowOffset;
+        }
+        OnSize(){
+
         }
         ScrollWindow(scrollX:number,scrollY:number):void{
             this.ScrollX(scrollX);
@@ -75,7 +88,7 @@ namespace EasySheet{
         }
         Draw(){
             this._gridCtrl.Draw();
-            this._rowCtrl.Draw();
+            //this._rowCtrl.Draw();
             this._xScrollBar.Draw();
             this._yScrollBar.Draw();
         }
