@@ -172,7 +172,6 @@ namespace EasySheet{
         DrawVisibleCellRange(rng:CCellRange):void{
             let x:number = rng.xPad+this.rowOffset;
             let y:number = rng.yPad+this.colOffset;
-            console.log("rng",JSON.stringify(rng));
             this._ctx.save();
             this._ctx.translate(rng.xPad+0.5,rng.yPad+0.5);
             // Fill Background

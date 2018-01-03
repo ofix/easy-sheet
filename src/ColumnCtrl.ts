@@ -52,8 +52,8 @@ namespace EasySheet {
         }
         Draw(){
             let wTotal:number=FIXED_CELL_WIDTH;
-            this._ctx.translate(0.5,0.5);
             this._ctx.save();
+            this._ctx.translate(0.5,0.5);
             this._ctx.fillStyle=CLR_BAR_FILL;
             this._ctx.fillRect(this._x,this._y,this.clientWidth,this.clientHeight);
 
