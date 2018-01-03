@@ -38,7 +38,7 @@ namespace EasySheet {
             this._inDrag = false;
         }
         OnSize(wWin:number,hWin:number):void{
-            this._clientH = wWin-18;
+            this._clientW = wWin-18;
             this.Draw();
         }
         getColName(index:number){
