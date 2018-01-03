@@ -64,7 +64,6 @@ namespace EasySheet {
             this._ctx.fillStyle=CLR_BAR_TEXT;
             this._cols.forEach((v, i)=>{
                 let name:string = this.getColName(i);
-                console.log(name,wTotal+v/2,CELL_HEIGHT/2);
                 this._ctx.fillText(name,wTotal+v/2,CELL_HEIGHT/2);
                 wTotal+=v;
                 this._ctx.moveTo(wTotal,0);
@@ -74,6 +73,7 @@ namespace EasySheet {
             this._ctx.moveTo(this._x,this._h-1);
             this._ctx.lineTo(this._x+this.clientWidth-18,this._h-1);
             this._ctx.stroke();
+            this._ctx.translate(-0.5,-0.5);
             this._ctx.restore();
         }
     }

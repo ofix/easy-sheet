@@ -182,13 +182,13 @@ namespace EasySheet{
             this._ctx.beginPath();
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                 this._ctx.moveTo(x,y+this._rows[i]);
-                this._ctx.lineTo(x+this._w,y+this._rows[i]);
+                this._ctx.lineTo(x+this.clientWidth,y+this._rows[i]);
                 y += this._rows[i];
             }
             // Draw Column Lines
             for(let j=rng.colStartIndex;j<rng.colEndIndex;j++){
                 this._ctx.moveTo(x+this._cols[j],0);
-                this._ctx.lineTo(x+this._cols[j],this._h);
+                this._ctx.lineTo(x+this._cols[j],this.clientHeight);
                 x += this._cols[j];
             }
             this._ctx.stroke();
