@@ -105,6 +105,38 @@ namespace EasySheet{
         OnDragEnd(ptCursor:CPoint):void{
             this._inDrag = false;
         }
+        OnKeyDirLeft():void{
+            if(this._activeRow != -1 && this._activeCol != -1){
+                this._activeCol -= 1;
+                if(this._activeCol <0){
+                    this._activeCol =0;
+                }
+            }
+        }
+        OnKeyDirRight():void{
+            if(this._activeRow != -1 && this._activeCol != -1){
+                this._activeCol += 1;
+                if(this._activeCol > this._nCols-1){
+                    this._activeRow = this._nCols-1;
+                }
+            }
+        }
+        OnKeyDirUp():void{
+            if(this._activeRow != -1 && this._activeCol != -1){
+                this._activeRow -= 1;
+                if(this._activeRow <0){
+                    this._activeRow =0;
+                }
+            }
+        }
+        OnKeyDirDown():void{
+            if(this._activeRow != -1 && this._activeCol != -1){
+                this._activeRow -= 1;
+                if(this._activeRow > this._nRows-1){
+                    this._activeRow = this._nRows-1;
+                }
+            }
+        }
         OnMouseMove(ptCursor:CPoint):void{
 
         }

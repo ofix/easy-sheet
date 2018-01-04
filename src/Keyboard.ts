@@ -13,7 +13,7 @@
  * @Time      22:40
  */
 namespace EasySheet{
-    export enum Key{
+    export enum KEY{
         BACKSPACE=8,
         TAB=9,
         ENTER=13,

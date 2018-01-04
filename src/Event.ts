@@ -15,6 +15,8 @@
 /// <reference path="lib/jquery.d.ts"/>
 /// <reference path="app.ts"/>
 /// <reference path="Point.ts"/>
+/// <reference path="Keyboard.ts"/>
+import KEY = EasySheet.KEY;
 $(function(){
     $(window).resize(function() {
         app.OnSize();
@@ -34,6 +36,25 @@ $(function(){
         }else if(e.button == 2){
             app.view.OnRightMouseUp(pt);
         }
+    });
+    $(document).on("keydown","#es-view",function(e){
+       switch(e.keyCode){
+           case KEY.LEFT:
+               app.view.OnKeyDirLeft();
+               break;
+           case KEY.RIGHT:
+               app.view.OnKeyDirRight();
+               break;
+           case KEY.UP:
+               app.view.OnKeyDirUp();
+               break;
+           case KEY.DOWN:
+               app.view.OnKeyDirDown();
+               break;
+       }
+    });
+    $(document).on("keyup","#es-view",function(e){
+
     });
 
 
