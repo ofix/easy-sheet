@@ -16,11 +16,11 @@
 /// <reference path="CellRange.ts"/>
 namespace EasySheet {
     export class CColumnCtrl extends CWnd implements IDraggable{
-        readonly CELL_BLANK:number = 16;
         protected _nCols;
         protected _cols:number[];
         protected _inDrag:boolean;
         protected _bLeftMouseDown:boolean;
+        protected _bRightMouseDown:boolean;
         protected _visibleRng:CCellRange;
         constructor(nCols:number){
             super("es-col-ctrl");
@@ -29,6 +29,7 @@ namespace EasySheet {
             this._nCols = nCols;
             this._cols = [];
             this._bLeftMouseDown = false;
+            this._bRightMouseDown = false;
             for(let i=0; i<this._nCols; i++){
                 this._cols.push(CELL_WIDTH);
             }
@@ -74,7 +75,6 @@ namespace EasySheet {
             if(!this._bLeftMouseDown) {
                 if(ptCursor.y >=0 && ptCursor.y <= this._h){
                     let rng: CCellRange = this.visibleRng;
-                    console.log("col-visible-rng",JSON.stringify(rng));
                     let x = app.view.rowOffset;
                     let bHorizontalResize = false;
                     for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
@@ -90,22 +90,37 @@ namespace EasySheet {
                         this.ChangeCursor("default");
                     }
                 }
+            }else{
+                if(ptCursor.x >=0 && ptCursor.x <= this._w) {
+                    let rng:CCellRange = this.visibleRng;
+                    let x:number = app.view.rowOffset;
+                    for(let i = rng.rowStartIndex; i<rng.rowEndIndex;i++){
+                        if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
+                            app.view.isColSelected = true;
+                            app.view.selectedColIndex = i;
+                            app.view.isRowSelected = false;
+                            app.view.selectedRowIndex = -1;
+                            break;
+                        }
+                        x+=this._cols[i];
+                    }
+                }
             }
         }
         ChangeCursor(cursor:string){
             this._canvas.style.cursor = cursor;
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
-
+            this._bLeftMouseDown = true;
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
-
+            this._bLeftMouseDown = false;
         }
         OnRightMouseDown(ptMouse:CPoint):void{
-
+            this._bRightMouseDown = true;
         }
         OnRightMouseUp(ptMouse:CPoint):void{
-
+            this._bRightMouseDown = false;
         }
 
         OnSize(wWin:number,hWin:number):void{

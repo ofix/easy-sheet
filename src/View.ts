@@ -30,6 +30,10 @@ namespace EasySheet{
         protected _yScrollBar:CScrollBarCtrl;
         protected _scrollX:number;
         protected _scrollY:number;
+        protected _bSelectedRow:boolean;
+        protected _iSelectedRow:number;
+        protected _bSelectedCol:boolean;
+        protected _iSelectedCol:number;
         constructor(nRows:number,nCols:number){
             super("es-view");
             let wWin = $(window).width();
@@ -39,6 +43,10 @@ namespace EasySheet{
             this._nCols = nCols;
             this._scrollX = 0;
             this._scrollY = 0;
+            this._bSelectedRow = false;
+            this._iSelectedRow = -1;
+            this._bSelectedCol = false;
+            this._iSelectedCol = -1;
             this._rowOffset = FIXED_CELL_WIDTH;
             this._colOffset = CELL_HEIGHT;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
@@ -69,6 +77,30 @@ namespace EasySheet{
         }
         get rowOffset():number{
             return this._rowOffset;
+        }
+        set selectedRowIndex(iSelectedRow:number){
+            this._iSelectedRow = iSelectedRow;
+        }
+        get selectedRowIndex():number{
+            return this._iSelectedRow;
+        }
+        set isRowSelected(bSelected:boolean){
+            this._bSelectedRow = bSelected;
+        }
+        get isRowSelected():boolean{
+            return this._bSelectedRow;
+        }
+        set selectedColIndex(iSelectedCol:number){
+            this._iSelectedCol = iSelectedCol;
+        }
+        get selectedColIndex():number{
+            return this._iSelectedCol;
+        }
+        set isColSelected(bSelected:boolean){
+            this._bSelectedCol = bSelected;
+        }
+        get isColSelected():boolean{
+            return this._bSelectedCol;
         }
         OnSize(wWin:number,hWin:number):void{
             this._clientW = wWin;
@@ -114,17 +146,22 @@ namespace EasySheet{
             this.Draw();
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
-            console.log("鼠标-左键-弹起 ",ptMouse.x,ptMouse.y);
             this._gridCtrl.OnLeftMouseUp(ptMouse);
             this._rowCtrl.OnLeftMouseUp(ptMouse);
+            this._colCtrl.OnLeftMouseUp(ptMouse);
+            this.Draw();
         }
         OnRightMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnRightMouseDown(ptMouse);
             this._rowCtrl.OnRightMouseDown(ptMouse);
+            this._colCtrl.OnRightMouseDown(ptMouse);
+            this.Draw();
         }
         OnRightMouseUp(ptMouse:CPoint):void{
             this._gridCtrl.OnRightMouseUp(ptMouse);
             this._rowCtrl.OnRightMouseUp(ptMouse);
+            this._colCtrl.OnRightMouseUp(ptMouse);
+            this.Draw();
         }
         ScrollWindow(scrollX:number,scrollY:number):void{
             this.ScrollX(scrollX);

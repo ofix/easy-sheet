@@ -281,19 +281,51 @@ namespace EasySheet{
                 }
             }
             // Draw Active Cell
-            if(this._activeRow != -1 && this._activeCol != -1){
-                let pt = this.GetItemXY(this._activeRow,this._activeCol);
-                let w = this._cols[this._activeCol];
-                let h = this._rows[this._activeRow];
+            if(!this._parent.isColSelected && !this._parent.isRowSelected) {
+                if (this._activeRow != -1 && this._activeCol != -1) {
+                    let pt = this.GetItemXY(this._activeRow, this._activeCol);
+                    let w = this._cols[this._activeCol];
+                    let h = this._rows[this._activeRow];
+                    this._ctx.strokeStyle = CLR_ACTIVE_CELL;
+                    this._ctx.lineWidth = 3;
+                    this._ctx.strokeRect(pt.x, pt.y, w, h);
+                    // Draw Active Copy Anchor
+                    this._ctx.strokeStyle = '#FFFFFF';
+                    this._ctx.lineWidth = 2;
+                    this._ctx.fillStyle = CLR_ACTIVE_CELL;
+                    this._ctx.fillRect(pt.x + w - 3, pt.y + h - 3, 6, 6);
+                    this._ctx.strokeRect(pt.x + w - 3, pt.y + h - 3, 6, 6);
+                }
+            }
+            // Draw selected Row
+            if(this._parent.isRowSelected){
+                let pt:CPoint = this.GetItemXY(app.view.selectedRowIndex,rng.colStartIndex);
+                this._ctx.fillStyle = "rgba(234,236,245,0.25)";
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                 this._ctx.lineWidth = 3;
-                this._ctx.strokeRect(pt.x,pt.y,w,h);
+                this._ctx.fillRect(pt.x,pt.y,this.clientWidth,this._rows[app.view.selectedRowIndex]);
+                this._ctx.strokeRect(pt.x,pt.y,this.clientWidth,this._rows[app.view.selectedRowIndex]);
                 // Draw Active Copy Anchor
                 this._ctx.strokeStyle = '#FFFFFF';
                 this._ctx.lineWidth = 2;
                 this._ctx.fillStyle = CLR_ACTIVE_CELL;
-                this._ctx.fillRect(pt.x+w-3,pt.y+h-3,6,6);
-                this._ctx.strokeRect(pt.x+w-3,pt.y+h-3,6,6);
+                this._ctx.fillRect(pt.x, pt.y+this._rows[app.view.selectedRowIndex], 6, 6);
+                this._ctx.strokeRect(pt.x,pt.y+this._rows[app.view.selectedRowIndex], 6, 6);
+            }
+            // Draw selected Column
+            if(this._parent.isColSelected){
+                let pt:CPoint = this.GetItemXY(rng.rowStartIndex,app.view.selectedColIndex);
+                this._ctx.fillStyle = "rgba(234,236,245,0.25)";
+                this._ctx.strokeStyle = CLR_ACTIVE_CELL;
+                this._ctx.lineWidth = 3;
+                this._ctx.fillRect(pt.x,pt.y,this._cols[app.view.selectedColIndex],this.clientHeight);
+                this._ctx.strokeRect(pt.x,pt.y,this._cols[app.view.selectedColIndex],this.clientHeight);
+                // Draw Active Copy Anchor
+                this._ctx.strokeStyle = '#FFFFFF';
+                this._ctx.lineWidth = 2;
+                this._ctx.fillStyle = CLR_ACTIVE_CELL;
+                this._ctx.fillRect(pt.x+this._cols[app.view.selectedColIndex],pt.y,6, 6);
+                this._ctx.strokeRect(pt.x+this._cols[app.view.selectedColIndex],pt.y,6, 6);
             }
             this._ctx.restore();
         }

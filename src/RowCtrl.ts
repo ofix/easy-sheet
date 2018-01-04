@@ -28,6 +28,7 @@
          protected _inDrag:boolean;
          protected _visibleRng:CCellRange;
          protected _bLeftMouseDown:boolean;
+         protected _bRightMouseDown:boolean;
          constructor(parentWnd:CView,nRows:number){
              super("es-row-ctrl");
              this._parent = parentWnd;
@@ -43,6 +44,7 @@
              }
              this.SetVisibleCellRange();
              this._bLeftMouseDown = false;
+             this._bRightMouseDown = false;
          }
          get x():number{
              return this._x;
@@ -50,7 +52,7 @@
          get y():number{
              return this._y;
          }
-         get visibleCellRange():CCellRange{
+         get visibleRng():CCellRange{
              return this._visibleRng;
          }
          get colOffset():number{
@@ -111,17 +113,17 @@
             this._bLeftMouseDown = false;
          }
          OnRightMouseDown(ptMouse:CPoint):void{
-
+             this._bRightMouseDown = true;
          }
          OnRightMouseUp(ptMouse:CPoint):void{
-
+             this._bRightMouseDown = false;
          }
          OnHitTest(ptCursor:CPoint):void{
              if(!this._bLeftMouseDown) {
                  if(ptCursor.x >=0 && ptCursor.x <= this._w){
-                     let rng: CCellRange = this.visibleCellRange;
-                     let y = this.colOffset;
-                     let bVerticalResize = false;
+                     let rng: CCellRange = this.visibleRng;
+                     let y:number = this.colOffset;
+                     let bVerticalResize:boolean = false;
                      for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
                          y += this._rows[i];
                          if(y-2 <= ptCursor.y && y+2 >= ptCursor.y){
@@ -135,10 +137,25 @@
                          this._parent.ChangeCursor("default");
                      }
                  }
+             }else{
+                 if(ptCursor.x >=0 && ptCursor.x <= this._w) {
+                     let rng:CCellRange = this.visibleRng;
+                     let y:number = this.colOffset;
+                     for(let i = rng.rowStartIndex; i<rng.rowEndIndex;i++){
+                         if(y+2 < ptCursor.y && (y+this._rows[i]-2) >ptCursor.y){
+                            app.view.isColSelected = false;
+                            app.view.selectedColIndex = -1;
+                            app.view.isRowSelected = true;
+                            app.view.selectedRowIndex = i;
+                            break;
+                         }
+                         y+=this._rows[i];
+                     }
+                 }
              }
          }
          Draw():void{
-             let rng:CCellRange = this.visibleCellRange;
+             let rng:CCellRange = this.visibleRng;
              let hTotal:number=this._y;
              this._ctx.save();
              this._ctx.translate(0.5,0.5);
@@ -170,14 +187,14 @@
              // draw active row
              this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
              this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
-             this._ctx.fillRect(this._x,activeY,this._w,this._rows[activeRow]);
-             this._ctx.moveTo(this._x,activeY);
-             this._ctx.lineTo(this._w,activeY);
-             this._ctx.lineTo(this._w,activeY+this._rows[activeRow]);
-             this._ctx.lineTo(this._x,activeY+this._rows[activeRow]);
-             let name:string= activeRow+"";
+             this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
+             this._ctx.moveTo(this._x, activeY);
+             this._ctx.lineTo(this._w, activeY);
+             this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
+             this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
+             let name: string = activeRow + "";
              this._ctx.fillStyle = CLR_BAR_TEXT;
-             this._ctx.fillText(name,FIXED_CELL_WIDTH/2,activeY+this._rows[activeRow]/2);
+             this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
              this._ctx.restore();
          }
          drawDragLine():void{
