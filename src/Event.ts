@@ -21,6 +21,14 @@ $(function(){
     $(window).resize(function() {
         app.OnSize();
     });
+    $(document).on("mousemove","#es-view",function(e){
+       let pt:CPoint = new CPoint(e.pageX,e.pageY);
+       app.view.OnMouseMove(pt);
+    });
+    $(document).on("mousemove","#es-col-ctrl",function(e){
+        let pt:CPoint = new CPoint(e.pageX,e.pageY);
+        app.view.OnMouseMove(pt);
+    });
     $(document).on("mousedown","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){

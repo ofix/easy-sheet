@@ -26,6 +26,8 @@
          protected _x:number;
          protected _y:number;
          protected _inDrag:boolean;
+         protected _visibleRng:CCellRange;
+         protected _bLeftMouseDown:boolean;
          constructor(parentWnd:CView,nRows:number){
              super("es-row-ctrl");
              this._parent = parentWnd;
@@ -39,6 +41,17 @@
              for(let i=0; i<this._nRows;i++){
                  this._rows.push(CELL_HEIGHT);
              }
+             this.SetVisibleCellRange();
+             this._bLeftMouseDown = false;
+         }
+         get x():number{
+             return this._x;
+         }
+         get y():number{
+             return this._y;
+         }
+         get visibleCellRange():CCellRange{
+             return this._visibleRng;
          }
          get colOffset():number{
              return this._parent.colOffset;
@@ -55,12 +68,6 @@
          OnSize(wWin:number,hWin:number):void{
             this.Draw();
          }
-         get x():number{
-             return this._x;
-         }
-         get y():number{
-             return this._y;
-         }
          OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
          }
@@ -71,8 +78,9 @@
          }
          ScrollX(delta:number):void{
              this._x = delta;
+             this.SetVisibleCellRange();
          }
-         GetVisibleCellRange():CCellRange{
+         SetVisibleCellRange():void{
              let scrollY:number = this._y;
              let y:number =0;
              let flag = true;
@@ -91,16 +99,16 @@
                      break;
                  }
              }
-             return rng;
+             this._visibleRng = rng;
          }
          OnMouseMove(ptMouse:CPoint):void{
-
+             this.OnHitTest(ptMouse);
          }
          OnLeftMouseDown(ptMouse:CPoint):void{
-
+            this._bLeftMouseDown = true;
          }
          OnLeftMouseUp(ptMouse:CPoint):void{
-
+            this._bLeftMouseDown = false;
          }
          OnRightMouseDown(ptMouse:CPoint):void{
 
@@ -108,9 +116,29 @@
          OnRightMouseUp(ptMouse:CPoint):void{
 
          }
-
+         OnHitTest(ptCursor:CPoint):void{
+             if(!this._bLeftMouseDown) {
+                 if(ptCursor.x >=0 && ptCursor.x <= this._w){
+                     let rng: CCellRange = this.visibleCellRange;
+                     let y = this.colOffset;
+                     let bVerticalResize = false;
+                     for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
+                         y += this._rows[i];
+                         if(y-2 <= ptCursor.y && y+2 >= ptCursor.y){
+                             bVerticalResize = true;
+                             break;
+                         }
+                     }
+                     if(bVerticalResize){
+                         this._parent.ChangeCursor("s-resize");
+                     }else{
+                         this._parent.ChangeCursor("default");
+                     }
+                 }
+             }
+         }
          Draw():void{
-             let rng:CCellRange = this.GetVisibleCellRange();
+             let rng:CCellRange = this.visibleCellRange;
              let hTotal:number=this._y;
              this._ctx.save();
              this._ctx.translate(0.5,0.5);

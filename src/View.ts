@@ -83,6 +83,9 @@ namespace EasySheet{
             this._yScrollBar.OnSize(wWin,hWin);
             this.Draw();
         }
+        ChangeCursor(cursor:string):void{
+            this._canvas.style.cursor = cursor;
+        }
         OnKeyDirLeft():void{
             this._gridCtrl.OnKeyDirLeft();
             this.Draw();
@@ -102,10 +105,12 @@ namespace EasySheet{
         OnMouseMove(ptCursor:CPoint):void{
             this._gridCtrl.OnMouseMove(ptCursor);
             this._rowCtrl.OnMouseMove(ptCursor);
+            this._colCtrl.OnMouseMove(ptCursor);
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnLeftMouseDown(ptMouse);
             this._rowCtrl.OnLeftMouseDown(ptMouse);
+            this._colCtrl.OnLeftMouseDown(ptMouse);
             this.Draw();
         }
         OnLeftMouseUp(ptMouse:CPoint):void{

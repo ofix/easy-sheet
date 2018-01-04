@@ -35,7 +35,7 @@ namespace EasySheet{
         protected _cacheCanvas:HTMLCanvasElement;
         protected _cacheCtx:CanvasRenderingContext2D;
         protected _canvasList:any[];
-        protected _visibleCellRange:CCellRange;
+        protected _visibleRng:CCellRange;
         protected _activeRow;
         protected _activeCol;
         constructor(parentWnd:CView,nRows:number,nCols:number){
@@ -56,7 +56,7 @@ namespace EasySheet{
             for(let j=0; j<nCols;j++){
                 this._cols.push(CELL_WIDTH);
             }
-            this._visibleCellRange = new CCellRange(0,nRows,0,nCols,0,0);
+            this._visibleRng = new CCellRange(0,nRows,0,nCols,0,0);
             this._activeRow = 0;
             this._activeCol = 0;
             this._ctx = this._parent.context;
@@ -167,8 +167,8 @@ namespace EasySheet{
             return this._h;
         }
         GetCellPos(ptCursor:CPoint):number[]{
-            for(let i= this._visibleCellRange.rowStartIndex;i<this._visibleCellRange.rowEndIndex;i++){
-                for(let j=this._visibleCellRange.colStartIndex;j<this._visibleCellRange.colEndIndex;j++){
+            for(let i= this._visibleRng.rowStartIndex; i<this._visibleRng.rowEndIndex; i++){
+                for(let j=this._visibleRng.colStartIndex; j<this._visibleRng.colEndIndex; j++){
                     let pt = this.GetItemXY(i,j);
                     pt.x = pt.x-this._x;
                     pt.y = pt.y-this._y;
@@ -179,6 +179,7 @@ namespace EasySheet{
                     }
                 }
             }
+            return [-1,-1];
         }
         SetItemText(iRow:number,iCol:number,text:string):void{
 
@@ -238,7 +239,7 @@ namespace EasySheet{
                     break;
                 }
             }
-            this._visibleCellRange = rng;
+            this._visibleRng = rng;
             return rng;
         }
         Draw():void{
