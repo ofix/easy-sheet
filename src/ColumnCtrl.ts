@@ -89,7 +89,7 @@ namespace EasySheet {
             this._ctx.lineTo(activeX,this._y+CELL_HEIGHT);
             this._ctx.lineTo(activeX+this._cols[activeCol],this._y+CELL_HEIGHT);
             this._ctx.lineTo(activeX+this._cols[activeCol],this._y);
-            let name:string= activeCol+"";
+            let name:string= this.getColName(activeCol);
             this._ctx.fillStyle = CLR_BAR_TEXT;
             this._ctx.fillText(name,activeX+this._cols[activeCol]/2, CELL_HEIGHT/2);
 
