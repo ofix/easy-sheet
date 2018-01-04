@@ -118,6 +118,7 @@ namespace EasySheet{
             return this._view;
         }
         Draw():void{
+            this._ctx.save();
             this._ctx.translate(0.5,0.5);
             this.DrawBk();
             if(this._bar_style == CScrollBarCtrl.SBC_HORZ) {
@@ -128,9 +129,9 @@ namespace EasySheet{
                 this.DrawDownTriangle();
             }
             this.DrawBar();
+            this._ctx.restore();
         }
         protected DrawLeftTriangle():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._triClr;
             this._ctx.strokeStyle = this._triClr;
             this._ctx.beginPath();
@@ -139,10 +140,8 @@ namespace EasySheet{
             this._ctx.lineTo(this._x+8,this._y+this._h/2);
             this._ctx.closePath();
             this._ctx.fill();
-            this._ctx.restore();
         }
         protected DrawUpTriangle():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._triClr;
             this._ctx.strokeStyle = this._triClr;
             this._ctx.beginPath();
@@ -151,10 +150,8 @@ namespace EasySheet{
             this._ctx.lineTo(this._x+this._w-4,this._y+10);
             this._ctx.closePath();
             this._ctx.fill();
-            this._ctx.restore();
         }
         protected DrawDownTriangle():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._triClr;
             this._ctx.strokeStyle = this._triClr;
             this._ctx.beginPath();
@@ -163,10 +160,8 @@ namespace EasySheet{
             this._ctx.lineTo(this._x+this._w-4,this._y+this._h-this.BLANK-16);
             this._ctx.closePath();
             this._ctx.fill();
-            this._ctx.restore();
         }
         protected DrawRightTriangle():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._triClr;
             this._ctx.strokeStyle = this._triClr;
             this._ctx.beginPath();
@@ -175,16 +170,12 @@ namespace EasySheet{
             this._ctx.lineTo(this._x+this._w-this.BLANK-8,this._y+this._h/2);
             this._ctx.closePath();
             this._ctx.fill();
-            this._ctx.restore();
         }
         protected DrawBk():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._bkClr;
             this._ctx.fillRect(this._x,this._y,this._w,this._h);
-            this._ctx.restore();
         }
         protected DrawBar():void{
-            this._ctx.save();
             this._ctx.fillStyle = this._barClr;
             if(this._bar_style == CScrollBarCtrl.SBC_HORZ) {
                 let w:number = Math.floor((this._w-40)*(this._view/this._page));
@@ -193,7 +184,6 @@ namespace EasySheet{
                 let h:number = Math.floor((this._h-40)*(this._view/this._page));
                 this._ctx.fillRect(this._x+2,this._y+18,this._x+2,this._y+18+h);
             }
-            this._ctx.restore();
         }
     }
 }

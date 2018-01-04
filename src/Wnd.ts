@@ -24,8 +24,6 @@ namespace EasySheet{
         protected _clientH:number;
         protected _bFixed:boolean;
         protected _zIndex:string;
-        protected _div:HTMLDivElement;
-        protected _subDiv:HTMLDivElement;
         protected _canvas:HTMLCanvasElement;
         protected _ctx:CanvasRenderingContext2D;
         constructor(name:string){
@@ -65,12 +63,6 @@ namespace EasySheet{
         }
         get name():string{
             return this._name;
-        }
-        get visualHeight():number{
-            return this._div.clientHeight;
-        }
-        get contentHeight():number{
-            return this._h;
         }
         get context():CanvasRenderingContext2D{
             return this._ctx;

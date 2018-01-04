@@ -97,6 +97,7 @@
 
          }
          OnLeftMouseDown(ptMouse:CPoint):void{
+
          }
          OnLeftMouseUp(ptMouse:CPoint):void{
 
