@@ -37,6 +37,9 @@ namespace EasySheet{
         protected _cacheCanvas:HTMLCanvasElement;
         protected _cacheCtx:CanvasRenderingContext2D;
         protected _canvasList:any[];
+        protected _visibleCellRange:CCellRange;
+        protected _activeRow;
+        protected _activeCol;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
@@ -57,6 +60,9 @@ namespace EasySheet{
             for(let j=0; j<nCols;j++){
                 this._cols.push(CELL_WIDTH);
             }
+            this._visibleCellRange = new CCellRange(0,nRows,0,nCols,0,0);
+            this._activeRow = -1;
+            this._activeCol = -1;
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
             this.makeCanvasList();
@@ -103,11 +109,41 @@ namespace EasySheet{
         OnDragEnd(ptCursor:CPoint):void{
             this._inDrag = false;
         }
+        OnMouseMove(ptCursor:CPoint):void{
+
+        }
+        OnLeftMouseDown(ptMouse:CPoint):void{
+            let pos:number[] = this.GetCellPos(ptMouse);
+            this._activeRow = pos[0];
+            this._activeCol = pos[1];
+            this.Draw();
+        }
+        OnLeftMouseUp(ptMouse:CPoint):void{
+
+        }
+        OnRightMouseDown(ptMouse:CPoint):void{
+
+        }
+        OnRightMouseUp(ptMouse:CPoint):void{
+
+        }
         GetRowWidth():number{
             return this._w;
         }
         GetColHeight():number{
             return this._h;
+        }
+        GetCellPos(ptCursor:CPoint):number[]{
+            for(let i= this._visibleCellRange.rowStartIndex;i<this._visibleCellRange.rowEndIndex;i++){
+                for(let j=this._visibleCellRange.colStartIndex;j<this._visibleCellRange.colEndIndex;j++){
+                    let pt = this.GetItemXY(i,j);
+                    let w = this._cols[j];
+                    let h = this._rows[i];
+                    if(IsPtInRect(ptCursor,pt.x,pt.y,w,h)){
+                        return [i,j];
+                    }
+                }
+            }
         }
         SetItemText(iRow:number,iCol:number,text:string):void{
 
@@ -167,6 +203,7 @@ namespace EasySheet{
                     break;
                 }
             }
+            this._visibleCellRange = rng;
             return rng;
         }
         DrawVisibleCellRange(rng:CCellRange):void{
@@ -199,9 +236,18 @@ namespace EasySheet{
             this._ctx.fillStyle = "#000";
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
                 for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
-                    let xy = this.GetItemXY(i,j);
-                    this._ctx.fillText(i + j+"", xy.x + CELL_WIDTH / 2, xy.y + CELL_HEIGHT / 2);
+                    let pt = this.GetItemXY(i,j);
+                    this._ctx.fillText(i + j+"", pt.x + CELL_WIDTH / 2, pt.y + CELL_HEIGHT / 2);
                 }
+            }
+            // Draw Active Cell
+            if(this._activeRow != -1 && this._activeCol != -1){
+                let pt = this.GetItemXY(this._activeRow,this._activeCol);
+                let w = this._cols[this._activeCol];
+                let h = this._rows[this._activeRow];
+                this._ctx.strokeStyle = CLR_ACTIVE_CELL;
+                this._ctx.lineWidth = 3;
+                this._ctx.strokeRect(pt.x,pt.y,w,h);
             }
             this._ctx.restore();
         }

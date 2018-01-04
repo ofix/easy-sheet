@@ -14,10 +14,25 @@
  */
 /// <reference path="Point.ts"/>
 /// <reference path="Rect.ts"/>
+/// <reference path="App.ts"/>
 
 function isPointInRect(pt:CPoint,rect:CRect):boolean{
-     return (pt.x >= rect.x && pt.x <= rect.x
-        && pt.y>=rect.y && pt.y <= rect.y);
+     return ((pt.x >= rect.x) && (pt.x <= rect.x + rect.w)
+        && (pt.y>=rect.y) && (pt.y <= rect.y+rect.h));
+}
+function IsPtInRect(pt:CPoint, xStart:number, yStart:number, width:number, height:number){
+    return ((pt.x >= xStart) && (pt.x <= xStart + width )&&
+    (pt.y >= yStart) && (pt.y < yStart + height));
+}
+function ScreenToClient(pt:CPoint){
+    pt.x += app.view.rowOffset;
+    pt.y += app.view.colOffset;
+    return pt;
+}
+function ClientToScreen(pt:CPoint){
+    pt.x -= app.view.rowOffset;
+    pt.y -= app.view.colOffset;
+    return pt;
 }
 function isRectEmpty(rect:CRect):boolean{
     return (rect.w==0 || rect.h==0);

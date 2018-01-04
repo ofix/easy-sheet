@@ -93,6 +93,22 @@
              }
              return rng;
          }
+         OnMouseMove(ptMouse:CPoint):void{
+
+         }
+         OnLeftMouseDown(ptMouse:CPoint):void{
+            this.Draw();
+         }
+         OnLeftMouseUp(ptMouse:CPoint):void{
+
+         }
+         OnRightMouseDown(ptMouse:CPoint):void{
+
+         }
+         OnRightMouseUp(ptMouse:CPoint):void{
+
+         }
+
          Draw():void{
              let rng:CCellRange = this.GetVisibleCellRange();
              let hTotal:number=this._y;

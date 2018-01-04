@@ -18,6 +18,8 @@ const CLR_BAR_FILL:string="#E4ECF7";
 const CLR_BAR_SEP:string="#9EB6CE";
 const CLR_BAR_FILL_ACTIVE:string="#FFD58D";
 const CLR_BAR_TEXT:string="#27413E";
+const CLR_ACTIVE_CELL:string="#000000";
+
 const DEFAULT_FONT_SIZE:number=12;
 
 const DEFAULT_ROWS:number = 1000;

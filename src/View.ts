@@ -72,6 +72,28 @@ namespace EasySheet{
             this._yScrollBar.OnSize(wWin,hWin);
             this.Draw();
         }
+        OnMouseMove(ptCursor:CPoint):void{
+            this._gridCtrl.OnMouseMove(ptCursor);
+            this._rowCtrl.OnMouseMove(ptCursor);
+        }
+        OnLeftMouseDown(ptMouse:CPoint):void{
+            console.log("鼠标-左键-按下 ",ptMouse.x,ptMouse.y);
+            this._gridCtrl.OnLeftMouseDown(ptMouse);
+            this._rowCtrl.OnLeftMouseDown(ptMouse);
+        }
+        OnLeftMouseUp(ptMouse:CPoint):void{
+            console.log("鼠标-左键-弹起 ",ptMouse.x,ptMouse.y);
+            this._gridCtrl.OnLeftMouseUp(ptMouse);
+            this._rowCtrl.OnLeftMouseUp(ptMouse);
+        }
+        OnRightMouseDown(ptMouse:CPoint):void{
+            this._gridCtrl.OnRightMouseDown(ptMouse);
+            this._rowCtrl.OnRightMouseDown(ptMouse);
+        }
+        OnRightMouseUp(ptMouse:CPoint):void{
+            this._gridCtrl.OnRightMouseUp(ptMouse);
+            this._rowCtrl.OnRightMouseUp(ptMouse);
+        }
         ScrollWindow(scrollX:number,scrollY:number):void{
             this.ScrollX(scrollX);
             this.ScrollY(scrollY);
