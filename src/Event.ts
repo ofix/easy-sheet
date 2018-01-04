@@ -21,7 +21,6 @@ $(function(){
     });
     $(document).on("mousedown","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
-        console.log(e);
         if(e.button == 0){
             app.view.OnLeftMouseDown(pt);
         }else if(e.button == 2){
@@ -35,7 +34,7 @@ $(function(){
         }else if(e.button == 2){
             app.view.OnRightMouseUp(pt);
         }
-    })
+    });
 
 
 });

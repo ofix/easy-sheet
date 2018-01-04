@@ -97,7 +97,6 @@
 
          }
          OnLeftMouseDown(ptMouse:CPoint):void{
-            this.Draw();
          }
          OnLeftMouseUp(ptMouse:CPoint):void{
 

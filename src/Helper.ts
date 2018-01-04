@@ -25,13 +25,13 @@ function IsPtInRect(pt:CPoint, xStart:number, yStart:number, width:number, heigh
     (pt.y >= yStart) && (pt.y < yStart + height));
 }
 function ScreenToClient(pt:CPoint){
-    pt.x += app.view.rowOffset;
-    pt.y += app.view.colOffset;
+    pt.x -= app.view.rowOffset;
+    pt.y -= app.view.colOffset;
     return pt;
 }
 function ClientToScreen(pt:CPoint){
-    pt.x -= app.view.rowOffset;
-    pt.y -= app.view.colOffset;
+    pt.x += app.view.rowOffset;
+    pt.y += app.view.colOffset;
     return pt;
 }
 function isRectEmpty(rect:CRect):boolean{

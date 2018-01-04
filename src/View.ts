@@ -80,6 +80,7 @@ namespace EasySheet{
             console.log("鼠标-左键-按下 ",ptMouse.x,ptMouse.y);
             this._gridCtrl.OnLeftMouseDown(ptMouse);
             this._rowCtrl.OnLeftMouseDown(ptMouse);
+            this.Draw();
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
             console.log("鼠标-左键-弹起 ",ptMouse.x,ptMouse.y);

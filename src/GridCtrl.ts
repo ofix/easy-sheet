@@ -30,8 +30,6 @@ namespace EasySheet{
         protected _cols:any[];
         protected _inDrag:boolean;
         protected _parent:CView;
-        protected _scrollX:number;
-        protected _scrollY:number;
         protected _cacheExist:boolean;
         protected _ctx:CanvasRenderingContext2D;
         protected _cacheCanvas:HTMLCanvasElement;
@@ -44,12 +42,10 @@ namespace EasySheet{
             this._parent = parentWnd;
             this._nRows = nRows;
             this._nCols = nCols;
-            this._scrollX = 0;
-            this._scrollY = 0;
             this._x = 0;
             this._y = 0;
-            this._w = parentWnd.clientWidth;
-            this._h = parentWnd.clientHeight;
+            this._w = nCols*CELL_WIDTH;
+            this._h = nRows*CELL_HEIGHT;
             this._rows = [];
             this._cols = [];
             this._canvasList = [];
@@ -116,7 +112,6 @@ namespace EasySheet{
             let pos:number[] = this.GetCellPos(ptMouse);
             this._activeRow = pos[0];
             this._activeCol = pos[1];
-            this.Draw();
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
 
@@ -137,6 +132,8 @@ namespace EasySheet{
             for(let i= this._visibleCellRange.rowStartIndex;i<this._visibleCellRange.rowEndIndex;i++){
                 for(let j=this._visibleCellRange.colStartIndex;j<this._visibleCellRange.colEndIndex;j++){
                     let pt = this.GetItemXY(i,j);
+                    pt.x = pt.x-this._x;
+                    pt.y = pt.y-this._y;
                     let w = this._cols[j];
                     let h = this._rows[i];
                     if(IsPtInRect(ptCursor,pt.x,pt.y,w,h)){
@@ -160,15 +157,15 @@ namespace EasySheet{
         }
         //利用图片函数滚动窗口
         ScrollWindow(deltaX:number,deltaY:number):void{
-            this._scrollX = this._scrollX+deltaX;
-            this._scrollY = this._scrollY+deltaY;
+            this._x = this._x+deltaX;
+            this._y = this._y+deltaY;
             if((deltaX>0) || ((deltaY>0) && (deltaY<this.clientHeight))) {
                 this.Draw();
             }
         }
         GetVisibleCellRange():CCellRange{
-            let xOffset:number = this._scrollX;
-            let yOffset:number = this._scrollY;
+            let xOffset:number = this._x;
+            let yOffset:number = this._y;
             let x:number =0;
             let y:number =0;
             let flagX = true;
