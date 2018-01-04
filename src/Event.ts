@@ -29,7 +29,7 @@ $(function(){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         app.view.OnMouseMove(pt);
     });
-    $(document).on("mousedown","#es-view",function(e){
+    $(document).on("mousedown","#es-view,#es-col-ctrl",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){
             app.view.OnLeftMouseDown(pt);
