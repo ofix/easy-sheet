@@ -62,9 +62,16 @@ namespace EasySheet {
             this._ctx.textAlign = 'center';
             this._ctx.strokeStyle=CLR_BAR_SEP;
             this._ctx.fillStyle=CLR_BAR_TEXT;
+            let activeX:number=0;
+            let activeCol:number= app.gridCtrl.activeCol;
             this._cols.forEach((v, i)=>{
                 let name:string = this.getColName(i);
-                this._ctx.fillText(name,wTotal+v/2,CELL_HEIGHT/2);
+                if(i!=activeCol) {
+                    this._ctx.fillText(name, wTotal + v / 2, CELL_HEIGHT / 2);
+                }
+                if(i==activeCol){
+                    activeX = wTotal;
+                }
                 wTotal+=v;
                 this._ctx.moveTo(wTotal,0);
                 this._ctx.lineTo(wTotal,CELL_HEIGHT);
@@ -73,7 +80,19 @@ namespace EasySheet {
             this._ctx.moveTo(this._x,this._h-1);
             this._ctx.lineTo(this._x+this.clientWidth-18,this._h-1);
             this._ctx.stroke();
-            this._ctx.translate(-0.5,-0.5);
+
+            // draw active column
+            this._ctx.fillStyle = CLR_ACTIVE_COL_FILL;
+            this._ctx.strokeStyle = CLR_ACTIVE_COL_BORDER;
+            this._ctx.fillRect(activeX,this._y,this._cols[activeCol],CELL_HEIGHT);
+            this._ctx.moveTo(activeX,this._y);
+            this._ctx.lineTo(activeX,this._y+CELL_HEIGHT);
+            this._ctx.lineTo(activeX+this._cols[activeCol],this._y+CELL_HEIGHT);
+            this._ctx.lineTo(activeX+this._cols[activeCol],this._y);
+            let name:string= activeCol+"";
+            this._ctx.fillStyle = CLR_BAR_TEXT;
+            this._ctx.fillText(name,activeX+this._cols[activeCol]/2, CELL_HEIGHT/2);
+
             this._ctx.restore();
         }
     }

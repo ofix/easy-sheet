@@ -37,7 +37,7 @@ $(function(){
             app.view.OnRightMouseUp(pt);
         }
     });
-    $(document).on("keydown","#es-view",function(e){
+    $(document).on("keydown","body",function(e){
        switch(e.keyCode){
            case KEY.LEFT:
                app.view.OnKeyDirLeft();
@@ -50,6 +50,8 @@ $(function(){
                break;
            case KEY.DOWN:
                app.view.OnKeyDirDown();
+               break;
+           default:
                break;
        }
     });

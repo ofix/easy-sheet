@@ -20,23 +20,16 @@
 /// <reference path="CornerCtrl.ts"/>
 namespace EasySheet {
     export class CApp{
-        protected _cornerCtrl:CCornerCtrl;
-        protected _colCtrl:CColumnCtrl;
         protected _view:CView;
         constructor(){
             this._view = new CView(3000,1260);
-            this._colCtrl = new CColumnCtrl(52);
-            this._cornerCtrl = new CCornerCtrl();
         }
         run(){
-            this._colCtrl.Draw();
-            this._cornerCtrl.Draw();
             this._view.Draw();
         }
         OnSize(){
             let wWin = $(window).width();
             let hWin = $(window).height();
-            this._colCtrl.OnSize(wWin,hWin);
             this._view.OnSize(wWin,hWin);
         }
         get view():CView{
@@ -49,10 +42,10 @@ namespace EasySheet {
             return this._view.gridCtrl;
         }
         get colCtrl():CColumnCtrl{
-            return this._colCtrl;
+            return this._view.colCtrl;
         }
         get cornerCtrl():CCornerCtrl{
-            return this._cornerCtrl;
+            return this._view.cornerCtrl;
         }
     }
 }

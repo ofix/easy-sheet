@@ -19,6 +19,10 @@ const CLR_BAR_SEP:string="#9EB6CE";
 const CLR_BAR_FILL_ACTIVE:string="#FFD58D";
 const CLR_BAR_TEXT:string="#27413E";
 const CLR_ACTIVE_CELL:string="#000000";
+const CLR_ACTIVE_ROW_FILL:string="#FFD58D";
+const CLR_ACTIVE_COL_FILL:string=CLR_ACTIVE_ROW_FILL;
+const CLR_ACTIVE_ROW_BORDER:string="#F29536";
+const CLR_ACTIVE_COL_BORDER:string=CLR_ACTIVE_ROW_BORDER;
 
 const DEFAULT_FONT_SIZE:number=12;
 

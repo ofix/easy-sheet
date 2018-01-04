@@ -57,8 +57,8 @@ namespace EasySheet{
                 this._cols.push(CELL_WIDTH);
             }
             this._visibleCellRange = new CCellRange(0,nRows,0,nCols,0,0);
-            this._activeRow = -1;
-            this._activeCol = -1;
+            this._activeRow = 0;
+            this._activeCol = 0;
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
             this.makeCanvasList();
@@ -74,6 +74,12 @@ namespace EasySheet{
         }
         get clientHeight():number{
             return this._parent.clientHeight;
+        }
+        get activeRow():number{
+            return this._activeRow;
+        }
+        get activeCol():number{
+            return this._activeCol;
         }
         makeCanvasList():void{
             // console.log("make-list 1 ",now());
@@ -131,7 +137,7 @@ namespace EasySheet{
         }
         OnKeyDirDown():void{
             if(this._activeRow != -1 && this._activeCol != -1){
-                this._activeRow -= 1;
+                this._activeRow += 1;
                 if(this._activeRow > this._nRows-1){
                     this._activeRow = this._nRows-1;
                 }
@@ -235,6 +241,10 @@ namespace EasySheet{
             this._visibleCellRange = rng;
             return rng;
         }
+        Draw():void{
+            let rng:CCellRange = this.GetVisibleCellRange();
+            this.DrawVisibleCellRange(rng);
+        }
         DrawVisibleCellRange(rng:CCellRange):void{
             let x:number = rng.xPad+this.rowOffset;
             let y:number = rng.yPad+this.colOffset;
@@ -277,12 +287,14 @@ namespace EasySheet{
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                 this._ctx.lineWidth = 3;
                 this._ctx.strokeRect(pt.x,pt.y,w,h);
+                // Draw Active Copy Anchor
+                this._ctx.strokeStyle = '#FFFFFF';
+                this._ctx.lineWidth = 2;
+                this._ctx.fillStyle = CLR_ACTIVE_CELL;
+                this._ctx.fillRect(pt.x+w-3,pt.y+h-3,6,6);
+                this._ctx.strokeRect(pt.x+w-3,pt.y+h-3,6,6);
             }
             this._ctx.restore();
-        }
-        Draw():void{
-            let rng:CCellRange = this.GetVisibleCellRange();
-            this.DrawVisibleCellRange(rng);
         }
     }
 }

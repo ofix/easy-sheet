@@ -122,9 +122,16 @@
              this._ctx.textBaseline = "middle";
              this._ctx.textAlign = "center";
              this._ctx.beginPath();
+             let activeY:number=0;
+             let activeRow:number= app.gridCtrl.activeRow;
              for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                  let name:string = i+"";
-                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                 if(i != activeRow) {
+                     this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                 }
+                 if(i == activeRow){
+                     activeY = hTotal;
+                 }
                  hTotal+=this._rows[i];
                  this._ctx.moveTo(this._x,hTotal);
                  this._ctx.lineTo(this._x+this._w,hTotal);
@@ -132,6 +139,17 @@
              this._ctx.moveTo(this._x+this._w,0);
              this._ctx.lineTo(this._x+this._w,this.clientHeight);
              this._ctx.stroke();
+             // draw active row
+             this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
+             this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
+             this._ctx.fillRect(this._x,activeY,this._w,this._rows[activeRow]);
+             this._ctx.moveTo(this._x,activeY);
+             this._ctx.lineTo(this._w,activeY);
+             this._ctx.lineTo(this._w,activeY+this._rows[activeRow]);
+             this._ctx.lineTo(this._x,activeY+this._rows[activeRow]);
+             let name:string= activeRow+"";
+             this._ctx.fillStyle = CLR_BAR_TEXT;
+             this._ctx.fillText(name,FIXED_CELL_WIDTH/2,activeY+this._rows[activeRow]/2);
              this._ctx.restore();
          }
          drawDragLine():void{

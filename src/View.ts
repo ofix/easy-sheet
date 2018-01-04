@@ -22,8 +22,10 @@ namespace EasySheet{
         protected _rowOffset:number;
         protected _nRows:number;
         protected _nCols:number;
-        protected _rowCtrl:CRowCtrl;
         protected _gridCtrl:CGridCtrl;
+        protected _rowCtrl:CRowCtrl;
+        protected _colCtrl:CColumnCtrl;
+        protected _cornerCtrl:CCornerCtrl;
         protected _xScrollBar:CScrollBarCtrl;
         protected _yScrollBar:CScrollBarCtrl;
         protected _scrollX:number;
@@ -41,6 +43,8 @@ namespace EasySheet{
             this._colOffset = CELL_HEIGHT;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
             this._rowCtrl = new CRowCtrl(this,nRows);
+            this._colCtrl = new CColumnCtrl(52);
+            this._cornerCtrl = new CCornerCtrl();
             this._xScrollBar = new CScrollBarCtrl(this,"horizontal-scroll-bar",CScrollBarCtrl.SBC_HORZ);
             this._xScrollBar.SetPageSize(1000);
             this._xScrollBar.SetViewSize(500);
@@ -53,6 +57,12 @@ namespace EasySheet{
         }
         get rowCtrl():CRowCtrl{
             return this._rowCtrl;
+        }
+        get colCtrl():CColumnCtrl{
+            return this._colCtrl;
+        }
+        get cornerCtrl():CCornerCtrl{
+            return this._cornerCtrl;
         }
         get colOffset():number{
             return this._colOffset;
@@ -68,6 +78,7 @@ namespace EasySheet{
             this._canvas.style.width = this._clientW+"px";
             this._canvas.style.height = this._clientH+"px";
             this._rowCtrl.OnSize(wWin,hWin);
+            this._colCtrl.OnSize(wWin,hWin);
             this._xScrollBar.OnSize(wWin,hWin);
             this._yScrollBar.OnSize(wWin,hWin);
             this.Draw();
@@ -138,6 +149,8 @@ namespace EasySheet{
             this._rowCtrl.Draw();
             this._xScrollBar.Draw();
             this._yScrollBar.Draw();
+            this._colCtrl.Draw();
+            this._cornerCtrl.Draw();
         }
     }
 }
