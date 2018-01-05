@@ -39,10 +39,12 @@ namespace EasySheet{
         protected _canvasList:any[];
         protected _visibleRng:CCellRange;
         protected _activeCell:CActiveCell;
+        protected _activeEndCell:CActiveCell;
         protected _activeRange:CActiveRange[]; // 0 选中整行, -1 没有选中，>0 选中某个单元格
         protected _gridState:number;
         protected _bLeftMouseDown:boolean;
         protected _bRightMouseDown:boolean;
+        protected _bSelectCell:boolean;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
@@ -57,6 +59,7 @@ namespace EasySheet{
             this._cacheExist = false;
             this._bLeftMouseDown = false;
             this._bRightMouseDown = false;
+            this._bSelectCell = false;
             for(let i=0; i<nRows;i++){
                 this._rows.push(CELL_HEIGHT);
             }
@@ -65,6 +68,7 @@ namespace EasySheet{
             }
             this._visibleRng = new CCellRange(0,nRows,0,nCols,0,0);
             this._activeCell = new CActiveCell(0,0);
+            this._activeEndCell = new CActiveCell(0,0);
             this._activeRange = [];
             this._gridState = GDS_SELECT_CELL;
             this._activeRange.push(new CActiveRange(this._activeCell,this._activeCell));
@@ -105,6 +109,19 @@ namespace EasySheet{
         set activeColumn(iCol:number){
             this._activeCell.iColumn = iCol;
         }
+        get activeEndRow():number{
+            return this._activeEndCell.iRow;
+        }
+        set activeEndRow(iRow:number){
+            this._activeEndCell.iRow = iRow;
+        }
+        get activeEndColumn():number{
+            return this._activeEndCell.iColumn;
+        }
+        set activeEndColumn(iCol:number){
+            this._activeEndCell.iColumn = iCol;
+        }
+
         MakeCanvasList():void{
             // console.log("make-list 1 ",now());
             // for(let i=0; i<1000;i++) {
@@ -151,10 +168,17 @@ namespace EasySheet{
             this.gridState = GDS_SELECT_CELL;
             this._activeCell.Down();
         }
-        OnMouseMove(ptCursor:CPoint):void{
-
+        OnMouseMove(ptMouse:CPoint):void{
+            if(this._bLeftMouseDown){
+                this._bSelectCell = false;
+                let pos:number[] = this.GetCellPos(ptMouse);
+                this._activeEndCell.iRow = pos[0];
+                this._activeEndCell.iColumn = pos[1];
+                this.gridState = GDS_SELECT_RANGE;
+            }
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
+            this._bLeftMouseDown = true;
             let pos:number[] = this.GetCellPos(ptMouse);
             this._activeCell.iRow = pos[0];
             this._activeCell.iColumn = pos[1];
@@ -163,13 +187,13 @@ namespace EasySheet{
             }
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
-
+            this._bLeftMouseDown = false;
         }
         OnRightMouseDown(ptMouse:CPoint):void{
-
+            this._bRightMouseDown = false;
         }
         OnRightMouseUp(ptMouse:CPoint):void{
-
+            this._bRightMouseDown = true;
         }
         GetRowWidth():number{
             return this._w;
@@ -337,6 +361,21 @@ namespace EasySheet{
                 this._ctx.fillStyle = CLR_ACTIVE_CELL;
                 this._ctx.fillRect(pt.x+this._cols[this.activeColumn],pt.y,6, 6);
                 this._ctx.strokeRect(pt.x+this._cols[this.activeColumn],pt.y,6, 6);
+            }
+            if(this.gridState === GDS_SELECT_RANGE){
+                let pt1 = this.GetItemXY(this.activeRow, this.activeColumn);
+                let pt2 = this.GetItemXY(this.activeEndRow,this.activeEndColumn);
+                let w = pt2.x-pt1.x + this._cols[this.activeEndColumn];
+                let h = pt2.y-pt1.y + this._rows[this.activeEndRow];
+                this._ctx.strokeStyle = CLR_ACTIVE_CELL;
+                this._ctx.lineWidth = 3;
+                this._ctx.strokeRect(pt1.x, pt1.y, w, h);
+                // Draw Active Copy Anchor
+                this._ctx.strokeStyle = '#FFFFFF';
+                this._ctx.lineWidth = 2;
+                this._ctx.fillStyle = CLR_ACTIVE_CELL;
+                this._ctx.fillRect(pt1.x + w - 3, pt1.y + h - 3, 6, 6);
+                this._ctx.strokeRect(pt1.x + w - 3, pt1.y + h - 3, 6, 6);
             }
             this._ctx.restore();
         }

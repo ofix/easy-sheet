@@ -18,3 +18,4 @@ let GDS_SELECT_ROW:number=1;
 let GDS_SELECT_COLUMN:number=2;
 let GDS_SELECT_BOTH:number=4;
 let GDS_SELECT_CELL:number=8;
+let GDS_SELECT_RANGE:number=16;

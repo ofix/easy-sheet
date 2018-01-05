@@ -124,6 +124,7 @@ namespace EasySheet{
             this._gridCtrl.OnMouseMove(ptCursor);
             this._rowCtrl.OnMouseMove(ptCursor);
             this._colCtrl.OnMouseMove(ptCursor);
+            this.Draw();
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnLeftMouseDown(ptMouse);
