@@ -20,7 +20,11 @@
 /// <reference path="CellRange.ts"/>
 /// <reference path="ActiveCell.ts"/>
 /// <reference path="State.ts"/>
+/// <reference path="EventNotifier.ts"/>
+/// <reference path="Message.ts"/>
 namespace EasySheet{
+    import CEventNotifier = Core.CEventNotifier;
+    import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
     export class CGridCtrl implements IDraggable{
         protected _x:number;
         protected _y:number;
@@ -175,6 +179,7 @@ namespace EasySheet{
                 this._activeEndCell.iRow = pos[0];
                 this._activeEndCell.iColumn = pos[1];
                 this.gridState = GDS_SELECT_RANGE;
+                CEventNotifier.Trigger(NM_GRID_SELECT_RANGE,this._activeCell,this._activeEndCell);
             }
         }
         OnLeftMouseDown(ptMouse:CPoint):void{

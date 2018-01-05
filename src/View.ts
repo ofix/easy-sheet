@@ -16,7 +16,11 @@
 /// <reference path="RowCtrl.ts"/>
 /// <reference path="GridCtrl.ts"/>
 /// <reference path="ScrollBarCtrl.ts"/>
+/// <reference path="EventNotifier.ts"/>
+/// <reference path="Message.ts"/>
 namespace EasySheet{
+    import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
+    import CEventNotifier = Core.CEventNotifier;
     export class CView extends CWnd{
         protected _colOffset:number;
         protected _rowOffset:number;
@@ -51,6 +55,7 @@ namespace EasySheet{
             this._yScrollBar = new CScrollBarCtrl(this,"vertical-scroll-bar",CScrollBarCtrl.SBC_VERT);
             this._yScrollBar.SetPageSize(1000);
             this._yScrollBar.SetViewSize(500);
+            CEventNotifier.On(NM_GRID_SELECT_RANGE,this.OnGridSelectRange);
         }
         get gridCtrl():CGridCtrl{
             return this._gridCtrl;
@@ -101,6 +106,10 @@ namespace EasySheet{
             this._yScrollBar.OnSize(wWin,hWin);
             this.Draw();
         }
+        OnGridSelectRange = (cellStart:CActiveCell,cellEnd:CActiveCell):void =>{
+            console.log("OnGridSelectRange ",cellStart,cellEnd);
+            this.Draw();
+        };
         ChangeCursor(cursor:string):void{
             this._canvas.style.cursor = cursor;
         }
@@ -124,9 +133,9 @@ namespace EasySheet{
             this._gridCtrl.OnMouseMove(ptCursor);
             this._rowCtrl.OnMouseMove(ptCursor);
             this._colCtrl.OnMouseMove(ptCursor);
-            this.Draw();
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
+            console.log("左键单击");
             this._gridCtrl.OnLeftMouseDown(ptMouse);
             this._rowCtrl.OnLeftMouseDown(ptMouse);
             this._colCtrl.OnLeftMouseDown(ptMouse);
