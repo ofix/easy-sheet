@@ -29,22 +29,28 @@ namespace EasySheet{
             this.iColumn = iColumn;
         }
         Left(){
-            this.iRow -= 1;
-            if(this.iRow<0){
-                this.iRow=0;
-            }
-        }
-        Right(){
-            this.iRow += 1;
-        }
-        Up(){
-            this.iColumn -=1;
+            this.iColumn -= 1;
             if(this.iColumn<0){
                 this.iColumn=0;
             }
+            if(this.iRow <0){
+                this.iRow = 0;
+            }
+        }
+        Right(){
+            this.iColumn += 1;
+        }
+        Up(){
+            this.iRow -=1;
+            if(this.iRow<0){
+                this.iRow=0;
+            }
+            if(this.iColumn<0){
+                this.iColumn = 0;
+            }
         }
         Down(){
-            this.iColumn +=1;
+            this.iRow +=1;
         }
     }
 }

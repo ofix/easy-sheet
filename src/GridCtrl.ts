@@ -98,7 +98,6 @@ namespace EasySheet{
         }
         set activeRow(iRow:number){
             this._activeCell.iRow = iRow;
-            console.log("this._activeCell.iRow ",iRow);
         }
         get activeColumn():number{
             return this._activeCell.iColumn;
@@ -137,24 +136,20 @@ namespace EasySheet{
             this._inDrag = false;
         }
         OnKeyDirLeft():void{
-            if(this._gridState == GDS_SELECT_CELL){
-                this._activeCell.Left();
-            }
+            this.gridState = GDS_SELECT_CELL;
+            this._activeCell.Left();
         }
         OnKeyDirRight():void{
-            if(this._gridState == GDS_SELECT_CELL){
-                this._activeCell.Right();
-            }
+            this.gridState = GDS_SELECT_CELL;
+            this._activeCell.Right();
         }
         OnKeyDirUp():void{
-            if(this._gridState == GDS_SELECT_CELL){
-                this._activeCell.Up();
-            }
+            this.gridState = GDS_SELECT_CELL;
+            this._activeCell.Up();
         }
         OnKeyDirDown():void{
-            if(this._gridState == GDS_SELECT_CELL){
-                this._activeCell.Down();
-            }
+            this.gridState = GDS_SELECT_CELL;
+            this._activeCell.Down();
         }
         OnMouseMove(ptCursor:CPoint):void{
 

@@ -108,7 +108,6 @@ namespace EasySheet {
                     let x:number = app.view.rowOffset;
                     for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
                         if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
-                            console.log("column click");
                             app.view.gridState = GDS_SELECT_COLUMN;
                             app.view.activeColumn = i;
                             app.view.activeRow = -1;
