@@ -108,6 +108,7 @@
          }
          OnLeftMouseDown(ptMouse:CPoint):void{
             this._bLeftMouseDown = true;
+            this.OnHitTest(ptMouse);
          }
          OnLeftMouseUp(ptMouse:CPoint):void{
             this._bLeftMouseDown = false;
@@ -211,6 +212,7 @@
              }else if(app.view.gridState == GDS_SELECT_COLUMN){
 
              }
+             this._ctx.restore();
          }
          drawDragLine():void{
 

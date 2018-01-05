@@ -69,7 +69,19 @@ namespace EasySheet {
                 }
             }
             this._visibleRng = rng;
-            console.log("col-vis-rng",this._visibleRng);
+        }
+        OnLeftMouseDown(ptMouse:CPoint):void{
+            this._bLeftMouseDown = true;
+            this.OnHitTest(ptMouse);
+        }
+        OnLeftMouseUp(ptMouse:CPoint):void{
+            this._bLeftMouseDown = false;
+        }
+        OnRightMouseDown(ptMouse:CPoint):void{
+            this._bRightMouseDown = true;
+        }
+        OnRightMouseUp(ptMouse:CPoint):void{
+            this._bRightMouseDown = false;
         }
         OnHitTest(ptCursor:CPoint):void{
             if(!this._bLeftMouseDown) {
@@ -96,6 +108,7 @@ namespace EasySheet {
                     let x:number = app.view.rowOffset;
                     for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
                         if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
+                            console.log("column click");
                             app.view.gridState = GDS_SELECT_COLUMN;
                             app.view.activeColumn = i;
                             app.view.activeRow = -1;
@@ -109,29 +122,16 @@ namespace EasySheet {
         ChangeCursor(cursor:string){
             this._canvas.style.cursor = cursor;
         }
-        OnLeftMouseDown(ptMouse:CPoint):void{
-            this._bLeftMouseDown = true;
-        }
-        OnLeftMouseUp(ptMouse:CPoint):void{
-            this._bLeftMouseDown = false;
-        }
-        OnRightMouseDown(ptMouse:CPoint):void{
-            this._bRightMouseDown = true;
-        }
-        OnRightMouseUp(ptMouse:CPoint):void{
-            this._bRightMouseDown = false;
-        }
-
         OnSize(wWin:number,hWin:number):void{
             this._clientW = wWin-18;
             this._clientH = CELL_HEIGHT;
             this.Draw();
         }
-        getColName(index:number){
+        getColumnName(index:number){
             let name = '';
             let i = Math.floor(index / 26);
             if ( i > 0) {
-                name += this.getColName(i-1);
+                name += this.getColumnName(i-1);
             }
             return name+String.fromCharCode(index % 26 + 65);
         }
@@ -151,7 +151,7 @@ namespace EasySheet {
             let activeX:number=0;
             let activeCol:number= app.gridCtrl.activeColumn;
             for(let i= rng.colStartIndex;i<rng.colEndIndex;i++){
-                let name:string = this.getColName(i);
+                let name:string = this.getColumnName(i);
                 if(i!=activeCol) {
                     this._ctx.fillText(name, wTotal + this._cols[i]/ 2, CELL_HEIGHT / 2);
                 }
@@ -175,7 +175,7 @@ namespace EasySheet {
             this._ctx.lineTo(activeX,this._y+CELL_HEIGHT);
             this._ctx.lineTo(activeX+this._cols[activeCol],this._y+CELL_HEIGHT);
             this._ctx.lineTo(activeX+this._cols[activeCol],this._y);
-            let name:string= this.getColName(activeCol);
+            let name:string= this.getColumnName(activeCol);
             this._ctx.fillStyle = CLR_BAR_TEXT;
             this._ctx.fillText(name,activeX+this._cols[activeCol]/2, CELL_HEIGHT/2);
 

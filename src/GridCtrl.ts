@@ -19,6 +19,7 @@
 /// <reference path="Point.ts"/>
 /// <reference path="CellRange.ts"/>
 /// <reference path="ActiveCell.ts"/>
+/// <reference path="State.ts"/>
 namespace EasySheet{
     export class CGridCtrl implements IDraggable{
         protected _x:number;
@@ -40,6 +41,8 @@ namespace EasySheet{
         protected _activeCell:CActiveCell;
         protected _activeRange:CActiveRange[]; // 0 选中整行, -1 没有选中，>0 选中某个单元格
         protected _gridState:number;
+        protected _bLeftMouseDown:boolean;
+        protected _bRightMouseDown:boolean;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
@@ -52,6 +55,8 @@ namespace EasySheet{
             this._cols = [];
             this._canvasList = [];
             this._cacheExist = false;
+            this._bLeftMouseDown = false;
+            this._bRightMouseDown = false;
             for(let i=0; i<nRows;i++){
                 this._rows.push(CELL_HEIGHT);
             }
@@ -60,6 +65,8 @@ namespace EasySheet{
             }
             this._visibleRng = new CCellRange(0,nRows,0,nCols,0,0);
             this._activeCell = new CActiveCell(0,0);
+            this._activeRange = [];
+            this._gridState = GDS_SELECT_CELL;
             this._activeRange.push(new CActiveRange(this._activeCell,this._activeCell));
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
@@ -91,6 +98,7 @@ namespace EasySheet{
         }
         set activeRow(iRow:number){
             this._activeCell.iRow = iRow;
+            console.log("this._activeCell.iRow ",iRow);
         }
         get activeColumn():number{
             return this._activeCell.iColumn;
@@ -156,7 +164,7 @@ namespace EasySheet{
             this._activeCell.iRow = pos[0];
             this._activeCell.iColumn = pos[1];
             if(pos[0] != -1 || pos[1] != -1){
-                this._parent.gridState = GDS_SELECT_CELL;
+                this.gridState = GDS_SELECT_CELL;
             }
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
@@ -289,7 +297,7 @@ namespace EasySheet{
                 }
             }
             // Draw Active Cell
-            if(this._parent.gridState == GDS_SELECT_CELL) {
+            if(this.gridState === GDS_SELECT_CELL) {
                 if (this.activeRow != -1 && this.activeColumn != -1) {
                     let pt = this.GetItemXY(this.activeRow, this.activeColumn);
                     let w = this._cols[this.activeColumn];
@@ -306,7 +314,7 @@ namespace EasySheet{
                 }
             }
             // Draw active row
-            if(this._parent.gridState == GDS_SELECT_ROW){
+            if(this.gridState === GDS_SELECT_ROW){
                 let pt:CPoint = this.GetItemXY(this.activeRow,rng.colStartIndex);
                 this._ctx.fillStyle = "rgba(234,236,245,0.25)";
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
@@ -321,7 +329,7 @@ namespace EasySheet{
                 this._ctx.strokeRect(pt.x,pt.y+this._rows[this.activeRow], 6, 6);
             }
             // Draw active column
-            if(this._parent.gridState == GDS_SELECT_COLUMN){
+            if(this.gridState === GDS_SELECT_COLUMN){
                 let pt:CPoint = this.GetItemXY(rng.rowStartIndex,this.activeColumn);
                 this._ctx.fillStyle = "rgba(234,236,245,0.25)";
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
