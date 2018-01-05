@@ -143,11 +143,10 @@
                      let y:number = this.colOffset;
                      for(let i = rng.rowStartIndex; i<rng.rowEndIndex;i++){
                          if(y+2 < ptCursor.y && (y+this._rows[i]-2) >ptCursor.y){
-                            app.view.isColSelected = false;
-                            app.view.selectedColIndex = -1;
-                            app.view.isRowSelected = true;
-                            app.view.selectedRowIndex = i;
-                            break;
+                             app.view.gridState = GDS_SELECT_ROW;
+                             app.view.activeColumn = -1;
+                             app.view.activeRow = i;
+                             break;
                          }
                          y+=this._rows[i];
                      }
@@ -185,17 +184,33 @@
              this._ctx.lineTo(this._x+this._w,this.clientHeight);
              this._ctx.stroke();
              // draw active row
-             this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
-             this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
-             this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
-             this._ctx.moveTo(this._x, activeY);
-             this._ctx.lineTo(this._w, activeY);
-             this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
-             this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
-             let name: string = activeRow + "";
-             this._ctx.fillStyle = CLR_BAR_TEXT;
-             this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
-             this._ctx.restore();
+             if(app.view.gridState == GDS_SELECT_CELL) {
+                 this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
+                 this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
+                 this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
+                 this._ctx.moveTo(this._x, activeY);
+                 this._ctx.lineTo(this._w, activeY);
+                 this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
+                 this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
+                 let name: string = activeRow + "";
+                 this._ctx.fillStyle = CLR_BAR_TEXT;
+                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
+                 this._ctx.restore();
+             }else if(app.view.gridState == GDS_SELECT_ROW){
+                 this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
+                 this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
+                 this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
+                 this._ctx.moveTo(this._x, activeY);
+                 this._ctx.lineTo(this._w, activeY);
+                 this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
+                 this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
+                 let name: string = activeRow + "";
+                 this._ctx.fillStyle = CLR_BAR_TEXT;
+                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
+                 this._ctx.restore();
+             }else if(app.view.gridState == GDS_SELECT_COLUMN){
+
+             }
          }
          drawDragLine():void{
 

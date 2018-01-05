@@ -91,15 +91,14 @@ namespace EasySheet {
                     }
                 }
             }else{
-                if(ptCursor.x >=0 && ptCursor.x <= this._w) {
+                if(ptCursor.y >=0 && ptCursor.y <= this._h) {
                     let rng:CCellRange = this.visibleRng;
                     let x:number = app.view.rowOffset;
-                    for(let i = rng.rowStartIndex; i<rng.rowEndIndex;i++){
+                    for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
                         if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
-                            app.view.isColSelected = true;
-                            app.view.selectedColIndex = i;
-                            app.view.isRowSelected = false;
-                            app.view.selectedRowIndex = -1;
+                            app.view.gridState = GDS_SELECT_COLUMN;
+                            app.view.activeColumn = i;
+                            app.view.activeRow = -1;
                             break;
                         }
                         x+=this._cols[i];
@@ -150,7 +149,7 @@ namespace EasySheet {
             this._ctx.strokeStyle=CLR_BAR_SEP;
             this._ctx.fillStyle=CLR_BAR_TEXT;
             let activeX:number=0;
-            let activeCol:number= app.gridCtrl.activeCol;
+            let activeCol:number= app.gridCtrl.activeColumn;
             for(let i= rng.colStartIndex;i<rng.colEndIndex;i++){
                 let name:string = this.getColName(i);
                 if(i!=activeCol) {

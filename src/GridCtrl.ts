@@ -18,6 +18,7 @@
 /// <reference path="Const.ts"/>
 /// <reference path="Point.ts"/>
 /// <reference path="CellRange.ts"/>
+/// <reference path="ActiveCell.ts"/>
 namespace EasySheet{
     export class CGridCtrl implements IDraggable{
         protected _x:number;
@@ -36,8 +37,9 @@ namespace EasySheet{
         protected _cacheCtx:CanvasRenderingContext2D;
         protected _canvasList:any[];
         protected _visibleRng:CCellRange;
-        protected _activeRow;
-        protected _activeCol;
+        protected _activeCell:CActiveCell;
+        protected _activeRange:CActiveRange[]; // 0 选中整行, -1 没有选中，>0 选中某个单元格
+        protected _gridState:number;
         constructor(parentWnd:CView,nRows:number,nCols:number){
             this._parent = parentWnd;
             this._nRows = nRows;
@@ -57,11 +59,11 @@ namespace EasySheet{
                 this._cols.push(CELL_WIDTH);
             }
             this._visibleRng = new CCellRange(0,nRows,0,nCols,0,0);
-            this._activeRow = 0;
-            this._activeCol = 0;
+            this._activeCell = new CActiveCell(0,0);
+            this._activeRange.push(new CActiveRange(this._activeCell,this._activeCell));
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
-            this.makeCanvasList();
+            this.MakeCanvasList();
         }
         get colOffset():number{
             return this._parent.colOffset;
@@ -75,13 +77,28 @@ namespace EasySheet{
         get clientHeight():number{
             return this._parent.clientHeight;
         }
+        get gridState():number{
+            return this._gridState;
+        }
+        set gridState(state:number){
+            this._gridState = state;
+        }
+        get activeCell():CActiveCell{
+            return this._activeCell;
+        }
         get activeRow():number{
-            return this._activeRow;
+            return this._activeCell.iRow;
         }
-        get activeCol():number{
-            return this._activeCol;
+        set activeRow(iRow:number){
+            this._activeCell.iRow = iRow;
         }
-        makeCanvasList():void{
+        get activeColumn():number{
+            return this._activeCell.iColumn;
+        }
+        set activeColumn(iCol:number){
+            this._activeCell.iColumn = iCol;
+        }
+        MakeCanvasList():void{
             // console.log("make-list 1 ",now());
             // for(let i=0; i<1000;i++) {
             //     let canvas: HTMLCanvasElement;
@@ -112,35 +129,23 @@ namespace EasySheet{
             this._inDrag = false;
         }
         OnKeyDirLeft():void{
-            if(this._activeRow != -1 && this._activeCol != -1){
-                this._activeCol -= 1;
-                if(this._activeCol <0){
-                    this._activeCol =0;
-                }
+            if(this._gridState == GDS_SELECT_CELL){
+                this._activeCell.Left();
             }
         }
         OnKeyDirRight():void{
-            if(this._activeRow != -1 && this._activeCol != -1){
-                this._activeCol += 1;
-                if(this._activeCol > this._nCols-1){
-                    this._activeRow = this._nCols-1;
-                }
+            if(this._gridState == GDS_SELECT_CELL){
+                this._activeCell.Right();
             }
         }
         OnKeyDirUp():void{
-            if(this._activeRow != -1 && this._activeCol != -1){
-                this._activeRow -= 1;
-                if(this._activeRow <0){
-                    this._activeRow =0;
-                }
+            if(this._gridState == GDS_SELECT_CELL){
+                this._activeCell.Up();
             }
         }
         OnKeyDirDown():void{
-            if(this._activeRow != -1 && this._activeCol != -1){
-                this._activeRow += 1;
-                if(this._activeRow > this._nRows-1){
-                    this._activeRow = this._nRows-1;
-                }
+            if(this._gridState == GDS_SELECT_CELL){
+                this._activeCell.Down();
             }
         }
         OnMouseMove(ptCursor:CPoint):void{
@@ -148,8 +153,11 @@ namespace EasySheet{
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             let pos:number[] = this.GetCellPos(ptMouse);
-            this._activeRow = pos[0];
-            this._activeCol = pos[1];
+            this._activeCell.iRow = pos[0];
+            this._activeCell.iColumn = pos[1];
+            if(pos[0] != -1 || pos[1] != -1){
+                this._parent.gridState = GDS_SELECT_CELL;
+            }
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
 
@@ -281,11 +289,11 @@ namespace EasySheet{
                 }
             }
             // Draw Active Cell
-            if(!this._parent.isColSelected && !this._parent.isRowSelected) {
-                if (this._activeRow != -1 && this._activeCol != -1) {
-                    let pt = this.GetItemXY(this._activeRow, this._activeCol);
-                    let w = this._cols[this._activeCol];
-                    let h = this._rows[this._activeRow];
+            if(this._parent.gridState == GDS_SELECT_CELL) {
+                if (this.activeRow != -1 && this.activeColumn != -1) {
+                    let pt = this.GetItemXY(this.activeRow, this.activeColumn);
+                    let w = this._cols[this.activeColumn];
+                    let h = this._rows[this.activeRow];
                     this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                     this._ctx.lineWidth = 3;
                     this._ctx.strokeRect(pt.x, pt.y, w, h);
@@ -297,35 +305,35 @@ namespace EasySheet{
                     this._ctx.strokeRect(pt.x + w - 3, pt.y + h - 3, 6, 6);
                 }
             }
-            // Draw selected Row
-            if(this._parent.isRowSelected){
-                let pt:CPoint = this.GetItemXY(app.view.selectedRowIndex,rng.colStartIndex);
+            // Draw active row
+            if(this._parent.gridState == GDS_SELECT_ROW){
+                let pt:CPoint = this.GetItemXY(this.activeRow,rng.colStartIndex);
                 this._ctx.fillStyle = "rgba(234,236,245,0.25)";
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                 this._ctx.lineWidth = 3;
-                this._ctx.fillRect(pt.x,pt.y,this.clientWidth,this._rows[app.view.selectedRowIndex]);
-                this._ctx.strokeRect(pt.x,pt.y,this.clientWidth,this._rows[app.view.selectedRowIndex]);
+                this._ctx.fillRect(pt.x,pt.y,this.clientWidth,this._rows[this.activeRow]);
+                this._ctx.strokeRect(pt.x,pt.y,this.clientWidth,this._rows[this.activeRow]);
                 // Draw Active Copy Anchor
                 this._ctx.strokeStyle = '#FFFFFF';
                 this._ctx.lineWidth = 2;
                 this._ctx.fillStyle = CLR_ACTIVE_CELL;
-                this._ctx.fillRect(pt.x, pt.y+this._rows[app.view.selectedRowIndex], 6, 6);
-                this._ctx.strokeRect(pt.x,pt.y+this._rows[app.view.selectedRowIndex], 6, 6);
+                this._ctx.fillRect(pt.x, pt.y+this._rows[this.activeRow], 6, 6);
+                this._ctx.strokeRect(pt.x,pt.y+this._rows[this.activeRow], 6, 6);
             }
-            // Draw selected Column
-            if(this._parent.isColSelected){
-                let pt:CPoint = this.GetItemXY(rng.rowStartIndex,app.view.selectedColIndex);
+            // Draw active column
+            if(this._parent.gridState == GDS_SELECT_COLUMN){
+                let pt:CPoint = this.GetItemXY(rng.rowStartIndex,this.activeColumn);
                 this._ctx.fillStyle = "rgba(234,236,245,0.25)";
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                 this._ctx.lineWidth = 3;
-                this._ctx.fillRect(pt.x,pt.y,this._cols[app.view.selectedColIndex],this.clientHeight);
-                this._ctx.strokeRect(pt.x,pt.y,this._cols[app.view.selectedColIndex],this.clientHeight);
+                this._ctx.fillRect(pt.x,pt.y,this._cols[this.activeColumn],this.clientHeight);
+                this._ctx.strokeRect(pt.x,pt.y,this._cols[this.activeColumn],this.clientHeight);
                 // Draw Active Copy Anchor
                 this._ctx.strokeStyle = '#FFFFFF';
                 this._ctx.lineWidth = 2;
                 this._ctx.fillStyle = CLR_ACTIVE_CELL;
-                this._ctx.fillRect(pt.x+this._cols[app.view.selectedColIndex],pt.y,6, 6);
-                this._ctx.strokeRect(pt.x+this._cols[app.view.selectedColIndex],pt.y,6, 6);
+                this._ctx.fillRect(pt.x+this._cols[this.activeColumn],pt.y,6, 6);
+                this._ctx.strokeRect(pt.x+this._cols[this.activeColumn],pt.y,6, 6);
             }
             this._ctx.restore();
         }

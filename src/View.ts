@@ -30,10 +30,6 @@ namespace EasySheet{
         protected _yScrollBar:CScrollBarCtrl;
         protected _scrollX:number;
         protected _scrollY:number;
-        protected _bSelectedRow:boolean;
-        protected _iSelectedRow:number;
-        protected _bSelectedCol:boolean;
-        protected _iSelectedCol:number;
         constructor(nRows:number,nCols:number){
             super("es-view");
             let wWin = $(window).width();
@@ -43,10 +39,6 @@ namespace EasySheet{
             this._nCols = nCols;
             this._scrollX = 0;
             this._scrollY = 0;
-            this._bSelectedRow = false;
-            this._iSelectedRow = -1;
-            this._bSelectedCol = false;
-            this._iSelectedCol = -1;
             this._rowOffset = FIXED_CELL_WIDTH;
             this._colOffset = CELL_HEIGHT;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
@@ -78,29 +70,23 @@ namespace EasySheet{
         get rowOffset():number{
             return this._rowOffset;
         }
-        set selectedRowIndex(iSelectedRow:number){
-            this._iSelectedRow = iSelectedRow;
+        set activeRow(iActiveRow:number){
+            this._gridCtrl.activeRow = iActiveRow;
         }
-        get selectedRowIndex():number{
-            return this._iSelectedRow;
+        get activeRow():number{
+            return this._gridCtrl.activeRow;
         }
-        set isRowSelected(bSelected:boolean){
-            this._bSelectedRow = bSelected;
+        set activeColumn(iActiveCol:number){
+            this._gridCtrl.activeColumn = iActiveCol;
         }
-        get isRowSelected():boolean{
-            return this._bSelectedRow;
+        get activeColumn():number{
+            return this._gridCtrl.activeColumn;
         }
-        set selectedColIndex(iSelectedCol:number){
-            this._iSelectedCol = iSelectedCol;
+        set gridState(state:number){
+            this._gridCtrl.gridState = state;
         }
-        get selectedColIndex():number{
-            return this._iSelectedCol;
-        }
-        set isColSelected(bSelected:boolean){
-            this._bSelectedCol = bSelected;
-        }
-        get isColSelected():boolean{
-            return this._bSelectedCol;
+        get gridState():number{
+            return this._gridCtrl.gridState;
         }
         OnSize(wWin:number,hWin:number):void{
             this._clientW = wWin;
@@ -183,7 +169,7 @@ namespace EasySheet{
         GetRowCount():number{
             return this._nRows;
         }
-        GetColCount():number{
+        GetColumnCount():number{
             return this._nCols;
         }
         Draw(){

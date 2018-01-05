@@ -29,7 +29,7 @@ $(function(){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         app.view.OnMouseMove(pt);
     });
-    $(document).on("mousedown","#es-view,#es-col-ctrl",function(e){
+    $(document).on("mousedown","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){
             app.view.OnLeftMouseDown(pt);
@@ -37,6 +37,15 @@ $(function(){
             app.view.OnRightMouseDown(pt);
         }
     });
+    $(document).on("mousedown","#es-col-ctrl",function(e){
+        let pt:CPoint = new CPoint(e.pageX,e.pageY);
+        if(e.button == 0){
+            app.view.OnLeftMouseDown(pt);
+        }else if(e.button == 2){
+            app.view.OnRightMouseDown(pt);
+        }
+    });
+
     $(document).on("mouseup","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 1){
