@@ -107,7 +107,7 @@ namespace EasySheet{
             this.Draw();
         }
         OnGridSelectRange = (cellStart:CActiveCell,cellEnd:CActiveCell):void =>{
-            console.log("OnGridSelectRange ",cellStart,cellEnd);
+            // console.log("OnGridSelectRange ",cellStart,cellEnd);
             this.Draw();
         };
         ChangeCursor(cursor:string):void{
@@ -135,7 +135,6 @@ namespace EasySheet{
             this._colCtrl.OnMouseMove(ptCursor);
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
-            console.log("左键单击");
             this._gridCtrl.OnLeftMouseDown(ptMouse);
             this._rowCtrl.OnLeftMouseDown(ptMouse);
             this._colCtrl.OnLeftMouseDown(ptMouse);
@@ -145,7 +144,6 @@ namespace EasySheet{
             this._gridCtrl.OnLeftMouseUp(ptMouse);
             this._rowCtrl.OnLeftMouseUp(ptMouse);
             this._colCtrl.OnLeftMouseUp(ptMouse);
-            this.Draw();
         }
         OnRightMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnRightMouseDown(ptMouse);

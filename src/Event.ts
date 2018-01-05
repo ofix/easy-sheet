@@ -48,7 +48,7 @@ $(function(){
 
     $(document).on("mouseup","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
-        if(e.button == 1){
+        if(e.button == 0){
             app.view.OnLeftMouseUp(pt);
         }else if(e.button == 2){
             app.view.OnRightMouseUp(pt);
