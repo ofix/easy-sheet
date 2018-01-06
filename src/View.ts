@@ -107,7 +107,6 @@ namespace EasySheet{
             this.Draw();
         }
         OnGridSelectRange = (cellStart:CActiveCell,cellEnd:CActiveCell):void =>{
-            // console.log("OnGridSelectRange ",cellStart,cellEnd);
             this.Draw();
         };
         ChangeCursor(cursor:string):void{

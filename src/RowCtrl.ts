@@ -17,7 +17,12 @@
 /// <reference path="Wnd.ts"/>
 /// <reference path="Const.ts"/>
 /// <reference path="View.ts"/>
+/// <reference path="Message.ts"/>
+/// <reference path="EventNotifier.ts"/>
  namespace EasySheet{
+     import CEventNotifier = Core.CEventNotifier;
+     import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
+     import NM_GRID_SELECT_CELL = Core.NM_GRID_SELECT_CELL;
      export class CRowCtrl extends CWnd implements IDraggable{
          protected _nRows:number;
          protected _parent:CView;
@@ -27,6 +32,7 @@
          protected _y:number;
          protected _inDrag:boolean;
          protected _visibleRng:CCellRange;
+         protected _activeRngList:CActiveCell[][];
          protected _bLeftMouseDown:boolean;
          protected _bRightMouseDown:boolean;
          constructor(parentWnd:CView,nRows:number){
@@ -45,6 +51,9 @@
              this.SetVisibleCellRange();
              this._bLeftMouseDown = false;
              this._bRightMouseDown = false;
+             this._activeRngList = [];
+             CEventNotifier.On(NM_GRID_SELECT_RANGE,this.OnGridSelectRange);
+             CEventNotifier.On(NM_GRID_SELECT_CELL,this.OnGridSelectCell);
          }
          get x():number{
              return this._x;
@@ -70,6 +79,16 @@
          OnSize(wWin:number,hWin:number):void{
             this.Draw();
          }
+         OnGridSelectRange = (cellStart:CActiveCell,cellEnd:CActiveCell,bReplace:boolean):void =>{
+             if(bReplace){
+                 this._activeRngList = [[cellStart,cellEnd]];
+             }else{
+                 this._activeRngList.push([cellStart,cellEnd]);
+             }
+         };
+         OnGridSelectCell = ():void =>{
+             this._activeRngList = [];
+         };
          OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
          }
@@ -154,6 +173,33 @@
                  }
              }
          }
+         getColumnY(iRow:number){
+             let rng = this.visibleRng;
+             let yTotal:number=app.view.colOffset;
+             if(iRow>=rng.rowStartIndex&&iRow<=rng.rowEndIndex){
+                 for(let i=rng.rowStartIndex;i<=rng.rowEndIndex;i++){
+                     if(i== iRow){
+                         break;
+                     }
+                     yTotal+=this._rows[i];
+                 }
+             }
+             return yTotal;
+         }
+         DrawActiveCell(iRow:number){
+             this._ctx.fillStyle = CLR_ACTIVE_COL_FILL;
+             this._ctx.strokeStyle = CLR_ACTIVE_COL_BORDER;
+             let y:number= this.getColumnY(iRow);
+             // console.log("column-y",y);
+             this._ctx.fillRect(0,y,FIXED_CELL_WIDTH,this._rows[iRow]);
+             this._ctx.moveTo(0,y);
+             this._ctx.lineTo(FIXED_CELL_WIDTH,y);
+             this._ctx.lineTo(FIXED_CELL_WIDTH,y+this._rows[iRow]);
+             this._ctx.lineTo(0,y+this._rows[iRow]);
+             let name:string= iRow+'';
+             this._ctx.fillStyle = CLR_BAR_TEXT;
+             this._ctx.fillText(name,FIXED_CELL_WIDTH/2,y+this._rows[iRow]/2);
+         }
          Draw():void{
              let rng:CCellRange = this.visibleRng;
              let hTotal:number=this._y;
@@ -167,15 +213,11 @@
              this._ctx.textBaseline = "middle";
              this._ctx.textAlign = "center";
              this._ctx.beginPath();
-             let activeY:number=0;
              let activeRow:number= app.gridCtrl.activeRow;
              for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                  let name:string = i+"";
                  if(i != activeRow) {
                      this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
-                 }
-                 if(i == activeRow){
-                     activeY = hTotal;
                  }
                  hTotal+=this._rows[i];
                  this._ctx.moveTo(this._x,hTotal);
@@ -186,31 +228,22 @@
              this._ctx.stroke();
              // draw active row
              if(app.view.gridState == GDS_SELECT_CELL) {
-                 this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
-                 this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
-                 this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
-                 this._ctx.moveTo(this._x, activeY);
-                 this._ctx.lineTo(this._w, activeY);
-                 this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
-                 this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
-                 let name: string = activeRow + "";
-                 this._ctx.fillStyle = CLR_BAR_TEXT;
-                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
-                 this._ctx.restore();
+                 this.DrawActiveCell(activeRow);
              }else if(app.view.gridState == GDS_SELECT_ROW){
-                 this._ctx.fillStyle = CLR_ACTIVE_ROW_FILL;
-                 this._ctx.strokeStyle = CLR_ACTIVE_ROW_BORDER;
-                 this._ctx.fillRect(this._x, activeY, this._w, this._rows[activeRow]);
-                 this._ctx.moveTo(this._x, activeY);
-                 this._ctx.lineTo(this._w, activeY);
-                 this._ctx.lineTo(this._w, activeY + this._rows[activeRow]);
-                 this._ctx.lineTo(this._x, activeY + this._rows[activeRow]);
-                 let name: string = activeRow + "";
-                 this._ctx.fillStyle = CLR_BAR_TEXT;
-                 this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, activeY + this._rows[activeRow] / 2);
-                 this._ctx.restore();
+                 this.DrawActiveCell(activeRow);
              }else if(app.view.gridState == GDS_SELECT_COLUMN){
-
+                 for(let j=rng.rowStartIndex;j<rng.rowEndIndex;j++){
+                     this.DrawActiveCell(j);
+                 }
+             }
+             // draw active range list
+             for(let i=0,len=this._activeRngList.length; i<len;i++){
+                 let rng:CActiveCell[] = this._activeRngList[i];
+                 let iRowStart:number = Math.min(rng[0].iRow,rng[1].iRow);
+                 let iRowEnd:number = Math.max(rng[0].iRow,rng[1].iRow);
+                 for(let j=iRowStart;j<=iRowEnd;j++){
+                     this.DrawActiveCell(j);
+                 }
              }
              this._ctx.restore();
          }

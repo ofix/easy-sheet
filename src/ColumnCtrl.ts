@@ -14,7 +14,12 @@
  */
 /// <reference path="Draggable.ts"/>
 /// <reference path="CellRange.ts"/>
+/// <reference path="Message.ts"/>
+/// <reference path="EventNotifier.ts"/>
 namespace EasySheet {
+    import CEventNotifier = Core.CEventNotifier;
+    import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
+    import NM_GRID_SELECT_CELL = Core.NM_GRID_SELECT_CELL;
     export class CColumnCtrl extends CWnd implements IDraggable{
         protected _nCols;
         protected _cols:number[];
@@ -22,6 +27,7 @@ namespace EasySheet {
         protected _bLeftMouseDown:boolean;
         protected _bRightMouseDown:boolean;
         protected _visibleRng:CCellRange;
+        protected _activeRngList:CActiveCell[][];
         constructor(nCols:number){
             super("es-col-ctrl");
             let wWin = $(window).width();
@@ -34,10 +40,23 @@ namespace EasySheet {
                 this._cols.push(CELL_WIDTH);
             }
             this.SetVisibleCellRange();
+            this._activeRngList = [];
+            CEventNotifier.On(NM_GRID_SELECT_RANGE,this.OnGridSelectRange);
+            CEventNotifier.On(NM_GRID_SELECT_CELL,this.OnGridSelectCell);
         }
         get visibleRng():CCellRange{
             return this._visibleRng;
         }
+        OnGridSelectRange = (cellStart:CActiveCell,cellEnd:CActiveCell,bReplace:boolean):void =>{
+            if(bReplace){
+                this._activeRngList = [[cellStart,cellEnd]];
+            }else{
+                this._activeRngList.push([cellStart,cellEnd]);
+            }
+        };
+        OnGridSelectCell = ():void =>{
+            this._activeRngList = [];
+        };
         OnDragStart(ptCursor:CPoint):void{
             this._inDrag = true;
         }
@@ -134,6 +153,31 @@ namespace EasySheet {
             }
             return name+String.fromCharCode(index % 26 + 65);
         }
+        getColumnX(iColumn:number){
+            let rng = this.visibleRng;
+            let xTotal:number=app.view.rowOffset;
+            if(iColumn>=rng.colStartIndex&&iColumn<=rng.colEndIndex){
+                for(let i=rng.colStartIndex;i<rng.colEndIndex;i++){
+                    if(i== iColumn){
+                        return xTotal;
+                    }
+                    xTotal+=this._cols[i];
+                }
+            }
+        }
+        DrawActiveCell(iColumn:number){
+            this._ctx.fillStyle = CLR_ACTIVE_COL_FILL;
+            this._ctx.strokeStyle = CLR_ACTIVE_COL_BORDER;
+            let x:number= this.getColumnX(iColumn);
+            this._ctx.fillRect(x,this._y,this._cols[iColumn],CELL_HEIGHT);
+            this._ctx.moveTo(x,this._y);
+            this._ctx.lineTo(x,this._y+CELL_HEIGHT);
+            this._ctx.lineTo(x+this._cols[iColumn],this._y+CELL_HEIGHT);
+            this._ctx.lineTo(x+this._cols[iColumn],this._y);
+            let name:string= this.getColumnName(iColumn);
+            this._ctx.fillStyle = CLR_BAR_TEXT;
+            this._ctx.fillText(name,x+this._cols[iColumn]/2, CELL_HEIGHT/2);
+        }
         Draw(){
             let wTotal:number=app.view.rowOffset;
             let rng = this.visibleRng;
@@ -147,15 +191,11 @@ namespace EasySheet {
             this._ctx.textAlign = 'center';
             this._ctx.strokeStyle=CLR_BAR_SEP;
             this._ctx.fillStyle=CLR_BAR_TEXT;
-            let activeX:number=0;
             let activeCol:number= app.gridCtrl.activeColumn;
             for(let i= rng.colStartIndex;i<rng.colEndIndex;i++){
                 let name:string = this.getColumnName(i);
                 if(i!=activeCol) {
                     this._ctx.fillText(name, wTotal + this._cols[i]/ 2, CELL_HEIGHT / 2);
-                }
-                if(i==activeCol){
-                    activeX = wTotal;
                 }
                 wTotal+=this._cols[i];
                 this._ctx.moveTo(wTotal,0);
@@ -167,17 +207,16 @@ namespace EasySheet {
             this._ctx.stroke();
 
             // draw active column
-            this._ctx.fillStyle = CLR_ACTIVE_COL_FILL;
-            this._ctx.strokeStyle = CLR_ACTIVE_COL_BORDER;
-            this._ctx.fillRect(activeX,this._y,this._cols[activeCol],CELL_HEIGHT);
-            this._ctx.moveTo(activeX,this._y);
-            this._ctx.lineTo(activeX,this._y+CELL_HEIGHT);
-            this._ctx.lineTo(activeX+this._cols[activeCol],this._y+CELL_HEIGHT);
-            this._ctx.lineTo(activeX+this._cols[activeCol],this._y);
-            let name:string= this.getColumnName(activeCol);
-            this._ctx.fillStyle = CLR_BAR_TEXT;
-            this._ctx.fillText(name,activeX+this._cols[activeCol]/2, CELL_HEIGHT/2);
-
+            this.DrawActiveCell(activeCol);
+            // draw active range list
+            for(let i=0,len=this._activeRngList.length; i<len;i++){
+                let rng:CActiveCell[] = this._activeRngList[i];
+                let iColStart:number = Math.min(rng[0].iColumn,rng[1].iColumn);
+                let iColEnd:number = Math.max(rng[0].iColumn,rng[1].iColumn);
+                for(let j=iColStart;j<=iColEnd;j++){
+                    this.DrawActiveCell(j);
+                }
+            }
             this._ctx.restore();
         }
     }
