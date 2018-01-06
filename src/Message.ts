@@ -17,4 +17,7 @@ namespace Core{
     export let NM_GRID_SELECT_CELL:number = 2;
     export let NM_GRID_SELECT_COLUMN:number = 3;
     export let NM_GRID_SELECT_ROW:number=4;
+    export let SBM_PREV_PAGE:number= 25;
+    export let SBM_NEXT_PAGE:number= 26;
+    export let SBM_NEW_POS:number=27;
 }
