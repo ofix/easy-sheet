@@ -371,10 +371,15 @@ namespace EasySheet{
                 this._ctx.strokeRect(pt.x+this._cols[this.activeColumn],pt.y,6, 6);
             }
             if(this.gridState === GDS_SELECT_RANGE){
-                let pt1 = this.GetItemXY(this.activeRow, this.activeColumn);
-                let pt2 = this.GetItemXY(this.activeEndRow,this.activeEndColumn);
-                let w = pt2.x-pt1.x + this._cols[this.activeEndColumn];
-                let h = pt2.y-pt1.y + this._rows[this.activeEndRow];
+                let rowStart = Math.min(this.activeRow,this.activeEndRow);
+                let colStart = Math.min(this.activeColumn,this.activeEndColumn);
+                let rowEnd = Math.max(this.activeRow,this.activeEndRow);
+                let colEnd = Math.max(this.activeColumn,this.activeEndColumn);
+                let pt1 = this.GetItemXY(rowStart, colStart);
+                let pt2 = this.GetItemXY(rowEnd,colEnd);
+                // console.log("(row,col,rowEnd,colEnd) = ",rowStart,colStart,rowEnd,colEnd);
+                let w = pt2.x-pt1.x + this._cols[colEnd];
+                let h = pt2.y-pt1.y + this._rows[rowEnd];
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;
                 this._ctx.lineWidth = 3;
                 this._ctx.strokeRect(pt1.x, pt1.y, w, h);
