@@ -21,32 +21,37 @@ namespace EasySheet{
             this.cellEnd = cellEnd;
         }
     }
-    export class CActiveCell{
+    export class CPos{
         public iRow:number;
-        public iColumn:number;
+        public iCol:number;
         constructor(iRow:number,iColumn:number){
             this.iRow = iRow;
-            this.iColumn = iColumn;
+            this.iCol = iColumn;
+        }
+    }
+    export class CActiveCell extends CPos{
+            constructor(iRow:number,iColumn:number){
+            super(iRow,iColumn);
         }
         Left(){
-            this.iColumn -= 1;
-            if(this.iColumn<0){
-                this.iColumn=0;
+            this.iCol -= 1;
+            if(this.iCol<0){
+                this.iCol=0;
             }
             if(this.iRow <0){
                 this.iRow = 0;
             }
         }
         Right(){
-            this.iColumn += 1;
+            this.iCol += 1;
         }
         Up(){
             this.iRow -=1;
             if(this.iRow<0){
                 this.iRow=0;
             }
-            if(this.iColumn<0){
-                this.iColumn = 0;
+            if(this.iCol<0){
+                this.iCol = 0;
             }
         }
         Down(){

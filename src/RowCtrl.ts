@@ -241,8 +241,10 @@
                  let rng:CActiveCell[] = this._activeRngList[i];
                  let iRowStart:number = Math.min(rng[0].iRow,rng[1].iRow);
                  let iRowEnd:number = Math.max(rng[0].iRow,rng[1].iRow);
-                 for(let j=iRowStart;j<=iRowEnd;j++){
-                     this.DrawActiveCell(j);
+                 if(iRowStart >=0 && iRowEnd >=0) {
+                     for (let j = iRowStart; j <= iRowEnd; j++) {
+                         this.DrawActiveCell(j);
+                     }
                  }
              }
              this._ctx.restore();

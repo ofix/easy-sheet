@@ -109,10 +109,10 @@ namespace EasySheet{
             this._activeCell.iRow = iRow;
         }
         get activeColumn():number{
-            return this._activeCell.iColumn;
+            return this._activeCell.iCol;
         }
         set activeColumn(iCol:number){
-            this._activeCell.iColumn = iCol;
+            this._activeCell.iCol = iCol;
         }
         get activeEndRow():number{
             return this._activeEndCell.iRow;
@@ -121,10 +121,10 @@ namespace EasySheet{
             this._activeEndCell.iRow = iRow;
         }
         get activeEndColumn():number{
-            return this._activeEndCell.iColumn;
+            return this._activeEndCell.iCol;
         }
         set activeEndColumn(iCol:number){
-            this._activeEndCell.iColumn = iCol;
+            this._activeEndCell.iCol = iCol;
         }
 
         MakeCanvasList():void{
@@ -176,19 +176,19 @@ namespace EasySheet{
         OnMouseMove(ptMouse:CPoint):void{
             if(this._bLeftMouseDown){
                 this._bSelectCell = false;
-                let pos:number[] = this.GetCellPos(ptMouse);
-                this._activeEndCell.iRow = pos[0];
-                this._activeEndCell.iColumn = pos[1];
+                let pos:CPos = this.GetCellPos(ptMouse);
+                this._activeEndCell.iRow = pos.iRow;
+                this._activeEndCell.iCol = pos.iCol;
                 this.gridState = GDS_SELECT_RANGE;
                 CEventNotifier.Trigger(NM_GRID_SELECT_RANGE,this._activeCell,this._activeEndCell,true);
             }
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             this._bLeftMouseDown = true;
-            let pos:number[] = this.GetCellPos(ptMouse);
+            let pos:CPos = this.GetCellPos(ptMouse);
             this._activeCell.iRow = pos[0];
-            this._activeCell.iColumn = pos[1];
-            if(pos[0] != -1 || pos[1] != -1){
+            this._activeCell.iCol = pos[1];
+            if( pos.iRow!= -1 || pos.iCol != -1){
                 this.gridState = GDS_SELECT_CELL;
                 CEventNotifier.Trigger(NM_GRID_SELECT_CELL);
             }
@@ -209,7 +209,7 @@ namespace EasySheet{
         GetColHeight():number{
             return this._h;
         }
-        GetCellPos(ptCursor:CPoint):number[]{
+        GetCellPos(ptCursor:CPoint):CPos{
             for(let i= this._visibleRng.rowStartIndex; i<this._visibleRng.rowEndIndex; i++){
                 for(let j=this._visibleRng.colStartIndex; j<this._visibleRng.colEndIndex; j++){
                     let pt = this.GetItemXY(i,j);
@@ -218,11 +218,11 @@ namespace EasySheet{
                     let w = this._cols[j];
                     let h = this._rows[i];
                     if(IsPtInRect(ptCursor,pt.x,pt.y,w,h)){
-                        return [i,j];
+                        return new CPos(i,j);
                     }
                 }
             }
-            return [-1,-1];
+            return new CPos(-1,-1);
         }
         SetItemText(iRow:number,iCol:number,text:string):void{
 

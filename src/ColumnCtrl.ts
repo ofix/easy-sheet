@@ -103,7 +103,21 @@ namespace EasySheet {
             this._bRightMouseDown = false;
         }
         OnHitTest(ptCursor:CPoint):void{
-            if(!this._bLeftMouseDown) {
+            if(this._bLeftMouseDown) {
+                if(ptCursor.y >=0 && ptCursor.y <= this._h) {
+                    let rng:CCellRange = this.visibleRng;
+                    let x:number = app.view.rowOffset;
+                    for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
+                        if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
+                            app.view.gridState = GDS_SELECT_COLUMN;
+                            app.view.activeColumn = i;
+                            app.view.activeRow = -1;
+                            break;
+                        }
+                        x+=this._cols[i];
+                    }
+                }
+            }else{
                 if(ptCursor.y >=0 && ptCursor.y <= this._h){
                     let rng: CCellRange = this.visibleRng;
                     let x = app.view.rowOffset;
@@ -119,20 +133,6 @@ namespace EasySheet {
                         this.ChangeCursor("w-resize");
                     }else{
                         this.ChangeCursor("default");
-                    }
-                }
-            }else{
-                if(ptCursor.y >=0 && ptCursor.y <= this._h) {
-                    let rng:CCellRange = this.visibleRng;
-                    let x:number = app.view.rowOffset;
-                    for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
-                        if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
-                            app.view.gridState = GDS_SELECT_COLUMN;
-                            app.view.activeColumn = i;
-                            app.view.activeRow = -1;
-                            break;
-                        }
-                        x+=this._cols[i];
                     }
                 }
             }
@@ -209,12 +209,15 @@ namespace EasySheet {
             // draw active column
             this.DrawActiveCell(activeCol);
             // draw active range list
+            console.log(JSON.stringify(this._activeRngList));
             for(let i=0,len=this._activeRngList.length; i<len;i++){
                 let rng:CActiveCell[] = this._activeRngList[i];
-                let iColStart:number = Math.min(rng[0].iColumn,rng[1].iColumn);
-                let iColEnd:number = Math.max(rng[0].iColumn,rng[1].iColumn);
-                for(let j=iColStart;j<=iColEnd;j++){
-                    this.DrawActiveCell(j);
+                let iColStart:number = Math.min(rng[0].iCol,rng[1].iCol);
+                let iColEnd:number = Math.max(rng[0].iCol,rng[1].iCol);
+                if(iColStart >=0 && iColEnd>=0) {
+                    for (let j = iColStart; j <= iColEnd; j++) {
+                        this.DrawActiveCell(j);
+                    }
                 }
             }
             this._ctx.restore();
