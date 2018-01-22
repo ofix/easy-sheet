@@ -112,6 +112,7 @@ namespace EasySheet {
                             app.view.gridState = GDS_SELECT_COLUMN;
                             app.view.activeColumn = i;
                             app.view.activeRow = -1;
+                            this._activeRngList = [];
                             break;
                         }
                         x+=this._cols[i];

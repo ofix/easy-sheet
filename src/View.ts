@@ -128,10 +128,10 @@ namespace EasySheet{
             this._gridCtrl.OnKeyDirDown();
             this.Draw();
         }
-        OnMouseMove(ptCursor:CPoint):void{
-            this._gridCtrl.OnMouseMove(ptCursor);
-            this._rowCtrl.OnMouseMove(ptCursor);
-            this._colCtrl.OnMouseMove(ptCursor);
+        OnMouseMove(ptMouse:CPoint):void{
+            this._gridCtrl.OnMouseMove(ptMouse);
+            this._rowCtrl.OnMouseMove(ptMouse);
+            this._colCtrl.OnMouseMove(ptMouse);
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnLeftMouseDown(ptMouse);

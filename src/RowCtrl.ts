@@ -166,6 +166,7 @@
                              app.view.gridState = GDS_SELECT_ROW;
                              app.view.activeColumn = -1;
                              app.view.activeRow = i;
+                             this._activeRngList = [];
                              break;
                          }
                          y+=this._rows[i];

@@ -184,10 +184,14 @@ namespace EasySheet{
             }
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
+            //因为GridCtrl上面是ColumnCtrl和RowCtrl
+            if(ptMouse.x <= this._parent.rowOffset || ptMouse.y <= this._parent.colOffset){
+                return;
+            }
             this._bLeftMouseDown = true;
             let pos:CPos = this.GetCellPos(ptMouse);
-            this._activeCell.iRow = pos[0];
-            this._activeCell.iCol = pos[1];
+            this._activeCell.iRow = pos.iRow;
+            this._activeCell.iCol = pos.iCol;
             if( pos.iRow!= -1 || pos.iCol != -1){
                 this.gridState = GDS_SELECT_CELL;
                 CEventNotifier.Trigger(NM_GRID_SELECT_CELL);
