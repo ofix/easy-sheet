@@ -191,7 +191,6 @@
              this._ctx.fillStyle = CLR_ACTIVE_COL_FILL;
              this._ctx.strokeStyle = CLR_ACTIVE_COL_BORDER;
              let y:number= this.getColumnY(iRow);
-             // console.log("column-y",y);
              this._ctx.fillRect(0,y,FIXED_CELL_WIDTH,this._rows[iRow]);
              this._ctx.moveTo(0,y);
              this._ctx.lineTo(FIXED_CELL_WIDTH,y);
