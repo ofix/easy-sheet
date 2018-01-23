@@ -75,7 +75,7 @@ namespace EasySheet{
             for(let j=0; j<nCols;j++){
                 this._cols.push(CELL_WIDTH);
             }
-            this._cells = [[]];
+            this._cells = [];
             this._visibleRng = new CCellRange(0,nRows,0,nCols,0,0);
             this._activeCell = new CActiveCell(0,0);
             this._activeEndCell = new CActiveCell(0,0);
@@ -139,10 +139,19 @@ namespace EasySheet{
             this._activeEndCell.iCol = iCol;
         }
         SetItemText(iRow:number,iCol:number,text:string):void{
+            if(!text){
+                return;
+            }
+            if(!this._cells[iRow]){
+                this._cells[iRow] = [];
+            }
             this._cells[iRow][iCol] = text;
         }
         GetItemText(iRow:number,iCol:number):string{
-            return this._cells[iRow][iCol];
+            if(this._cells[iRow] && this._cells[iRow][iCol]) {
+                return this._cells[iRow][iCol];
+            }
+            return '';
         }
         MakeCanvasList():void{
             // console.log("make-list 1 ",now());
@@ -210,14 +219,18 @@ namespace EasySheet{
         OnLeaveEdit():void{
             this.bInEdit = false;
             this._lastEditCell = this._activeCell;
-            let text:string = $('#es-editable-cell').text();
+            console.log(this._activeCell);
+            let $cell = $('#es-editable-cell');
+            let text:string = $cell.text();
             this.SetItemText(this._lastEditCell.iRow,this._lastEditCell.iCol,text);
+            $cell.empty().hide();
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             //因为GridCtrl上面是ColumnCtrl和RowCtrl
             if(ptMouse.x <= this._parent.rowOffset || ptMouse.y <= this._parent.colOffset){
                 return;
             }
+            this.OnLeaveEdit();
             console.log("left-mouse-down");
             this._bLeftMouseDown = true;
             let pos:CPos = this.GetCellPos(ptMouse);
@@ -322,17 +335,25 @@ namespace EasySheet{
             this.DrawVisibleCellRange(rng);
         }
         static editableCell():HTMLDivElement{
-            if($('#es-editable-cell').length == 0) {
+            let $cell = $('#es-editable-cell');
+            if($cell.length == 0) {
                 let editor: HTMLDivElement = document.createElement('div');
                 editor.contentEditable = 'true';
                 editor.style.position = "fixed";
-                editor.style.border = "1px solid #FF0000";
+                editor.style.border = "2px solid #000";
                 editor.style.zIndex = "100000";
                 editor.style.whiteSpace = "nowrap";
+                editor.style.fontSize = DEFAULT_FONT_SIZE + 'px';
+                editor.style.fontFamily = 'Aerial';
+                editor.style.verticalAlign = 'middle';
+                editor.style.outline = 'none';
+                editor.style.webkitAppearance = 'none';
+                editor.style.background = "#FFF";
                 editor.id = "es-editable-cell";
                 document.body.appendChild(editor);
                 return editor;
             }else{
+                $cell.show();
                 return <HTMLDivElement>document.getElementById('es-editable-cell');
             }
         }
@@ -362,13 +383,18 @@ namespace EasySheet{
             // Draw Grid Cells
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
             this._ctx.textBaseline="middle";
-            this._ctx.textAlign = "center";
-            this._ctx.fillStyle = "#000";
+            this._ctx.textAlign = "left";
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex; i++){
                 for(let j=rng.colStartIndex; j<rng.colEndIndex; j++){
                     let pt = this.GetItemXY(i,j);
                     let text = this.GetItemText(i,j);
-                    this._ctx.fillText(text, pt.x + CELL_WIDTH / 2, pt.y + CELL_HEIGHT / 2);
+                    if(text) {
+                        let wText:number = this._ctx.measureText(text).width;
+                        this._ctx.fillStyle = "#FFF";
+                        this._ctx.fillRect(pt.x+3, pt.y+1, wText, DEFAULT_FONT_SIZE-2);
+                        this._ctx.fillStyle = "#000";
+                        this._ctx.fillText(text, pt.x, pt.y+CELL_HEIGHT/2);
+                    }
                 }
             }
             // Draw Active Cell
@@ -443,9 +469,9 @@ namespace EasySheet{
                 let pt: CPoint = this.GetItemXY(this.activeRow, this.activeColumn);
                 let w: number = this._cols[this.activeColumn];
                 let h: number = this._rows[this.activeRow];
-                editor.style.left = pt.x + "px";
-                editor.style.top = pt.y + "px";
-                editor.style.width = w + "px";
+                editor.style.left = pt.x-1 + "px";
+                editor.style.top = pt.y-1 + "px";
+                editor.style.width = w-1 + "px";
                 editor.style.height = h + "px";
             }
             this._ctx.restore();
