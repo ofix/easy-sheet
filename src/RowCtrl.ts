@@ -31,6 +31,9 @@
          protected _x:number;
          protected _y:number;
          protected _inDrag:boolean;
+         protected _dragIndex:number;
+         protected _dragDashY:number;
+         protected _dragStartY:number;
          protected _visibleRng:CCellRange;
          protected _activeRngList:CActiveCell[][];
          protected _bLeftMouseDown:boolean;
@@ -44,6 +47,10 @@
              this._h=this.clientHeight;
              this._nRows = nRows;
              this._rows = [];
+             this._inDrag = false;
+             this._dragIndex = -1;
+             this._dragDashY = 0;
+             this._dragStartY = 0;
              this._ctx = this._parent.context;
              for(let i=0; i<this._nRows;i++){
                  this._rows.push(CELL_HEIGHT);
@@ -89,13 +96,24 @@
          OnGridSelectCell = ():void =>{
              this._activeRngList = [];
          };
-         OnDragStart(ptCursor:CPoint):void{
+         OnDragStart(ptCursor:CPoint,dragIndex:number,dragStartPos:number):void{
             this._inDrag = true;
+            this._dragIndex = dragIndex;
+            this._dragStartY = dragStartPos;
          }
          OnDragging(ptCursor:CPoint):void{
+             if(this._dragStartY +2 >= ptCursor.y){
+                 this._dragDashY = this._dragStartY+2;
+             }else{
+                 this._dragDashY = ptCursor.y;
+             }
          }
          OnDragEnd(ptCursor:CPoint):void{
              this._inDrag = false;
+             this._rows[this._dragIndex] = ptCursor.y - this._dragStartY;
+             this._dragIndex = -1;
+             this._dragDashY = -1;
+             this._dragStartY = 0;
          }
          ScrollX(delta:number):void{
              this._x = delta;
@@ -247,10 +265,10 @@
                      }
                  }
              }
+             // draw drag dash line
+             this._ctx.strokeStyle = CLR_BAR_SEP;
+             drawDashLine(this._ctx,0,this._dragDashY,this.clientWidth,this._dragDashY,5);
              this._ctx.restore();
-         }
-         drawDragLine():void{
-
          }
      }
  }

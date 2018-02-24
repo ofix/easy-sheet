@@ -15,7 +15,7 @@
 
 namespace EasySheet{
    export interface IDraggable{
-        OnDragStart(ptCursor:CPoint):void;
+        OnDragStart(ptCursor:CPoint,dragIndex:number,dragStartPos:number):void;
         OnDragging(ptCursor:CPoint):void;
         OnDragEnd(ptCursor:CPoint):void;
     }

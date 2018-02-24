@@ -29,6 +29,22 @@ function ScreenToClient(pt:CPoint){
     pt.y -= app.view.colOffset;
     return pt;
 }
+function drawDashLine(ctx:CanvasRenderingContext2D, x1:number, y1:number, x2:number, y2:number, dashLength:number) {
+    let dashLen: number = dashLength === undefined ? 5 : dashLength,
+        xPos: number = x2 - x1, //得到横向的宽度;
+        yPos: number = y2 - y1, //得到纵向的高度;
+        numDashes = Math.floor(Math.sqrt(xPos * xPos + yPos * yPos) / dashLen);
+    //利用正切获取斜边的长度除以虚线长度，得到要分为多少段;
+    for (let i = 0; i < numDashes; i++) {
+        if (i % 2 === 0) {
+            ctx.moveTo(x1 + (xPos / numDashes) * i, y1 + (yPos / numDashes) * i);
+            //有了横向宽度和多少段，得出每一段是多长，起点 + 每段长度 * i = 要绘制的起点；
+        } else {
+            ctx.lineTo(x1 + (xPos / numDashes) * i, y1 + (yPos / numDashes) * i);
+        }
+    }
+    ctx.stroke();
+}
 function ClientToScreen(pt:CPoint){
     pt.x += app.view.rowOffset;
     pt.y += app.view.colOffset;

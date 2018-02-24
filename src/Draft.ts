@@ -21,7 +21,7 @@ namespace EasySheet{
             }
             localStorage.setItem(key,value);
         }
-        read<T>(key:string):T{
+        read<T>(key:string):any{
             let value:string = localStorage.getItem(key);
             if(value && value != "undefined" && value != "null"){
 

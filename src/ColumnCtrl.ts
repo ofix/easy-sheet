@@ -24,6 +24,9 @@ namespace EasySheet {
         protected _nCols;
         protected _cols:number[];
         protected _inDrag:boolean;
+        protected _dragIndex:number;
+        protected _dragStartX:number;
+        protected _dragDashX:number;
         protected _bLeftMouseDown:boolean;
         protected _bRightMouseDown:boolean;
         protected _visibleRng:CCellRange;
@@ -34,6 +37,9 @@ namespace EasySheet {
             this.CreateWindow("1000",FIXED_CELL_WIDTH,0,wWin-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
+            this._dragIndex = -1;
+            this._dragStartX = 0;
+            this._dragDashX = 0;
             this._bLeftMouseDown = false;
             this._bRightMouseDown = false;
             for(let i=0; i<this._nCols; i++){
@@ -57,16 +63,76 @@ namespace EasySheet {
         OnGridSelectCell = ():void =>{
             this._activeRngList = [];
         };
-        OnDragStart(ptCursor:CPoint):void{
+        OnDragStart(ptCursor:CPoint,dragIndex:number,dragStartPos:number):void{
             this._inDrag = true;
+            this._dragIndex = dragIndex;
+            this._dragStartX = dragStartPos;
         }
         OnDragging(ptCursor:CPoint):void{
+            if(ptCursor.x-2 <this._dragStartX){
+                this._dragDashX = this._dragStartX+2;
+            }else{
+                this._dragDashX = ptCursor.x;
+            }
+            this.Draw();
         }
         OnDragEnd(ptCursor:CPoint):void{
+            this._cols[this._dragIndex] = ptCursor.x - this._dragStartX;
             this._inDrag = false;
+            this._dragIndex = -1;
+            this._dragDashX  = 0;
+            this.Draw();
+            this.ChangeCursor("default");
         }
         OnMouseMove(ptCursor:CPoint):void{
             this.OnHitTest(ptCursor);
+        }
+        OnHitTest(ptCursor:CPoint):void{
+            if(this._bLeftMouseDown) {
+                if(this._inDrag){ //如果当前正在拖拽，需要更新拖拽的位置
+                    this.OnDragging(ptCursor);
+                }else {
+                    if (ptCursor.y >= 0 && ptCursor.y <= this._h) {
+                        let rng: CCellRange = this.visibleRng;
+                        let x: number = app.view.rowOffset;
+                        for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
+                            if (x + 2 < ptCursor.x && (x + this._cols[i] - 2) > ptCursor.x) {
+                                app.view.gridState = GDS_SELECT_COLUMN;
+                                app.view.activeColumn = i;
+                                app.view.activeRow = -1;
+                                this._activeRngList = [];
+                                break;
+                            }
+                            x += this._cols[i];
+                        }
+                    }
+                }
+            }else {
+                if (this._inDrag) {
+                    this.OnDragEnd(ptCursor);
+                } else {
+                    if (ptCursor.y >= 0 && ptCursor.y <= this._h) {
+                        let rng: CCellRange = this.visibleRng;
+                        let x = app.view.rowOffset;
+                        let bHorizontalResize = false;
+                        for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
+                            x += this._cols[i];
+                            if (x - 2 <= ptCursor.x && x + 2 >= ptCursor.x) {
+                                bHorizontalResize = true;
+                                break;
+                            } else if (x + 2 === ptCursor.x) {
+                                this.OnDragStart(ptCursor, i, x);
+                                break;
+                            }
+                        }
+                        if (bHorizontalResize) {
+                            this.ChangeCursor("w-resize");
+                        } else {
+                            this.ChangeCursor("default");
+                        }
+                    }
+                }
+            }
         }
         SetVisibleCellRange():void{
             let scrollX:number = this._x-FIXED_CELL_WIDTH;
@@ -101,42 +167,6 @@ namespace EasySheet {
         }
         OnRightMouseUp(ptMouse:CPoint):void{
             this._bRightMouseDown = false;
-        }
-        OnHitTest(ptCursor:CPoint):void{
-            if(this._bLeftMouseDown) {
-                if(ptCursor.y >=0 && ptCursor.y <= this._h) {
-                    let rng:CCellRange = this.visibleRng;
-                    let x:number = app.view.rowOffset;
-                    for(let i = rng.colStartIndex; i<rng.colEndIndex;i++){
-                        if(x+2 < ptCursor.x && (x+this._cols[i]-2) >ptCursor.x){
-                            app.view.gridState = GDS_SELECT_COLUMN;
-                            app.view.activeColumn = i;
-                            app.view.activeRow = -1;
-                            this._activeRngList = [];
-                            break;
-                        }
-                        x+=this._cols[i];
-                    }
-                }
-            }else{
-                if(ptCursor.y >=0 && ptCursor.y <= this._h){
-                    let rng: CCellRange = this.visibleRng;
-                    let x = app.view.rowOffset;
-                    let bHorizontalResize = false;
-                    for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
-                        x += this._cols[i];
-                        if(x-2 <= ptCursor.x && x+2 >= ptCursor.x){
-                            bHorizontalResize = true;
-                            break;
-                        }
-                    }
-                    if(bHorizontalResize){
-                        this.ChangeCursor("w-resize");
-                    }else{
-                        this.ChangeCursor("default");
-                    }
-                }
-            }
         }
         ChangeCursor(cursor:string){
             this._canvas.style.cursor = cursor;
@@ -210,7 +240,6 @@ namespace EasySheet {
             // draw active column
             this.DrawActiveCell(activeCol);
             // draw active range list
-            console.log(JSON.stringify(this._activeRngList));
             for(let i=0,len=this._activeRngList.length; i<len;i++){
                 let rng:CActiveCell[] = this._activeRngList[i];
                 let iColStart:number = Math.min(rng[0].iCol,rng[1].iCol);
@@ -221,6 +250,9 @@ namespace EasySheet {
                     }
                 }
             }
+            // draw drag dash line
+            this._ctx.strokeStyle = CLR_BAR_SEP;
+            drawDashLine(this._ctx,this._dragDashX,0,this._dragDashX,this.clientHeight,5);
             this._ctx.restore();
         }
     }
