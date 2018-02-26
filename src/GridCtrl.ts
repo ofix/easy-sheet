@@ -252,12 +252,10 @@ namespace EasySheet{
                 return;
             }
             this.bInEdit = true;
-            console.log("dbl-click");
         }
         OnLeaveEdit():void{
             this.bInEdit = false;
             this._lastEditCell = this._activeCell;
-            console.log(this._activeCell);
             let $cell = $('#es-editable-cell');
             let text:string = $cell.text();
             this.SetItemText(this._lastEditCell.iRow,this._lastEditCell.iCol,text);
@@ -269,7 +267,6 @@ namespace EasySheet{
                 return;
             }
             this.OnLeaveEdit();
-            console.log("left-mouse-down");
             this._bLeftMouseDown = true;
             let pos:CPos = this.GetCellPos(ptMouse);
             this._activeCell.iRow = pos.iRow;
@@ -491,7 +488,6 @@ namespace EasySheet{
                 let colEnd = Math.max(this.activeColumn,this.activeEndColumn);
                 let pt1 = this.GetItemXY(rowStart, colStart);
                 let pt2 = this.GetItemXY(rowEnd,colEnd);
-                // console.log("(row,col,rowEnd,colEnd) = ",rowStart,colStart,rowEnd,colEnd);
                 let w = pt2.x-pt1.x + this._cols[colEnd];
                 let h = pt2.y-pt1.y + this._rows[rowEnd];
                 this._ctx.strokeStyle = CLR_ACTIVE_CELL;

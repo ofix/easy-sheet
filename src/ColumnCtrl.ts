@@ -126,7 +126,6 @@ namespace EasySheet {
                 }
             }else {
                 if (this._inDrag) {
-                    console.log("onDragEnd.......");
                     this.OnDragEnd(ptCursor);
                 } else {
                     if (ptCursor.y >= 0 && ptCursor.y <= this._h) {
@@ -177,7 +176,6 @@ namespace EasySheet {
         OnLeftMouseUp(ptMouse:CPoint):void{
             this._bLeftMouseDown = false;
             if (this._inDrag) {
-                console.log("onDragEnd.......");
                 this.OnDragEnd(ptMouse);
             }
         }

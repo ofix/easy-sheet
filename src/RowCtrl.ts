@@ -23,6 +23,9 @@
      import CEventNotifier = Core.CEventNotifier;
      import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
      import NM_GRID_SELECT_CELL = Core.NM_GRID_SELECT_CELL;
+     import NM_ROW_DRAGGING = Core.NM_ROW_DRAGGING;
+     import NM_ROW_DRAG_START = Core.NM_ROW_DRAG_START;
+     import NM_ROW_DRAG_END = Core.NM_ROW_DRAG_END;
      export class CRowCtrl extends CWnd implements IDraggable{
          protected _nRows:number;
          protected _parent:CView;
@@ -100,6 +103,7 @@
             this._inDrag = true;
             this._dragIndex = dragIndex;
             this._dragStartY = dragStartPos;
+             CEventNotifier.Trigger(NM_ROW_DRAG_START,this._dragDashY);
          }
          OnDragging(ptCursor:CPoint):void{
              if(this._dragStartY +2 >= ptCursor.y){
@@ -107,13 +111,22 @@
              }else{
                  this._dragDashY = ptCursor.y;
              }
+             this._rows[this._dragIndex] = this._dragDashY - this._dragStartY;
+             CEventNotifier.Trigger(NM_ROW_DRAGGING,this._dragDashY);
          }
          OnDragEnd(ptCursor:CPoint):void{
              this._inDrag = false;
+             if(ptCursor.y-2 <this._dragStartY){
+                 this._dragDashY = this._dragStartY+2;
+             }else{
+                 this._dragDashY = ptCursor.y;
+             }
+             this._rows[this._dragIndex] = this._dragDashY - this._dragStartY;
+             CEventNotifier.Trigger(NM_ROW_DRAG_END,this._dragIndex,this._rows[this._dragIndex]);
              this._rows[this._dragIndex] = ptCursor.y - this._dragStartY;
              this._dragIndex = -1;
-             this._dragDashY = -1;
-             this._dragStartY = 0;
+             this._dragDashY = 0;
+             this._dragStartY= 0;
          }
          ScrollX(delta:number):void{
              this._x = delta;
@@ -149,6 +162,9 @@
          }
          OnLeftMouseUp(ptMouse:CPoint):void{
             this._bLeftMouseDown = false;
+            if (this._inDrag) {
+                this.OnDragEnd(ptMouse);
+            }
          }
          OnRightMouseDown(ptMouse:CPoint):void{
              this._bRightMouseDown = true;
@@ -157,37 +173,51 @@
              this._bRightMouseDown = false;
          }
          OnHitTest(ptCursor:CPoint):void{
-             if(!this._bLeftMouseDown) {
-                 if(ptCursor.x >=0 && ptCursor.x <= this._w){
-                     let rng: CCellRange = this.visibleRng;
-                     let y:number = this.colOffset;
-                     let bVerticalResize:boolean = false;
-                     for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
-                         y += this._rows[i];
-                         if(y-2 <= ptCursor.y && y+2 >= ptCursor.y){
-                             bVerticalResize = true;
-                             break;
+             if(this._bLeftMouseDown) {
+                 if(this._inDrag){ //如果当前正在拖拽，需要更新拖拽的位置
+                     this.OnDragging(ptCursor);
+                 }else {
+                     if (ptCursor.x >= 0 && ptCursor.x <= this._w) {
+                         let rng: CCellRange = this.visibleRng;
+                         let y: number = this.colOffset;
+                         for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
+                             if (y + 2 < ptCursor.y && (y + this._rows[i] - 2) > ptCursor.y) {
+                                 app.view.gridState = GDS_SELECT_ROW;
+                                 app.view.activeColumn = -1;
+                                 app.view.activeRow = i;
+                                 this._activeRngList = [];
+                                 break;
+                             }
+                             if (ptCursor.y - 2 < y && ptCursor.y + 2 > y) {
+                                 if (!this._inDrag) {
+                                     this.OnDragStart(ptCursor, i - 1, y - this._rows[i - 1]);
+                                     break;
+                                 }
+                             }
+                             y += this._rows[i];
                          }
-                     }
-                     if(bVerticalResize){
-                         this._parent.ChangeCursor("s-resize");
-                     }else{
-                         this._parent.ChangeCursor("default");
                      }
                  }
-             }else{
-                 if(ptCursor.x >=0 && ptCursor.x <= this._w) {
-                     let rng:CCellRange = this.visibleRng;
-                     let y:number = this.colOffset;
-                     for(let i = rng.rowStartIndex; i<rng.rowEndIndex;i++){
-                         if(y+2 < ptCursor.y && (y+this._rows[i]-2) >ptCursor.y){
-                             app.view.gridState = GDS_SELECT_ROW;
-                             app.view.activeColumn = -1;
-                             app.view.activeRow = i;
-                             this._activeRngList = [];
-                             break;
+             }else {
+                 if (this._inDrag) {
+                     this.OnDragEnd(ptCursor);
+                 } else {
+                     if (ptCursor.x >= 0 && ptCursor.x <= this._w) {
+                         let rng: CCellRange = this.visibleRng;
+                         let y: number = this.colOffset;
+                         let bVerticalResize: boolean = false;
+                         for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
+                             y += this._rows[i];
+                             if (y - 2 <= ptCursor.y && y + 2 >= ptCursor.y) {
+                                 bVerticalResize = true;
+                                 break;
+                             }
                          }
-                         y+=this._rows[i];
+                         if (bVerticalResize) {
+                             this._parent.ChangeCursor("s-resize");
+                         } else {
+                             this._parent.ChangeCursor("default");
+                         }
                      }
                  }
              }
@@ -221,6 +251,7 @@
          Draw():void{
              let rng:CCellRange = this.visibleRng;
              let hTotal:number=this._y;
+             console.log("hTotal =",hTotal);
              this._ctx.save();
              this._ctx.translate(0.5,0.5);
              this._ctx.fillStyle=CLR_BAR_FILL;
@@ -235,7 +266,7 @@
              for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                  let name:string = i+"";
                  if(i != activeRow) {
-                     this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + CELL_HEIGHT / 2);
+                     this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + this._rows[i]/ 2);
                  }
                  hTotal+=this._rows[i];
                  this._ctx.moveTo(this._x,hTotal);
@@ -265,9 +296,6 @@
                      }
                  }
              }
-             // draw drag dash line
-             this._ctx.strokeStyle = CLR_BAR_SEP;
-             drawDashLine(this._ctx,0,this._dragDashY,this.clientWidth,this._dragDashY,5);
              this._ctx.restore();
          }
      }
