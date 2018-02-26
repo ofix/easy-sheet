@@ -26,7 +26,13 @@ namespace EasySheet{
     import CEventNotifier = Core.CEventNotifier;
     import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
     import NM_GRID_SELECT_CELL = Core.NM_GRID_SELECT_CELL;
-    export class CGridCtrl implements IDraggable{
+    import NM_ROW_DRAG_START = Core.NM_ROW_DRAG_START;
+    import NM_ROW_DRAGGING = Core.NM_ROW_DRAGGING;
+    import NM_ROW_DRAG_END = Core.NM_ROW_DRAG_END;
+    import NM_COLUMN_DRAG_START = Core.NM_COLUMN_DRAG_START;
+    import NM_COLUMN_DRAGGING = Core.NM_COLUMN_DRAGGING;
+    import NM_COLUMN_DRAG_END = Core.NM_COLUMN_DRAG_END;
+    export class CGridCtrl{
         protected _x:number;
         protected _y:number;
         protected _w:number;
@@ -35,7 +41,10 @@ namespace EasySheet{
         protected _nCols:number;
         protected _rows:any[];
         protected _cols:any[];
-        protected _inDrag:boolean;
+        protected _inRowDrag:boolean;
+        protected _inColumnDrag:boolean;
+        protected _dragDashX:number;
+        protected _dragDashY:number;
         protected _parent:CView;
         protected _cacheExist:boolean;
         protected _ctx:CanvasRenderingContext2D;
@@ -86,6 +95,16 @@ namespace EasySheet{
             this._ctx = this._parent.context;
             this.CreateCacheCtx();
             this.MakeCanvasList();
+            this._inColumnDrag = false;
+            this._inRowDrag = false;
+            this._dragDashX = 0;
+            this._dragDashY = 0;
+            CEventNotifier.On(NM_ROW_DRAG_START,this.OnRowDragStart);
+            CEventNotifier.On(NM_ROW_DRAGGING,this.OnRowDragging);
+            CEventNotifier.On(NM_ROW_DRAG_END,this.OnRowDragEnd);
+            CEventNotifier.On(NM_COLUMN_DRAG_START,this.OnColumnDragStart);
+            CEventNotifier.On(NM_COLUMN_DRAGGING,this.OnColumnDragging);
+            CEventNotifier.On(NM_COLUMN_DRAG_END,this.OnColumnDragEnd);
         }
         get colOffset():number{
             return this._parent.colOffset;
@@ -174,15 +193,34 @@ namespace EasySheet{
             this._cacheCanvas.height = this._h;
             this._cacheCtx = this._cacheCanvas.getContext("2d");
         }
-        OnDragStart(ptCursor:CPoint):void{
-            this._inDrag = true;
-        }
-        OnDragging(ptCursor:CPoint):void{
-
-        }
-        OnDragEnd(ptCursor:CPoint):void{
-            this._inDrag = false;
-        }
+        OnRowDragStart = (dragDashY:number):void=>{
+            this._inRowDrag = true;
+            this._dragDashY = dragDashY;
+            this._parent.Draw();
+        };
+        OnRowDragging = (dragDashY:number):void=>{
+            this._dragDashY = dragDashY;
+            this._parent.Draw();
+        };
+        OnRowDragEnd =(dragRowIndex:number,dragRowHeight:number):void=>{
+            this._inRowDrag = false;
+            this._rows[dragRowIndex] = dragRowHeight;
+            this._parent.Draw();
+        };
+        OnColumnDragStart = (dragDashX:number):void=>{
+            this._inColumnDrag = true;
+            this._dragDashX = dragDashX;
+            this._parent.Draw();
+        };
+        OnColumnDragging = (dragDashX:number):void=>{
+            this._dragDashX = dragDashX;
+            this._parent.Draw();
+        };
+        OnColumnDragEnd=(dragColumnIndex:number,dragColumnWidth:number):void=>{
+            this._inColumnDrag = false;
+            this._cols[dragColumnIndex] = dragColumnWidth;
+            this._parent.Draw();
+        };
         OnKeyDirLeft():void{
             this.gridState = GDS_SELECT_CELL;
             this._activeCell.Left();
@@ -363,9 +401,11 @@ namespace EasySheet{
             this._ctx.save();
             this._ctx.translate(rng.xPad+0.5,rng.yPad+0.5);
             // Fill Background
+            this._ctx.beginPath();
             this._ctx.fillStyle = "#FFF";
             this._ctx.fillRect(0,0,this.clientWidth,this.clientHeight);
             this._ctx.strokeStyle = "#C5C5C5";
+            this._ctx.closePath();
             // Draw Row Lines
             this._ctx.beginPath();
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
@@ -474,6 +514,19 @@ namespace EasySheet{
                 editor.style.width = w-1 + "px";
                 editor.style.height = h + "px";
             }
+            // draw column drag dash line
+            if(this._inColumnDrag) {
+                this._ctx.strokeStyle = CLR_BAR_SEP;
+                let hWin = $(window).height();
+                drawDashLine(this._ctx, this._dragDashX, 0, this._dragDashX, hWin, 5);
+            }
+            // draw row drag dash line
+            if(this._inRowDrag) {
+                this._ctx.strokeStyle = CLR_BAR_SEP;
+                let wWin = $(window).width();
+                drawDashLine(this._ctx, 0,this._dragDashY, wWin, this._dragDashY, 5);
+            }
+            this._ctx.closePath();
             this._ctx.restore();
         }
     }

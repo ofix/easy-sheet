@@ -20,6 +20,9 @@ namespace EasySheet {
     import CEventNotifier = Core.CEventNotifier;
     import NM_GRID_SELECT_RANGE = Core.NM_GRID_SELECT_RANGE;
     import NM_GRID_SELECT_CELL = Core.NM_GRID_SELECT_CELL;
+    import NM_COLUMN_DRAG_START = Core.NM_COLUMN_DRAG_START;
+    import NM_COLUMN_DRAGGING = Core.NM_COLUMN_DRAGGING;
+    import NM_COLUMN_DRAG_END = Core.NM_COLUMN_DRAG_END;
     export class CColumnCtrl extends CWnd implements IDraggable{
         protected _nCols;
         protected _cols:number[];
@@ -37,6 +40,7 @@ namespace EasySheet {
             this.CreateWindow("1000",FIXED_CELL_WIDTH,0,wWin-18,CELL_HEIGHT,nCols*CELL_WIDTH,CELL_HEIGHT,true);
             this._nCols = nCols;
             this._cols = [];
+            this._inDrag = false;
             this._dragIndex = -1;
             this._dragStartX = 0;
             this._dragDashX = 0;
@@ -67,6 +71,7 @@ namespace EasySheet {
             this._inDrag = true;
             this._dragIndex = dragIndex;
             this._dragStartX = dragStartPos;
+            CEventNotifier.Trigger(NM_COLUMN_DRAG_START,this._dragDashX);
         }
         OnDragging(ptCursor:CPoint):void{
             if(ptCursor.x-2 <this._dragStartX){
@@ -74,14 +79,20 @@ namespace EasySheet {
             }else{
                 this._dragDashX = ptCursor.x;
             }
-            this.Draw();
+            this._cols[this._dragIndex] = this._dragDashX - this._dragStartX;
+            CEventNotifier.Trigger(NM_COLUMN_DRAGGING,this._dragDashX);
         }
         OnDragEnd(ptCursor:CPoint):void{
-            this._cols[this._dragIndex] = ptCursor.x - this._dragStartX;
+            if(ptCursor.x-2 <this._dragStartX){
+                this._dragDashX = this._dragStartX+2;
+            }else{
+                this._dragDashX = ptCursor.x;
+            }
+            this._cols[this._dragIndex] = this._dragDashX - this._dragStartX;
+            CEventNotifier.Trigger(NM_COLUMN_DRAG_END,this._dragIndex,this._cols[this._dragIndex]);
             this._inDrag = false;
             this._dragIndex = -1;
-            this._dragDashX  = 0;
-            this.Draw();
+            this._dragDashX = 0;
             this.ChangeCursor("default");
         }
         OnMouseMove(ptCursor:CPoint):void{
@@ -96,12 +107,18 @@ namespace EasySheet {
                         let rng: CCellRange = this.visibleRng;
                         let x: number = app.view.rowOffset;
                         for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
-                            if (x + 2 < ptCursor.x && (x + this._cols[i] - 2) > ptCursor.x) {
+                            if (x+2  < ptCursor.x && (x + this._cols[i]-2) > ptCursor.x) {
                                 app.view.gridState = GDS_SELECT_COLUMN;
                                 app.view.activeColumn = i;
                                 app.view.activeRow = -1;
                                 this._activeRngList = [];
                                 break;
+                            }
+                            if(ptCursor.x-2<x && ptCursor.x+2>x) {
+                                if(!this._inDrag) {
+                                    this.OnDragStart(ptCursor, i-1, x-this._cols[i-1]);
+                                    break;
+                                }
                             }
                             x += this._cols[i];
                         }
@@ -109,6 +126,7 @@ namespace EasySheet {
                 }
             }else {
                 if (this._inDrag) {
+                    console.log("onDragEnd.......");
                     this.OnDragEnd(ptCursor);
                 } else {
                     if (ptCursor.y >= 0 && ptCursor.y <= this._h) {
@@ -117,11 +135,8 @@ namespace EasySheet {
                         let bHorizontalResize = false;
                         for (let i = rng.colStartIndex; i < rng.colEndIndex; i++) {
                             x += this._cols[i];
-                            if (x - 2 <= ptCursor.x && x + 2 >= ptCursor.x) {
+                            if(ptCursor.x-2<x && ptCursor.x+2>x) {
                                 bHorizontalResize = true;
-                                break;
-                            } else if (x + 2 === ptCursor.x) {
-                                this.OnDragStart(ptCursor, i, x);
                                 break;
                             }
                         }
@@ -161,6 +176,10 @@ namespace EasySheet {
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
             this._bLeftMouseDown = false;
+            if (this._inDrag) {
+                console.log("onDragEnd.......");
+                this.OnDragEnd(ptMouse);
+            }
         }
         OnRightMouseDown(ptMouse:CPoint):void{
             this._bRightMouseDown = true;
@@ -215,7 +234,9 @@ namespace EasySheet {
             this._ctx.save();
             this._ctx.translate(0.5,0.5);
             this._ctx.fillStyle=CLR_BAR_FILL;
+            this._ctx.beginPath();
             this._ctx.fillRect(this._x,this._y,this.clientWidth,this.clientHeight);
+            this._ctx.closePath();
 
             this._ctx.font = DEFAULT_FONT_SIZE + 'px '+"Arial";
             this._ctx.textBaseline = "middle";
@@ -250,9 +271,6 @@ namespace EasySheet {
                     }
                 }
             }
-            // draw drag dash line
-            this._ctx.strokeStyle = CLR_BAR_SEP;
-            drawDashLine(this._ctx,this._dragDashX,0,this._dragDashX,this.clientHeight,5);
             this._ctx.restore();
         }
     }
