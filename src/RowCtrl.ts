@@ -28,7 +28,6 @@
      import NM_ROW_DRAG_END = Core.NM_ROW_DRAG_END;
      export class CRowCtrl extends CWnd implements IDraggable{
          protected _nRows:number;
-         protected _parent:CView;
          protected _rows:number[];
          protected _ctx:CanvasRenderingContext2D;
          protected _x:number;
@@ -41,12 +40,13 @@
          protected _activeRngList:CActiveCell[][];
          protected _bLeftMouseDown:boolean;
          protected _bRightMouseDown:boolean;
-         constructor(parentWnd:CView,nRows:number){
+         constructor(nRows:number){
              super("es-row-ctrl");
-             this._parent = parentWnd;
+             let hWin = $(window).height();
+             this.CreateWindow("1000",FIXED_CELL_WIDTH,0,FIXED_CELL_WIDTH,hWin,FIXED_CELL_WIDTH,nRows*CELL_HEIGHT,true);
              this._x=0;
              this._y=CELL_HEIGHT;
-             this._w=this.rowOffset;
+             this._w=FIXED_CELL_WIDTH;
              this._h=this.clientHeight;
              this._nRows = nRows;
              this._rows = [];
@@ -54,7 +54,6 @@
              this._dragIndex = -1;
              this._dragDashY = 0;
              this._dragStartY = 0;
-             this._ctx = this._parent.context;
              for(let i=0; i<this._nRows;i++){
                  this._rows.push(CELL_HEIGHT);
              }
@@ -74,18 +73,10 @@
          get visibleRng():CCellRange{
              return this._visibleRng;
          }
-         get colOffset():number{
-             return this._parent.colOffset;
+         get offsetY():number{
+             return CELL_HEIGHT;
          }
-         get rowOffset():number{
-             return this._parent.rowOffset;
-         }
-         get clientWidth():number{
-             return this._w;
-         }
-         get clientHeight():number{
-             return this._parent.clientHeight;
-         }
+
          OnSize(wWin:number,hWin:number):void{
             this.Draw();
          }
@@ -179,7 +170,7 @@
                  }else {
                      if (ptCursor.x >= 0 && ptCursor.x <= this._w) {
                          let rng: CCellRange = this.visibleRng;
-                         let y: number = this.colOffset;
+                         let y: number = this.offsetY;
                          for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
                              if (y + 2 < ptCursor.y && (y + this._rows[i] - 2) > ptCursor.y) {
                                  app.view.gridState = GDS_SELECT_ROW;
@@ -204,23 +195,21 @@
                  } else {
                      if (ptCursor.x >= 0 && ptCursor.x <= this._w) {
                          let rng: CCellRange = this.visibleRng;
-                         let y: number = this.colOffset;
-                         let bVerticalResize: boolean = false;
+                         let y: number = this.offsetY;
                          for (let i = rng.rowStartIndex; i < rng.rowEndIndex; i++) {
                              y += this._rows[i];
                              if (y - 2 <= ptCursor.y && y + 2 >= ptCursor.y) {
-                                 bVerticalResize = true;
-                                 break;
+                                 this.ChangeCursor("s-resize");
+                                 return;
                              }
                          }
-                         if (bVerticalResize) {
-                             this._parent.ChangeCursor("s-resize");
-                         } else {
-                             this._parent.ChangeCursor("default");
-                         }
+                         this.ChangeCursor("default");
                      }
                  }
              }
+         }
+         ChangeCursor(cursor:string){
+             this._canvas.style.cursor = cursor;
          }
          getColumnY(iRow:number){
              let rng = this.visibleRng;
@@ -251,7 +240,6 @@
          Draw():void{
              let rng:CCellRange = this.visibleRng;
              let hTotal:number=this._y;
-             console.log("hTotal =",hTotal);
              this._ctx.save();
              this._ctx.translate(0.5,0.5);
              this._ctx.fillStyle=CLR_BAR_FILL;
@@ -266,7 +254,7 @@
              for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                  let name:string = i+"";
                  if(i != activeRow) {
-                     this._ctx.fillText(name, FIXED_CELL_WIDTH / 2, hTotal + this._rows[i]/ 2);
+                     this._ctx.fillText(name, this._w / 2, hTotal + this._rows[i]/ 2);
                  }
                  hTotal+=this._rows[i];
                  this._ctx.moveTo(this._x,hTotal);

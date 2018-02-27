@@ -278,7 +278,6 @@ namespace EasySheet{
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
             this._bLeftMouseDown = false;
-            this.gridState = GDS_SELECT_NONE;
         }
         OnRightMouseDown(ptMouse:CPoint):void{
             this._bRightMouseDown = false;

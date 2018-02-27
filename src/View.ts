@@ -46,7 +46,7 @@ namespace EasySheet{
             this._rowOffset = FIXED_CELL_WIDTH;
             this._colOffset = CELL_HEIGHT;
             this._gridCtrl = new CGridCtrl(this,nRows,nCols);
-            this._rowCtrl = new CRowCtrl(this,nRows);
+            this._rowCtrl = new CRowCtrl(nRows);
             this._colCtrl = new CColumnCtrl(52);
             this._cornerCtrl = new CCornerCtrl();
             this._xScrollBar = new CScrollBarCtrl(this,"horizontal-scroll-bar",CScrollBarCtrl.SBC_HORZ);
@@ -130,8 +130,6 @@ namespace EasySheet{
         }
         OnMouseMove(ptMouse:CPoint):void{
             this._gridCtrl.OnMouseMove(ptMouse);
-            this._rowCtrl.OnMouseMove(ptMouse);
-            this._colCtrl.OnMouseMove(ptMouse);
         }
         OnDblClick(ptMouse:CPoint):void{
             this._gridCtrl.OnEnterEdit(ptMouse);
@@ -139,25 +137,17 @@ namespace EasySheet{
         }
         OnLeftMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnLeftMouseDown(ptMouse);
-            this._rowCtrl.OnLeftMouseDown(ptMouse);
-            this._colCtrl.OnLeftMouseDown(ptMouse);
             this.Draw();
         }
         OnLeftMouseUp(ptMouse:CPoint):void{
             this._gridCtrl.OnLeftMouseUp(ptMouse);
-            this._rowCtrl.OnLeftMouseUp(ptMouse);
-            this._colCtrl.OnLeftMouseUp(ptMouse);
         }
         OnRightMouseDown(ptMouse:CPoint):void{
             this._gridCtrl.OnRightMouseDown(ptMouse);
-            this._rowCtrl.OnRightMouseDown(ptMouse);
-            this._colCtrl.OnRightMouseDown(ptMouse);
             this.Draw();
         }
         OnRightMouseUp(ptMouse:CPoint):void{
             this._gridCtrl.OnRightMouseUp(ptMouse);
-            this._rowCtrl.OnRightMouseUp(ptMouse);
-            this._colCtrl.OnRightMouseUp(ptMouse);
             this.Draw();
         }
         ScrollWindow(scrollX:number,scrollY:number):void{

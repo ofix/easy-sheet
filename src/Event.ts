@@ -27,24 +27,45 @@ $(function(){
     });
     $(document).on("mousemove","#es-col-ctrl",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
-        app.view.OnMouseMove(pt);
+        app.colCtrl.OnMouseMove(pt);
     });
     $(document).on("mousedown","#es-col-ctrl",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){
-            app.view.OnLeftMouseDown(pt);
+            app.colCtrl.OnLeftMouseDown(pt);
         }else if(e.button == 2){
-            app.view.OnRightMouseDown(pt);
+            app.colCtrl.OnRightMouseDown(pt);
         }
     });
     $(document).on("mouseup","#es-col-ctrl",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){
-            app.view.OnLeftMouseUp(pt);
+            app.colCtrl.OnLeftMouseUp(pt);
         }else if(e.button == 2){
-            app.view.OnRightMouseUp(pt);
+            app.colCtrl.OnRightMouseUp(pt);
         }
     });
+    $(document).on("mousemove","#es-row-ctrl",function(e){
+        let pt:CPoint = new CPoint(e.pageX,e.pageY);
+        app.rowCtrl.OnMouseMove(pt);
+    });
+    $(document).on("mousedown","#es-row-ctrl",function(e){
+        let pt:CPoint = new CPoint(e.pageX,e.pageY);
+        if(e.button == 0){
+            app.rowCtrl.OnLeftMouseDown(pt);
+        }else if(e.button == 2){
+            app.rowCtrl.OnRightMouseDown(pt);
+        }
+    });
+    $(document).on("mouseup","#es-row-ctrl",function(e){
+        let pt:CPoint = new CPoint(e.pageX,e.pageY);
+        if(e.button == 0){
+            app.rowCtrl.OnLeftMouseUp(pt);
+        }else if(e.button == 2){
+            app.rowCtrl.OnRightMouseUp(pt);
+        }
+    });
+
     $(document).on("mousedown","#es-view",function(e){
         let pt:CPoint = new CPoint(e.pageX,e.pageY);
         if(e.button == 0){
