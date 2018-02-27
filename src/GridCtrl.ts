@@ -428,9 +428,9 @@ namespace EasySheet{
                     if(text) {
                         let wText:number = this._ctx.measureText(text).width;
                         this._ctx.fillStyle = "#FFF";
-                        this._ctx.fillRect(pt.x+3, pt.y+1, wText, DEFAULT_FONT_SIZE-2);
+                        this._ctx.fillRect(pt.x+1, pt.y+1, wText, this._rows[i]-2);
                         this._ctx.fillStyle = "#000";
-                        this._ctx.fillText(text, pt.x, pt.y+CELL_HEIGHT/2);
+                        this._ctx.fillText(text, pt.x+3, pt.y+CELL_HEIGHT/2);
                     }
                 }
             }
