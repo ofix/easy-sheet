@@ -34,6 +34,8 @@ function drawDashLine(ctx:CanvasRenderingContext2D, x1:number, y1:number, x2:num
         xPos: number = x2 - x1, //得到横向的宽度;
         yPos: number = y2 - y1, //得到纵向的高度;
         numDashes = Math.floor(Math.sqrt(xPos * xPos + yPos * yPos) / dashLen);
+    ctx.beginPath();
+    ctx.lineWidth = 1;
     //利用正切获取斜边的长度除以虚线长度，得到要分为多少段;
     for (let i = 0; i < numDashes; i++) {
         if (i % 2 === 0) {

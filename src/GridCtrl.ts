@@ -402,21 +402,22 @@ namespace EasySheet{
             this._ctx.fillRect(0,0,this.clientWidth,this.clientHeight);
             this._ctx.strokeStyle = "#C5C5C5";
             this._ctx.closePath();
-            // Draw Row Lines
+
+            // // Draw Row Lines
             this._ctx.beginPath();
             for(let i=rng.rowStartIndex; i<rng.rowEndIndex;i++){
                 this._ctx.moveTo(x,y+this._rows[i]);
                 this._ctx.lineTo(x+this.clientWidth,y+this._rows[i]);
                 y += this._rows[i];
             }
-            // Draw Column Lines
+            // // Draw Column Lines
             for(let j=rng.colStartIndex;j<rng.colEndIndex;j++){
                 this._ctx.moveTo(x+this._cols[j],0);
                 this._ctx.lineTo(x+this._cols[j],this.clientHeight);
                 x += this._cols[j];
             }
             this._ctx.stroke();
-            // Draw Grid Cells
+            // // Draw Grid Cells
             this._ctx.font = DEFAULT_FONT_SIZE + 'px ' + "Arial";
             this._ctx.textBaseline="middle";
             this._ctx.textAlign = "left";
@@ -521,7 +522,6 @@ namespace EasySheet{
                 let wWin = $(window).width();
                 drawDashLine(this._ctx, 0,this._dragDashY, wWin, this._dragDashY, 5);
             }
-            this._ctx.closePath();
             this._ctx.restore();
         }
     }
